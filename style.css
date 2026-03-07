@@ -4,12 +4,28 @@
                             color: #1f1f1f;
                             margin: 0;
                             line-height: 1.6;
+                            position: relative;
+                            min-height: 100vh;
+                            background-color: #f4e9ee;
+                     }
+                     body::before {
+                            content: "";
+                            position: fixed;
+                            inset: 0;
                             background-image: url("img.jpg.png.jpeg");
                             background-size: cover;
                             background-position: center;
                             background-repeat: no-repeat;
-                            background-attachment: fixed;
-                     
+                            filter: blur(8px);
+                            transform: scale(1.06);
+                            z-index: -2;
+                     }
+                     body::after {
+                            content: "";
+                            position: fixed;
+                            inset: 0;
+                            background-color: rgba(255, 245, 248, 0.28);
+                            z-index: -1;
                      }
                      .container {
                             max-width: 700px;
