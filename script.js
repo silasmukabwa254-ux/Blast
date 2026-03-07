@@ -1,0 +1,118 @@
+const button = document.getElementById("welcomeBtn");
+const message = document.getElementById("message");
+const nameInput = document.getElementById("nameInput");
+const nameError = document.getElementById("nameError");
+const savedName = localStorage.getItem("blastName");
+const messageMeta = document.getElementById("messageMeta");
+const nameCount = document.getElementById("nameCount");
+const resetBtn = document.getElementById("resetBtn");
+
+let isVisible = false;
+
+function sanitizeName(value) {
+  return value.replace(/[^a-zA-Z\s'-]/g, "").replace(/\s{2,}/g, " ");
+}
+
+function getPartOfDay(hour) {
+  if (hour < 12) return "morning";
+  if (hour < 18) return "afternoon";
+  return "evening";
+}
+
+function updateButtonState() {
+  const currentName = sanitizeName(nameInput.value).trim();
+  nameCount.textContent = `${currentName.length}/30`;
+  button.disabled = !isVisible && currentName.length === 0;
+}
+
+if (savedName) {
+  nameInput.value = sanitizeName(savedName);
+}
+
+button.textContent = "Show message";
+updateButtonState();
+
+button.addEventListener("click", function () {
+  nameError.textContent = "";
+  const name = sanitizeName(nameInput.value).trim();
+  const partOfDay = getPartOfDay(new Date().getHours());
+
+  if (!isVisible) {
+    if (name === "") {
+      nameError.textContent = "Please enter your name first.";
+      message.textContent = "";
+      message.classList.remove("show");
+      messageMeta.textContent = "";
+      button.textContent = "Show message";
+      isVisible = false;
+      updateButtonState();
+      nameInput.focus();
+      return;
+    }
+
+    if (name.length > 30) {
+      nameError.textContent = "Name must be 30 characters or less.";
+      message.textContent = "";
+      message.classList.remove("show");
+      messageMeta.textContent = "";
+      button.textContent = "Show message";
+      isVisible = false;
+      updateButtonState();
+      nameInput.focus();
+      return;
+    }
+
+    button.textContent = "Loading...";
+    button.disabled = true;
+
+    setTimeout(function () {
+      message.textContent = `Good ${partOfDay}, ${name}! Welcome to BLAST! We are thrilled to have you here. Let's embark on this journey of faith and growth together!`;
+      message.classList.add("show");
+      localStorage.setItem("blastName", name);
+
+      const now = new Date();
+      messageMeta.textContent = `Last updated: ${now.toLocaleDateString()} at ${now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+
+      button.textContent = "Hide message";
+      isVisible = true;
+      nameInput.value = "";
+      updateButtonState();
+    }, 400);
+    return;
+  }
+
+  message.textContent = "";
+  message.classList.remove("show");
+  messageMeta.textContent = "";
+  button.textContent = "Show message";
+  isVisible = false;
+  updateButtonState();
+  nameInput.focus();
+});
+
+nameInput.addEventListener("keydown", function (event) {
+  if (event.key === "Enter") {
+    button.click();
+  }
+});
+
+resetBtn.addEventListener("click", function () {
+  localStorage.removeItem("blastName");
+  nameError.textContent = "";
+  message.textContent = "";
+  message.classList.remove("show");
+  messageMeta.textContent = "";
+  nameInput.value = "";
+  button.textContent = "Show message";
+  isVisible = false;
+  updateButtonState();
+  nameInput.focus();
+});
+
+nameInput.addEventListener("input", function () {
+  nameInput.value = sanitizeName(nameInput.value);
+  if (nameError.textContent !== "") {
+    nameError.textContent = "";
+  }
+  updateButtonState();
+});
