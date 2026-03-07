@@ -16,7 +16,7 @@
                             background-size: cover;
                             background-position: center;
                             background-repeat: no-repeat;
-                            filter: blur(12px);
+                            filter: blur(22px);
                             transform: scale(1.06);
                             z-index: -2;
                      }
@@ -153,7 +153,7 @@
                         .programs {
                             margin-top: 28px;
                         }
-                     .progams h2 {
+                     .programs h2 {
                             color: #5d1029;
                             margin-bottom: 14px;
                      }
@@ -183,7 +183,7 @@
                             margin-bottom:16px;
 
                      } 
-                     .events-card {
+                     .event-card {
                             background-color: rgba(255, 248, 250, 0.95);
                             border-left: 5px solid #8b1e3f;
                             padding: 14px 16px;
