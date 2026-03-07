@@ -46,7 +46,17 @@
                      p, strong, #message {color: #222; }
                      .mission {color: #7a1f1f; }
                      .quote {color: #0d4ea6; }
-                     .footer { color: #333; margin-top: 20px; font-size: 14px;}
+                     .footer {
+                             color: #333; 
+                             margin-top: 20px;
+                              font-size: 14px;
+                              padding-top: 16px;
+                              border-top: 1px solid rgba(93, 16, 41, 0.12);
+                              text-align: center;
+                            }
+                            .footer p {
+                                   margin: 6px 0;
+                            }
                      
                      .founded {
                             background-color: #fff3a3;
@@ -252,6 +262,7 @@
                             background-color: rgba(255, 255, 255, 0.72);
                             padding: 10px 12px;
                             border-radius: 999px;
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
                      }
                      .site-nav a {
                             color: #8b1e3f;
