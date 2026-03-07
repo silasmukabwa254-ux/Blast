@@ -295,5 +295,22 @@
                             .footer {
                                    font-size: 12px;
                             }
+                            .site-nav {
+                                   gap: 8px;
+                                   margin-top: 10px;
+                                   margin-bottom: 18px;
+                                   padding: 8px 10px;
+                            }
+                            .program-card,
+                            .event-card,
+                            .contact,
+                            .about,
+                            .join {
+                                   padding: 14px;
+                            }
+                            .join-button {
+                                   width: 100%;
+                                   box-sizing: border-box;
+                            }
                      }
               
