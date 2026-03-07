@@ -214,6 +214,30 @@
                      .contact a:hover {
                             text-decoration: underline;
                      }
+                     .join {
+                            margin-top: 32px;
+                            text-align: center;
+                            padding: 24px 18px;
+                            background: linear-gradient(135deg, rgba(139, 30, 63, 0.12), rgba(110, 168, 255, 0.12));
+                            border-radius: 12px;
+                     }
+                     .join h2 {
+                            color: #5d1029;
+                            margin-top: 0;
+                     }
+                     .join-button {
+                            display: inline-block;
+                            margin-top: 12px;
+                            background-color: #8b1e3f;
+                            color: #fff;
+                            text-decoration: none;
+                            padding: 12px 18px;
+                            border-radius: 8px;
+                            font-weight: 600;
+                     }
+                     .join-button:hover {
+                            background-color: #6f1732;
+                     }
                      @media (max-width: 600px) {
                             .container {
                                    margin: 16px;
