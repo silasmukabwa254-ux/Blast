@@ -256,6 +256,9 @@
                      .site-nav a:hover {
                             background-color: rgba(139, 30, 63, 0.16);
                      }
+                     html {
+                            scroll-behavior: smooth;
+                     }
                      @media (max-width: 600px) {
                             .container {
                                    margin: 16px;
