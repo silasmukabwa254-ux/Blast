@@ -238,6 +238,24 @@
                      .join-button:hover {
                             background-color: #6f1732;
                      }
+                     .site-nav {
+                            display: flex;
+                            justify-content: center;
+                            flex-wrap: wrap;
+                            gap: 21px;
+                            margin-bottom: 20px;
+                     }
+                     .site-nav a {
+                            color: #8b1e3f;
+                            text-decoration: none;
+                            font-weight: 600;
+                            padding: 6px 10px;
+                            border-radius: 999px;
+                            background-color: rgba(139, 30, 63, 0.08);
+                     }
+                     .site-nav a:hover {
+                            background-color: rgba(139, 30, 63, 0.16);
+                     }
                      @media (max-width: 600px) {
                             .container {
                                    margin: 16px;
