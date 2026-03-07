@@ -157,6 +157,27 @@
                             margin-top: 0;
                             color: #7a1f1f;
                      }
+                     .events {
+                            margin-top: 32px;
+                            text-align: left;
+                     }
+                     .events h2 {
+                            color: #5d1029;
+                            text-align: center;
+                            margin-bottom:16px;
+
+                     } 
+                     .events-card {
+                            background-color: rgba(255, 248, 250, 0.95);
+                            border-left: 5px solid #8b1e3f;
+                            padding: 14px 16px;
+                            margin-bottom: 14px;
+                            border-radius: 8px;
+                     }
+                     .event-card h3 {
+                            margin-top: 0;
+                            color: #7a1f1f;
+                     }
                      @media (max-width: 600px) {
                             .container {
                                    margin: 16px;
