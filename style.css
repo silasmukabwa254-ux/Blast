@@ -206,6 +206,14 @@
                             margin-top: 0;
                             text-align: center;
                      }
+                     .contact a {
+                            color: #8b1e3f;
+                            text-decoration: none;
+                            font-weight: 600;
+                     }
+                     .contact a:hover {
+                            text-decoration: underline;
+                     }
                      @media (max-width: 600px) {
                             .container {
                                    margin: 16px;
