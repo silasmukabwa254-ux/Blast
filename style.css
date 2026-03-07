@@ -194,6 +194,18 @@
                             margin-top: 0;
                             color: #7a1f1f;
                      }
+                     .contact {
+                            margin-top: 32px;
+                            padding: 18px;
+                            background-color: rgba(255, 255, 255, 0.88);
+                            border-radius: 10px;
+                            text-align: left;
+                     }
+                     .contact h2 {
+                            color: #5d1029;
+                            margin-top: 0;
+                            text-align: center;
+                     }
                      @media (max-width: 600px) {
                             .container {
                                    margin: 16px;
