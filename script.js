@@ -123,6 +123,7 @@ const email = document.getElementById("email");
 const interest = document.getElementById("interest");
 const formFeedback = document.getElementById("formFeedback");
 const joinFields = [fullName, email, interest];
+const formButton = joinForm.querySelector(".form-button");
 
 function clearJoinFieldState() {
   joinFields.forEach(function (field) {
@@ -161,9 +162,15 @@ joinForm.addEventListener("submit", function (event) {
     return;
   }
 
-  formFeedback.classList.add("success");
-  formFeedback.textContent = "Your message has been submitted successfully.";
-  joinForm.reset();
+  formFeedback.textContent = "Submitting...";
+  formButton.disabled = true;
+
+  setTimeout(function () {
+    formFeedback.classList.add("success");
+    formFeedback.textContent = "Your message has been submitted successfully.";
+    joinForm.reset();
+    formButton.disabled = false;
+  }, 800);
 });
 
 joinFields.forEach(function (field) {

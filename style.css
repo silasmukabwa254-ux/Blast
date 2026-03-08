@@ -331,6 +331,10 @@
                      .form-button:hover {
                             background-color: #6f1732;
                      }
+                     .form-button:disabled {
+                            background-color: #aaa;
+                            cursor: not-allowed;
+                     }
                      .form-feedback {
                             margin-top: 8px;
                             font-weight: 600;
