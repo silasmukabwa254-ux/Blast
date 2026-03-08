@@ -290,6 +290,41 @@
                             margin-top: 0;
                             text-align: left;
                      }
+                     .join-form-section {
+                            margin-top: 32px;
+                            padding: 20px;
+                            background-color: rgba(255, 255, 255, 0.89);
+                            border-radius: 12px;
+                            text-align: left;
+                     }
+                     .join-form-section h2 {
+                            text-align: center;
+                            color: #5d1029;
+                            margin-top: 0;                            
+                     }
+                     .join-form {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 12px;
+                     }
+                     .join-form input,
+                     .join-form textarea {
+                            padding: 10px 12px;
+                            border: 1px solid #cfc3c8;
+                            border-radius: 8px;
+                            font: inherit;
+                     }
+                     .form-button {
+                            background-color: #8b1e3f;
+                            color: #fff;
+                            border: none;
+                            padding: 12px 16px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                     }
+                     .form-button:hover {
+                            background-color: #6f1732;
+                     }
                      @media (max-width: 600px) {
                             .container {
                                    margin: 16px;
