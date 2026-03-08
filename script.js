@@ -122,19 +122,56 @@ const fullName = document.getElementById("fullName");
 const email = document.getElementById("email");
 const interest = document.getElementById("interest");
 const formFeedback = document.getElementById("formFeedback");
+const joinFields = [fullName, email, interest];
+
+function clearJoinFieldState() {
+  joinFields.forEach(function (field) {
+    field.classList.remove("invalid");
+  });
+}
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
 
 joinForm.addEventListener("submit", function (event) {
   event.preventDefault();
+  clearJoinFieldState();
+  formFeedback.classList.remove("success");
+
+  const trimmedName = fullName.value.trim();
+  const trimmedEmail = email.value.trim();
+  const trimmedInterest = interest.value.trim();
 
   if (
-    fullName.value.trim() === "" ||
-    email.value.trim() === "" ||
-    interest.value.trim() === ""
+    trimmedName === "" ||
+    trimmedEmail === "" ||
+    trimmedInterest === ""
   ) {
+    if (trimmedName === "") fullName.classList.add("invalid");
+    if (trimmedEmail === "") email.classList.add("invalid");
+    if (trimmedInterest === "") interest.classList.add("invalid");
     formFeedback.textContent = "Please fill in all form fields.";
     return;
   }
 
+  if (!isValidEmail(trimmedEmail)) {
+    email.classList.add("invalid");
+    formFeedback.textContent = "Please enter a valid email address.";
+    return;
+  }
+
+  formFeedback.classList.add("success");
   formFeedback.textContent = "Your message has been submitted successfully.";
   joinForm.reset();
+});
+
+joinFields.forEach(function (field) {
+  field.addEventListener("input", function () {
+    field.classList.remove("invalid");
+    if (formFeedback.textContent !== "") {
+      formFeedback.textContent = "";
+      formFeedback.classList.remove("success");
+    }
+  });
 });

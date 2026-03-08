@@ -313,6 +313,12 @@
                             border: 1px solid #cfc3c8;
                             border-radius: 8px;
                             font: inherit;
+                            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+                     }
+                     .join-form input.invalid,
+                     .join-form textarea.invalid {
+                            border-color: #b00020;
+                            box-shadow: 0 0 0 3px rgba(176, 0, 32, 0.12);
                      }
                      .form-button {
                             background-color: #8b1e3f;
@@ -329,6 +335,9 @@
                             margin-top: 8px;
                             font-weight: 600;
                             color: #8b1e3f;
+                     }
+                     .form-feedback.success {
+                            color: #1f6f43;
                      }
                      @media (max-width: 600px) {
                             .container {
