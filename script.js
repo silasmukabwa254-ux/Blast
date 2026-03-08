@@ -124,6 +124,13 @@ const interest = document.getElementById("interest");
 const formFeedback = document.getElementById("formFeedback");
 const joinFields = [fullName, email, interest];
 const formButton = joinForm.querySelector(".form-button");
+const savedJoinName = localStorage.getItem("joinFullName");
+const savedJoinEmail = localStorage.getItem("joinEmail");
+const savedJoinInterest = localStorage.getItem("joinInterest");
+
+if (savedJoinName) fullName.value = savedJoinName;
+if (savedJoinEmail) email.value = savedJoinEmail;
+if (savedJoinInterest) interest.value = savedJoinInterest;
 
 function clearJoinFieldState() {
   joinFields.forEach(function (field) {
@@ -169,12 +176,18 @@ joinForm.addEventListener("submit", function (event) {
     formFeedback.classList.add("success");
     formFeedback.textContent = "Your message has been submitted successfully.";
     joinForm.reset();
+    localStorage.removeItem("joinFullName");
+    localStorage.removeItem("joinEmail");
+    localStorage.removeItem("joinInterest");
     formButton.disabled = false;
   }, 800);
 });
 
 joinFields.forEach(function (field) {
   field.addEventListener("input", function () {
+       localStorage.setItem("joinFullName", fullName.value);
+       localStorage.setItem("joinEmail", email.value);
+       localStorage.setItem("joinInterest", interest.value);
     field.classList.remove("invalid");
     if (formFeedback.textContent !== "") {
       formFeedback.textContent = "";
