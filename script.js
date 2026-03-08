@@ -116,3 +116,25 @@ nameInput.addEventListener("input", function () {
   }
   updateButtonState();
 });
+
+const joinForm = document.querySelector(".join-form");
+const fullName = document.getElementById("fullName");
+const email = document.getElementById("email");
+const interest = document.getElementById("interest");
+const formFeedback = document.getElementById("formFeedback");
+
+joinForm.addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  if (
+    fullName.value.trim() === "" ||
+    email.value.trim() === "" ||
+    interest.value.trim() === ""
+  ) {
+    formFeedback.textContent = "Please fill in all form fields.";
+    return;
+  }
+
+  formFeedback.textContent = "Your message has been submitted successfully.";
+  joinForm.reset();
+});

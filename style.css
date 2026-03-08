@@ -325,6 +325,11 @@
                      .form-button:hover {
                             background-color: #6f1732;
                      }
+                     .form-feedback {
+                            margin-top: 8px;
+                            font-weight: 600;
+                            color: #8b1e3f;
+                     }
                      @media (max-width: 600px) {
                             .container {
                                    margin: 16px;
