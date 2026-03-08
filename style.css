@@ -365,7 +365,8 @@
                             .event-card,
                             .contact,
                             .about,
-                            .join {
+                            .join,
+                            .join-form-section {
                                    padding: 14px;
                             }
                             .join-button {
