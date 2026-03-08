@@ -156,6 +156,17 @@ joinForm.addEventListener("submit", function (event) {
     trimmedEmail === "" ||
     trimmedInterest === ""
   ) {
+    if (trimmedName === "") {
+      fullName.classList.add("invalid");
+      fullName.focus();
+    } else if (trimmedEmail === "") {
+      email.classList.add("invalid");
+      email.focus();
+    } else {
+      interest.classList.add("invalid");
+      interest.focus();
+    }
+
     if (trimmedName === "") fullName.classList.add("invalid");
     if (trimmedEmail === "") email.classList.add("invalid");
     if (trimmedInterest === "") interest.classList.add("invalid");
@@ -165,6 +176,7 @@ joinForm.addEventListener("submit", function (event) {
 
   if (!isValidEmail(trimmedEmail)) {
     email.classList.add("invalid");
+    email.focus();
     formFeedback.textContent = "Please enter a valid email address.";
     return;
   }
