@@ -204,6 +204,30 @@
                             margin-top: 0;
                             color: #7a1f1f;
                      }
+                     .testimonies {
+                            margin-top: 32px;
+                            text-align: left;
+                     }
+                     .testimonies h2 {
+                            color: #5d1029;
+                            text-align: center;
+                            margin-bottom: 16px;
+                     }
+                     .testimony-card {
+                            background-color: rgba(255, 255, 255, 0.9);
+                            border-left: 4px solid #6ea8ff;
+                            padding: 14px 16px;
+                            margin-bottom: 14px;
+                            border-radius: 8px;
+                     }
+                     .testimony-card p {
+                            margin: 0 0 8px 0;
+                     }
+                     .testimony-card span {
+                            font-size: 14px;
+                            color: #555;
+                            font-style: italic;
+                     }
                      .contact {
                             margin-top: 32px;
                             padding: 18px;
@@ -394,6 +418,7 @@
                             }
                             .program-card,
                             .event-card,
+                            .testimonies,
                             .contact,
                             .about,
                             .join,
