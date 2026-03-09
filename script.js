@@ -130,6 +130,9 @@ const savedJoinInterest = localStorage.getItem("joinInterest");
 const fullNameError = document.getElementById("fullNameError");
 const emailError = document.getElementById("emailError");
 const interestError = document.getElementById("interestError");
+const fullNameCount = document.getElementById("fullNameCount");
+const emailCount = document.getElementById("emailCount");
+const interestCount = document.getElementById("interestCount");
 
 function clearJoinErrors() {
   fullNameError.textContent = "";
@@ -145,12 +148,21 @@ if (savedJoinInterest) interest.value = savedJoinInterest;
 function clearJoinFieldState() {
   joinFields.forEach(function (field) {
     field.classList.remove("invalid");
+    field.setAttribute("aria-invalid", "false");
   });
 }
 
 function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
+
+function updateJoinCounts() {
+  fullNameCount.textContent = `${fullName.value.length}/50`;
+  emailCount.textContent = `${email.value.length}/80`;
+  interestCount.textContent = `${interest.value.length}/300`;
+}
+
+updateJoinCounts();
 
 joinForm.addEventListener("submit", function (event) {
   event.preventDefault();
@@ -163,16 +175,19 @@ joinForm.addEventListener("submit", function (event) {
 
   if (trimmedName === "") {
     fullName.classList.add("invalid");
+    fullName.setAttribute("aria-invalid", "true");
     fullNameError.textContent = "Full name is required.";
   }
 
   if (trimmedEmail === "") {
     email.classList.add("invalid");
+    email.setAttribute("aria-invalid", "true");
     emailError.textContent = "Email is required.";
   }
 
   if (trimmedInterest === "") {
     interest.classList.add("invalid");
+    interest.setAttribute("aria-invalid", "true");
     interestError.textContent = "Please tell us why you want to join.";
   }
 
@@ -190,6 +205,7 @@ joinForm.addEventListener("submit", function (event) {
 
   if (!isValidEmail(trimmedEmail)) {
     email.classList.add("invalid");
+    email.setAttribute("aria-invalid", "true");
     emailError.textContent = "Please enter a valid email address.";
     email.focus();
     formFeedback.textContent = "Please enter a valid email address.";
@@ -203,6 +219,7 @@ joinForm.addEventListener("submit", function (event) {
     formFeedback.classList.add("success");
     formFeedback.textContent = "Your message has been submitted successfully.";
     joinForm.reset();
+    updateJoinCounts();
     localStorage.removeItem("joinFullName");
     localStorage.removeItem("joinEmail");
     localStorage.removeItem("joinInterest");
@@ -220,6 +237,8 @@ joinFields.forEach(function (field) {
     localStorage.setItem("joinEmail", email.value);
     localStorage.setItem("joinInterest", interest.value);
     field.classList.remove("invalid");
+    field.setAttribute("aria-invalid", "false");
+    updateJoinCounts();
     if (field === fullName) fullNameError.textContent = "";
     if (field === email) emailError.textContent = "";
     if (field === interest) interestError.textContent = "";

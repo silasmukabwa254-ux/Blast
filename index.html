@@ -95,22 +95,25 @@
 </section>
 <section class="join-form-section">
   <h2>Join Form</h2>
-  <form class="join-form">
+  <form class="join-form" novalidate>
        <label for="fullName">Full Name</label>
-       <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" maxlength="50">
-       <small id="fullNameError" class="field-error"></small>
+       <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" maxlength="50" autocomplete="name" aria-describedby="fullNameError fullNameCount" aria-invalid="false">
+       <small id="fullNameError" class="field-error" aria-live="polite"></small>
+       <small id="fullNameCount" class="field-meta">0/50</small>
 
        <label for="email">Email Address</label>
-       <input type="email" id="email" name="email" placeholder="Enter your email" maxlength="80">
-       <small id="emailError" class="field-error"></small>
+       <input type="email" id="email" name="email" placeholder="Enter your email" maxlength="80" autocomplete="email" aria-describedby="emailError emailCount" aria-invalid="false">
+       <small id="emailError" class="field-error" aria-live="polite"></small>
+       <small id="emailCount" class="field-meta">0/80</small>
 
 
        <label for="interest">Why would you like to join BLAST?</label>
-       <textarea id="interest" name="interest" rows="4" placeholder="Write your message here" maxlength="300"></textarea>
-       <small id="interestError" class="field-error"></small>
+       <textarea id="interest" name="interest" rows="4" placeholder="Write your message here" maxlength="300" aria-describedby="interestError interestCount" aria-invalid="false"></textarea>
+       <small id="interestError" class="field-error" aria-live="polite"></small>
+       <small id="interestCount" class="field-meta">0/300</small>
 
  <button type="submit" class="form-button">Submit</button>
- <p id="formFeedback" class="form-feedback"></p>
+ <p id="formFeedback" class="form-feedback" aria-live="polite"></p>
   </form>
 </section>
 <label for="nameInput" id="nameLabel">Your name</label>

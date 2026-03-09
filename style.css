@@ -322,6 +322,13 @@
                             font: inherit;
                             transition: border-color 0.2s ease, box-shadow 0.2s ease;
                      }
+                     .join-form input:focus,
+                     .join-form textarea:focus,
+                     .form-button:focus {
+                            outline: 3px solid #6ea8ff;
+                            outline-offset: 2px;
+                            border-color: #6ea8ff;
+                     }
                      .join-form input.invalid,
                      .join-form textarea.invalid {
                             border-color: #b00020;
@@ -355,6 +362,13 @@
                             font-size: 13px;
                             color: #b00020;
                             margin-top: -4px;
+                     }
+                     .field-meta {
+                            display: block;
+                            margin-top: -8px;
+                            font-size: 12px;
+                            color: #666;
+                            text-align: right;
                      }
                      @media (max-width: 600px) {
                             .container {
