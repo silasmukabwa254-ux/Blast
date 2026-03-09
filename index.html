@@ -97,16 +97,16 @@
   <h2>Join Form</h2>
   <form class="join-form">
        <label for="fullName">Full Name</label>
-       <input type="text" id="fullName" name="fullName" placeholder="Enter your full name">
+       <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" maxlength="50">
        <small id="fullNameError" class="field-error"></small>
 
        <label for="email">Email Address</label>
-       <input type="email" id="email" name="email" placeholder="Enter your email">
+       <input type="email" id="email" name="email" placeholder="Enter your email" maxlength="80">
        <small id="emailError" class="field-error"></small>
 
 
        <label for="interest">Why would you like to join BLAST?</label>
-       <textarea id="interest" name="interest" rows="4" placeholder="Write your message here"></textarea>
+       <textarea id="interest" name="interest" rows="4" placeholder="Write your message here" maxlength="300"></textarea>
        <small id="interestError" class="field-error"></small>
 
  <button type="submit" class="form-button">Submit</button>
@@ -114,9 +114,7 @@
   </form>
 </section>
 <label for="nameInput" id="nameLabel">Your name</label>
-<input type="text" id="fullName" name="fullName" placeholder="Enter your name" maxlength="50">
-<input type="email" id="email" name="email" placeholder="Enter your email" maxlength="80">
-<textarea id="interest" name="interest" rows="4" placeholder="Write your message here" maxlength="300"></textarea>
+<input id="nameInput" type="text" placeholder="Enter your name" maxlength="30">
 <small id="nameError" class="error" aria-live="polite"></small>
 <button id="welcomeBtn">Show message</button>
 <button id="resetBtn">Reset</button>
