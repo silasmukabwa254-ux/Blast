@@ -208,6 +208,10 @@ joinForm.addEventListener("submit", function (event) {
     localStorage.removeItem("joinInterest");
     formButton.disabled = false;
   }, 800);
+  setTimeout(function () {
+       formFeedback.textContent ="";
+       formFeedback.classList.remove("success");
+  }, 2500);
 });
 
 joinFields.forEach(function (field) {
