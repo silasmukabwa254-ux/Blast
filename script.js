@@ -10,16 +10,55 @@ const welcomeModal = document.getElementById("welcomeModal");
 const closeWelcomeModal = document.getElementById("closeWelcomeModal");
 const dismissWelcomeModal = document.getElementById("dismissWelcomeModal");
 const exploreBlastLink = document.getElementById("exploreBlastLink");
+const welcomeModalEyebrow = document.getElementById("welcomeModalEyebrow");
+const welcomeModalTitle = document.getElementById("welcomeModalTitle");
+const welcomeModalText = document.getElementById("welcomeModalText");
 
 let isVisible = false;
+let modalTypingTimeout;
+let modalTypingDelayTimeout;
+
+const modalEyebrowText = welcomeModalEyebrow.textContent;
+const modalTitleText = welcomeModalTitle.textContent;
+const modalBodyText = welcomeModalText.textContent;
+
+function typeModalText(element, text, speed, callback) {
+  let index = 0;
+  element.textContent = "";
+
+  function typeNextCharacter() {
+    if (index < text.length) {
+      element.textContent += text.charAt(index);
+      index += 1;
+      modalTypingTimeout = setTimeout(typeNextCharacter, speed);
+      return;
+    }
+
+    if (callback) {
+      callback();
+    }
+  }
+
+  typeNextCharacter();
+}
 
 function openWelcomeModal() {
+  clearTimeout(modalTypingTimeout);
+  clearTimeout(modalTypingDelayTimeout);
   welcomeModal.classList.add("is-visible");
   welcomeModal.setAttribute("aria-hidden", "false");
   document.body.classList.add("modal-open");
+  welcomeModalEyebrow.textContent = modalEyebrowText;
+  typeModalText(welcomeModalTitle, modalTitleText, 40, function () {
+    modalTypingDelayTimeout = setTimeout(function () {
+      typeModalText(welcomeModalText, modalBodyText, 18);
+    }, 120);
+  });
 }
 
 function closeModal() {
+  clearTimeout(modalTypingTimeout);
+  clearTimeout(modalTypingDelayTimeout);
   welcomeModal.classList.remove("is-visible");
   welcomeModal.setAttribute("aria-hidden", "true");
   document.body.classList.remove("modal-open");
