@@ -6,8 +6,42 @@ const savedName = localStorage.getItem("blastName");
 const messageMeta = document.getElementById("messageMeta");
 const nameCount = document.getElementById("nameCount");
 const resetBtn = document.getElementById("resetBtn");
+const welcomeModal = document.getElementById("welcomeModal");
+const closeWelcomeModal = document.getElementById("closeWelcomeModal");
+const dismissWelcomeModal = document.getElementById("dismissWelcomeModal");
+const exploreBlastLink = document.getElementById("exploreBlastLink");
 
 let isVisible = false;
+
+function openWelcomeModal() {
+  welcomeModal.classList.add("is-visible");
+  welcomeModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+}
+
+function closeModal() {
+  welcomeModal.classList.remove("is-visible");
+  welcomeModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+}
+
+window.addEventListener("load", function () {
+  setTimeout(openWelcomeModal, 250);
+});
+
+closeWelcomeModal.addEventListener("click", closeModal);
+dismissWelcomeModal.addEventListener("click", closeModal);
+exploreBlastLink.addEventListener("click", closeModal);
+welcomeModal.addEventListener("click", function (event) {
+  if (event.target.dataset.closeModal === "true") {
+    closeModal();
+  }
+});
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape" && welcomeModal.classList.contains("is-visible")) {
+    closeModal();
+  }
+});
 
 function sanitizeName(value) {
   return value.replace(/[^a-zA-Z\s'-]/g, "").replace(/\s{2,}/g, " ");

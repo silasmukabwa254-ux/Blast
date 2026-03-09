@@ -27,6 +27,105 @@
                             background-color: rgba(255, 245, 248, 0.28);
                             z-index: -1;
                      }
+                     body.modal-open {
+                            overflow: hidden;
+                     }
+                     .welcome-modal {
+                            position: fixed;
+                            inset: 0;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 20px;
+                            opacity: 0;
+                            visibility: hidden;
+                            pointer-events: none;
+                            transition: opacity 0.25s ease, visibility 0.25s ease;
+                            z-index: 30;
+                     }
+                     .welcome-modal.is-visible {
+                            opacity: 1;
+                            visibility: visible;
+                            pointer-events: auto;
+                     }
+                     .welcome-modal__backdrop {
+                            position: absolute;
+                            inset: 0;
+                            background-color: rgba(20, 10, 14, 0.55);
+                            backdrop-filter: blur(10px);
+                     }
+                     .welcome-modal__dialog {
+                            position: relative;
+                            width: min(440px, 100%);
+                            padding: 24px 22px;
+                            border-radius: 18px;
+                            background: linear-gradient(180deg, rgba(255, 250, 252, 0.97), rgba(255, 241, 246, 0.95));
+                            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+                            text-align: center;
+                            border: 1px solid rgba(139, 30, 63, 0.12);
+                     }
+                     .welcome-modal__close {
+                            position: absolute;
+                            top: 12px;
+                            right: 12px;
+                            width: 36px;
+                            height: 36px;
+                            border: none;
+                            border-radius: 999px;
+                            background-color: rgba(93, 16, 41, 0.08);
+                            color: #5d1029;
+                            font-size: 22px;
+                            cursor: pointer;
+                     }
+                     .welcome-modal__image {
+                            width: 110px;
+                            height: auto;
+                            margin: 0 auto 10px;
+                            border-radius: 16px;
+                     }
+                     .welcome-modal__eyebrow {
+                            margin: 0 0 4px;
+                            font-size: 12px;
+                            font-weight: 700;
+                            letter-spacing: 0.12em;
+                            text-transform: uppercase;
+                            color: #8b1e3f;
+                     }
+                     .welcome-modal__title {
+                            margin: 0;
+                            color: #5d1029;
+                            font-size: 28px;
+                            line-height: 1.15;
+                     }
+                     .welcome-modal__text {
+                            margin: 12px 0 0;
+                            color: #3d2b32;
+                     }
+                     .welcome-modal__actions {
+                            display: flex;
+                            gap: 10px;
+                            justify-content: center;
+                            flex-wrap: wrap;
+                            margin-top: 18px;
+                     }
+                     .welcome-modal__primary,
+                     .welcome-modal__secondary {
+                            border: none;
+                            border-radius: 999px;
+                            padding: 11px 16px;
+                            font: inherit;
+                            font-weight: 600;
+                            cursor: pointer;
+                            text-decoration: none;
+                     }
+                     .welcome-modal__primary {
+                            background-color: #8b1e3f;
+                            color: #fff;
+                     }
+                     .welcome-modal__secondary {
+                            background-color: rgba(93, 16, 41, 0.08);
+                            color: #5d1029;
+                     }
                      .container {
                             max-width: 700px;
                             margin: 40px auto;
@@ -415,6 +514,20 @@
                                    margin-top: 10px;
                                    margin-bottom: 18px;
                                    padding: 8px 10px;
+                            }
+                            .welcome-modal__dialog {
+                                   padding: 22px 16px;
+                            }
+                            .welcome-modal__title {
+                                   font-size: 24px;
+                            }
+                            .welcome-modal__actions {
+                                   flex-direction: column;
+                            }
+                            .welcome-modal__primary,
+                            .welcome-modal__secondary {
+                                   width: 100%;
+                                   box-sizing: border-box;
                             }
                             .program-card,
                             .event-card,

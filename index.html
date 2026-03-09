@@ -21,6 +21,20 @@
               
        </head>
        <body>
+              <div class="welcome-modal" id="welcomeModal" aria-hidden="true">
+                     <div class="welcome-modal__backdrop" data-close-modal="true"></div>
+                     <div class="welcome-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="welcomeModalTitle">
+                            <button type="button" class="welcome-modal__close" id="closeWelcomeModal" aria-label="Close welcome message">×</button>
+                            <img class="welcome-modal__image" src="blast-logo.webp" alt="BLAST logo">
+                            <p class="welcome-modal__eyebrow">Welcome to BLAST</p>
+                            <h2 class="welcome-modal__title" id="welcomeModalTitle">Building Lives Around Sound Truth</h2>
+                            <p class="welcome-modal__text">A youth-centered Christian community focused on faith, mentorship, fellowship, and purposeful living.</p>
+                            <div class="welcome-modal__actions">
+                                   <a href="#join" class="welcome-modal__primary" id="exploreBlastLink">Join BLAST</a>
+                                   <button type="button" class="welcome-modal__secondary" id="dismissWelcomeModal">Explore Site</button>
+                            </div>
+                     </div>
+              </div>
               
               <main class="container">
                      <h1><abbr title="Building Lives Around Sound Truth">BLAST</abbr></h1>
@@ -146,3 +160,4 @@
 
 </body>
 </html>
+
