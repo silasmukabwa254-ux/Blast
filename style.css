@@ -554,7 +554,7 @@
                                    box-sizing: border-box;
                             }
                      }
-                     @media (max-width: 420px) {
+                     @media (max-width: 600px) {
                             .welcome-modal {
                                    padding: 12px;
                             }
