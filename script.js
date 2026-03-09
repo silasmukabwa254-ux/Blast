@@ -49,10 +49,10 @@ function openWelcomeModal() {
   welcomeModal.setAttribute("aria-hidden", "false");
   document.body.classList.add("modal-open");
   welcomeModalEyebrow.textContent = modalEyebrowText;
-  typeModalText(welcomeModalTitle, modalTitleText, 40, function () {
+  typeModalText(welcomeModalTitle, modalTitleText, 65, function () {
     modalTypingDelayTimeout = setTimeout(function () {
-      typeModalText(welcomeModalText, modalBodyText, 18);
-    }, 120);
+      typeModalText(welcomeModalText, modalBodyText, 30);
+    }, 180);
   });
 }
 

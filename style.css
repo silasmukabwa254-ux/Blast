@@ -72,11 +72,14 @@
                             right: 12px;
                             width: 36px;
                             height: 36px;
+                            display: grid;
+                            place-items: center;
                             border: none;
                             border-radius: 999px;
                             background-color: rgba(93, 16, 41, 0.08);
                             color: #5d1029;
                             font-size: 22px;
+                            line-height: 1;
                             cursor: pointer;
                      }
                      .welcome-modal__image {
@@ -577,8 +580,9 @@
                             .welcome-modal__close {
                                    top: 10px;
                                    right: 10px;
-                                   width: 34px;
-                                   height: 34px;
+                                   width: 42px;
+                                   height: 42px;
+                                   font-size: 26px;
                             }
                      }
               
