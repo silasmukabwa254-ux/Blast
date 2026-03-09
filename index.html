@@ -98,12 +98,16 @@
   <form class="join-form">
        <label for="fullName">Full Name</label>
        <input type="text" id="fullName" name="fullName" placeholder="Enter your full name">
+       <small id="fullNameError" class="field-error"></small>
 
        <label for="email">Email Address</label>
        <input type="email" id="email" name="email" placeholder="Enter your email">
+       <small id="emailError" class="field-error"></small>
+
 
        <label for="interest">Why would you like to join BLAST?</label>
        <textarea id="interest" name="interest" rows="4" placeholder="write your message here"></textarea>
+       <small id="interetError" class="field-error"></small>
 
  <button type="submit" class="form-button">Submit</button>
  <p id="formFeedback" class="form-feedback"></p>

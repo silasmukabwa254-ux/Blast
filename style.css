@@ -343,6 +343,12 @@
                      .form-feedback.success {
                             color: #1f6f43;
                      }
+                     .field-error {
+                            min-height: 18px;
+                            font-size: 13px;
+                            color: #b00020;
+                            margin-top: -4px;
+                     }
                      @media (max-width: 600px) {
                             .container {
                                    margin: 16px;

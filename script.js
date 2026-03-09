@@ -127,6 +127,16 @@ const formButton = joinForm.querySelector(".form-button");
 const savedJoinName = localStorage.getItem("joinFullName");
 const savedJoinEmail = localStorage.getItem("joinEmail");
 const savedJoinInterest = localStorage.getItem("joinInterest");
+const fullNameError = document.getElementById("fullNameError");
+const emailError = document.getElementById("emailError");
+const interestError = document.getElementById("interestError");
+
+function clearJoinErrors() {
+  fullNameError.textContent = "";
+  emailError.textContent = "";
+  interestError.textContent = "";
+  clearJoinFieldState();
+}
 
 if (savedJoinName) fullName.value = savedJoinName;
 if (savedJoinEmail) email.value = savedJoinEmail;
@@ -144,38 +154,43 @@ function isValidEmail(value) {
 
 joinForm.addEventListener("submit", function (event) {
   event.preventDefault();
-  clearJoinFieldState();
+  clearJoinErrors();
   formFeedback.classList.remove("success");
 
   const trimmedName = fullName.value.trim();
   const trimmedEmail = email.value.trim();
   const trimmedInterest = interest.value.trim();
 
-  if (
-    trimmedName === "" ||
-    trimmedEmail === "" ||
-    trimmedInterest === ""
-  ) {
+  if (trimmedName === "") {
+    fullName.classList.add("invalid");
+    fullNameError.textContent = "Full name is required.";
+  }
+
+  if (trimmedEmail === "") {
+    email.classList.add("invalid");
+    emailError.textContent = "Email is required.";
+  }
+
+  if (trimmedInterest === "") {
+    interest.classList.add("invalid");
+    interestError.textContent = "Please tell us why you want to join.";
+  }
+
+  if (trimmedName === "" || trimmedEmail === "" || trimmedInterest === "") {
     if (trimmedName === "") {
-      fullName.classList.add("invalid");
       fullName.focus();
     } else if (trimmedEmail === "") {
-      email.classList.add("invalid");
       email.focus();
     } else {
-      interest.classList.add("invalid");
       interest.focus();
     }
-
-    if (trimmedName === "") fullName.classList.add("invalid");
-    if (trimmedEmail === "") email.classList.add("invalid");
-    if (trimmedInterest === "") interest.classList.add("invalid");
     formFeedback.textContent = "Please fill in all form fields.";
     return;
   }
 
   if (!isValidEmail(trimmedEmail)) {
     email.classList.add("invalid");
+    emailError.textContent = "Please enter a valid email address.";
     email.focus();
     formFeedback.textContent = "Please enter a valid email address.";
     return;
@@ -197,10 +212,13 @@ joinForm.addEventListener("submit", function (event) {
 
 joinFields.forEach(function (field) {
   field.addEventListener("input", function () {
-       localStorage.setItem("joinFullName", fullName.value);
-       localStorage.setItem("joinEmail", email.value);
-       localStorage.setItem("joinInterest", interest.value);
+    localStorage.setItem("joinFullName", fullName.value);
+    localStorage.setItem("joinEmail", email.value);
+    localStorage.setItem("joinInterest", interest.value);
     field.classList.remove("invalid");
+    if (field === fullName) fullNameError.textContent = "";
+    if (field === email) emailError.textContent = "";
+    if (field === interest) interestError.textContent = "";
     if (formFeedback.textContent !== "") {
       formFeedback.textContent = "";
       formFeedback.classList.remove("success");
