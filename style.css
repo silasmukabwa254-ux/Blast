@@ -278,25 +278,32 @@
                      html {
                             scroll-behavior: smooth;
                      }
-                     .about {
-                            margin-top: 28px;
-                            padding: 18px;
-                            background-color: rgba(255, 255, 255, 0.88);
-                            border-radius: 10px;
-                            text-align: left;
-                     }
+.about {
+  margin-top: 28px;
+  padding: 18px;
+  background-color: rgba(255, 255, 255, 0.88);
+  border-radius: 10px;
+  text-align: left;
+  scroll-margin-top: 88px;
+}
                      .about h2 {
                             color: #5d1029;
                             margin-top: 0;
                             text-align: left;
                      }
-                     .join-form-section {
-                            margin-top: 32px;
-                            padding: 20px;
-                            background-color: rgba(255, 255, 255, 0.89);
-                            border-radius: 12px;
-                            text-align: left;
-                     }
+.join-form-section {
+  margin-top: 32px;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.89);
+  border-radius: 12px;
+  text-align: left;
+}
+.programs,
+.events,
+.contact,
+.join {
+  scroll-margin-top: 88px;
+}
                      .join-form-section h2 {
                             text-align: center;
                             color: #5d1029;
