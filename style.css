@@ -525,6 +525,9 @@
                             .welcome-modal__dialog {
                                    padding: 22px 16px;
                             }
+                            .welcome-modal {
+                                   padding: 12px;
+                            }
                             .welcome-modal__title {
                                    font-size: 24px;
                             }
@@ -538,24 +541,6 @@
                             .welcome-modal__secondary {
                                    width: 100%;
                                    box-sizing: border-box;
-                            }
-                            .program-card,
-                            .event-card,
-                            .testimonies,
-                            .contact,
-                            .about,
-                            .join,
-                            .join-form-section {
-                                   padding: 14px;
-                            }
-                            .join-button {
-                                   width: 100%;
-                                   box-sizing: border-box;
-                            }
-                     }
-                     @media (max-width: 600px) {
-                            .welcome-modal {
-                                   padding: 12px;
                             }
                             .welcome-modal__dialog {
                                    width: min(360px, 100%);
@@ -584,6 +569,19 @@
                                    width: 38px;
                                    height: 38px;
                                    font-size: 24px;
+                            }
+                            .program-card,
+                            .event-card,
+                            .testimonies,
+                            .contact,
+                            .about,
+                            .join,
+                            .join-form-section {
+                                   padding: 14px;
+                            }
+                            .join-button {
+                                   width: 100%;
+                                   box-sizing: border-box;
                             }
                      }
               
