@@ -397,7 +397,8 @@
                             overflow: hidden;
                             background-color: #1f1f1f;
                      }
-                     .media-video__frame iframe {
+                     .media-video__frame iframe,
+                     .media-video__frame video {
                             position: absolute;
                             inset: 0;
                             width: 100%;
