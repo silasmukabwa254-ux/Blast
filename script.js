@@ -17,6 +17,7 @@ const welcomeModalText = document.getElementById("welcomeModalText");
 let isVisible = false;
 let modalTypingTimeout;
 let modalTypingDelayTimeout;
+let lastFocusedElement;
 
 const modalEyebrowText = welcomeModalEyebrow.textContent;
 const modalTitleText = welcomeModalTitle.textContent;
@@ -45,10 +46,12 @@ function typeModalText(element, text, speed, callback) {
 function openWelcomeModal() {
   clearTimeout(modalTypingTimeout);
   clearTimeout(modalTypingDelayTimeout);
+  lastFocusedElement = document.activeElement;
   welcomeModal.classList.add("is-visible");
   welcomeModal.setAttribute("aria-hidden", "false");
   document.body.classList.add("modal-open");
   welcomeModalEyebrow.textContent = modalEyebrowText;
+  closeWelcomeModal.focus();
   typeModalText(welcomeModalTitle, modalTitleText, 65, function () {
     modalTypingDelayTimeout = setTimeout(function () {
       typeModalText(welcomeModalText, modalBodyText, 30);
@@ -62,6 +65,9 @@ function closeModal() {
   welcomeModal.classList.remove("is-visible");
   welcomeModal.setAttribute("aria-hidden", "true");
   document.body.classList.remove("modal-open");
+  if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
+    lastFocusedElement.focus();
+  }
 }
 
 window.addEventListener("load", function () {
