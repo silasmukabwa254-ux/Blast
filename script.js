@@ -13,6 +13,7 @@ const exploreBlastLink = document.getElementById("exploreBlastLink");
 const welcomeModalEyebrow = document.getElementById("welcomeModalEyebrow");
 const welcomeModalTitle = document.getElementById("welcomeModalTitle");
 const welcomeModalText = document.getElementById("welcomeModalText");
+const welcomeModalDialog = document.querySelector(".welcome-modal__dialog");
 
 let isVisible = false;
 let modalTypingTimeout;
@@ -70,6 +71,17 @@ function closeModal() {
   }
 }
 
+function getFocusableElements(container) {
+  if (!container) return [];
+  return Array.from(
+    container.querySelectorAll(
+      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+  ).filter(function (element) {
+    return element.offsetParent !== null;
+  });
+}
+
 window.addEventListener("load", function () {
   setTimeout(openWelcomeModal, 250);
 });
@@ -83,8 +95,33 @@ welcomeModal.addEventListener("click", function (event) {
   }
 });
 document.addEventListener("keydown", function (event) {
-  if (event.key === "Escape" && welcomeModal.classList.contains("is-visible")) {
+  if (!welcomeModal.classList.contains("is-visible")) return;
+
+  if (event.key === "Escape") {
     closeModal();
+    return;
+  }
+
+  if (event.key !== "Tab") return;
+
+  const focusableElements = getFocusableElements(welcomeModalDialog);
+  if (!focusableElements.length) {
+    event.preventDefault();
+    return;
+  }
+
+  const firstElement = focusableElements[0];
+  const lastElement = focusableElements[focusableElements.length - 1];
+
+  if (event.shiftKey && document.activeElement === firstElement) {
+    event.preventDefault();
+    lastElement.focus();
+    return;
+  }
+
+  if (!event.shiftKey && document.activeElement === lastElement) {
+    event.preventDefault();
+    firstElement.focus();
   }
 });
 

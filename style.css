@@ -227,7 +227,6 @@
                             padding: 8px;
                             border-radius: 6px;
                             border: 1px solid #bbb;
-                            margin-right: 8px;
                             margin-bottom: 10px;
                      }
                      #resetBtn {
@@ -490,12 +489,32 @@
                             text-decoration: underline;
                      }
                      .name-widget {
-                            margin-top: 28px;
-                            text-align: center;
+                            margin-top: 32px;
+                            padding: 20px;
+                            background-color: rgba(255, 255, 255, 0.88);
+                            border-radius: 12px;
+                            text-align: left;
                      }
                      .name-widget h2 {
                             color: #5d1029;
                             margin-top: 0;
+                            text-align: center;
+                     }
+                     .name-row {
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 10px;
+                            align-items: center;
+                            justify-content: center;
+                     }
+                     .name-row #nameInput {
+                            flex: 1 1 220px;
+                            min-width: 180px;
+                            margin-bottom: 0;
+                     }
+                     .name-buttons {
+                            display: flex;
+                            gap: 8px;
                      }
                      .join {
                             margin-top: 32px;
@@ -728,6 +747,16 @@
                             .join-button {
                                    width: 100%;
                                    box-sizing: border-box;
+                            }
+                            .name-row {
+                                   flex-direction: column;
+                                   align-items: stretch;
+                            }
+                            .name-buttons {
+                                   width: 100%;
+                            }
+                            .name-buttons button {
+                                   flex: 1 1 auto;
                             }
                      }
               

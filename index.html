@@ -206,13 +206,17 @@
 <section class="name-widget" aria-labelledby="nameWidgetTitle">
        <h2 id="nameWidgetTitle">Personal Welcome</h2>
        <label for="nameInput" id="nameLabel">Your name</label>
-       <input id="nameInput" type="text" placeholder="Enter your name" maxlength="30" aria-describedby="nameError messageMeta nameCount" aria-invalid="false">
+       <div class="name-row">
+              <input id="nameInput" type="text" placeholder="Enter your name" maxlength="30" aria-describedby="nameError messageMeta nameCount" aria-invalid="false">
+              <div class="name-buttons">
+                     <button id="welcomeBtn">Show message</button>
+                     <button id="resetBtn">Reset</button>
+              </div>
+       </div>
        <small id="nameError" class="error" aria-live="polite"></small>
-       <button id="welcomeBtn">Show message</button>
-       <button id="resetBtn">Reset</button>
+       <small id="nameCount">0/30</small>
        <p id="message"></p>
        <small id="messageMeta" aria-live="polite"></small>
-       <small id="nameCount">0/30</small>
 </section>
 <footer class="footer">
        <p>BLAST Mini Project - Built by Silas Mukabwa</p>
