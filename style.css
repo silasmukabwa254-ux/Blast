@@ -511,11 +511,12 @@
                             justify-content: center;
                      }
                      .name-row #nameInput {
-                            flex: 1 1 220px;
+                            flex: none;
+                            height: 45px;
                             min-width: 180px;
                             max-width: 100%;
                             width: 100%;
-                            margin-bottom: 0;
+                            margin-bottom: 10px;
                      }
                      .name-buttons {
                             display: flex;
