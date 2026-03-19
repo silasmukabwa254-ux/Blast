@@ -191,6 +191,7 @@
                      
                      
                      img {
+                            max-width: 100%;
                             border-radius: 10px;
                             margin: 12px auto;
                             display: block;
@@ -754,9 +755,10 @@
                             }
                             .name-buttons {
                                    width: 100%;
+                                   flex-direction: column;
                             }
                             .name-buttons button {
-                                   flex: 1 1 auto;
+                                   width: 100%;
                             }
                      }
               
