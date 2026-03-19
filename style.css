@@ -1,4 +1,4 @@
-                  body {
+                 body {
                             font-family: Verdana, sans-serif;
                             color: #1f1f1f;
                             margin: 0;
@@ -511,12 +511,11 @@
                             justify-content: center;
                      }
                      .name-row #nameInput {
-                            flex: none;
-                            height: 45px;
+                            flex: 1 1 220px;
                             min-width: 180px;
                             max-width: 100%;
                             width: 100%;
-                            margin-bottom: 10px;
+                            margin-bottom: 0;
                      }
                      .name-buttons {
                             display: flex;
