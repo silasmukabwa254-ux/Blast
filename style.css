@@ -225,9 +225,11 @@
                             cursor: not-allowed;
                      }
                      #nameInput {
-                            padding: 8px;
-                            border-radius: 6px;
-                            border: 1px solid #bbb;
+                            padding: 10px 12px;
+                            border-radius: 8px;
+                            border: 1px solid #cfc3c8;
+                            font: inherit;
+                            box-sizing: border-box;
                             margin-bottom: 10px;
                      }
                      #resetBtn {
@@ -512,6 +514,7 @@
                             flex: 1 1 220px;
                             min-width: 180px;
                             max-width: 320px;
+                            width: 100%;
                             margin-bottom: 0;
                      }
                      .name-buttons {
@@ -752,14 +755,16 @@
                             }
                             .name-row {
                                    flex-direction: column;
-                                   align-items: stretch;
+                                   align-items: center;
                             }
                             .name-row #nameInput {
-                                   max-width: 100%;
+                                   max-width: 260px;
                             }
                             .name-buttons {
                                    width: 100%;
                                    flex-direction: column;
+                                   max-width: 260px;
+                                   margin: 0 auto;
                             }
                             .name-buttons button {
                                    width: 100%;
