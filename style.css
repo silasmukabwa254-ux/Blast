@@ -489,6 +489,14 @@
                      .contact a:hover {
                             text-decoration: underline;
                      }
+                     .name-widget {
+                            margin-top: 28px;
+                            text-align: center;
+                     }
+                     .name-widget h2 {
+                            color: #5d1029;
+                            margin-top: 0;
+                     }
                      .join {
                             margin-top: 32px;
                             text-align: center;
