@@ -2,6 +2,7 @@ const button = document.getElementById("welcomeBtn");
 const message = document.getElementById("message");
 const nameInput = document.getElementById("nameInput");
 const nameError = document.getElementById("nameError");
+const savedName = localStorage.getItem("blastName");
 const messageMeta = document.getElementById("messageMeta");
 const nameCount = document.getElementById("nameCount");
 const resetBtn = document.getElementById("resetBtn");
@@ -12,36 +13,11 @@ const exploreBlastLink = document.getElementById("exploreBlastLink");
 const welcomeModalEyebrow = document.getElementById("welcomeModalEyebrow");
 const welcomeModalTitle = document.getElementById("welcomeModalTitle");
 const welcomeModalText = document.getElementById("welcomeModalText");
-const mainContent = document.getElementById("main-content");
 
 let isVisible = false;
 let modalTypingTimeout;
 let modalTypingDelayTimeout;
 let lastFocusedElement;
-
-function getStoredValue(key) {
-  try {
-    return localStorage.getItem(key);
-  } catch (error) {
-    return null;
-  }
-}
-
-function setStoredValue(key, value) {
-  try {
-    localStorage.setItem(key, value);
-  } catch (error) {
-    // Storage unavailable; safely ignore.
-  }
-}
-
-function removeStoredValue(key) {
-  try {
-    localStorage.removeItem(key);
-  } catch (error) {
-    // Storage unavailable; safely ignore.
-  }
-}
 
 const modalEyebrowText = welcomeModalEyebrow.textContent;
 const modalTitleText = welcomeModalTitle.textContent;
@@ -74,10 +50,6 @@ function openWelcomeModal() {
   welcomeModal.classList.add("is-visible");
   welcomeModal.setAttribute("aria-hidden", "false");
   document.body.classList.add("modal-open");
-  if (mainContent) {
-    mainContent.setAttribute("inert", "");
-    mainContent.setAttribute("aria-hidden", "true");
-  }
   welcomeModalEyebrow.textContent = modalEyebrowText;
   closeWelcomeModal.focus();
   typeModalText(welcomeModalTitle, modalTitleText, 65, function () {
@@ -93,10 +65,6 @@ function closeModal() {
   welcomeModal.classList.remove("is-visible");
   welcomeModal.setAttribute("aria-hidden", "true");
   document.body.classList.remove("modal-open");
-  if (mainContent) {
-    mainContent.removeAttribute("inert");
-    mainContent.removeAttribute("aria-hidden");
-  }
   if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
     lastFocusedElement.focus();
   }
@@ -136,7 +104,6 @@ function updateButtonState() {
   button.disabled = !isVisible && currentName.length === 0;
 }
 
-const savedName = getStoredValue("blastName");
 if (savedName) {
   nameInput.value = sanitizeName(savedName);
 }
@@ -152,7 +119,6 @@ button.addEventListener("click", function () {
   if (!isVisible) {
     if (name === "") {
       nameError.textContent = "Please enter your name first.";
-      nameInput.setAttribute("aria-invalid", "true");
       message.textContent = "";
       message.classList.remove("show");
       messageMeta.textContent = "";
@@ -165,7 +131,6 @@ button.addEventListener("click", function () {
 
     if (name.length > 30) {
       nameError.textContent = "Name must be 30 characters or less.";
-      nameInput.setAttribute("aria-invalid", "true");
       message.textContent = "";
       message.classList.remove("show");
       messageMeta.textContent = "";
@@ -182,8 +147,7 @@ button.addEventListener("click", function () {
     setTimeout(function () {
       message.textContent = `Good ${partOfDay}, ${name}! Welcome to BLAST! We are thrilled to have you here. Let's embark on this journey of faith and growth together!`;
       message.classList.add("show");
-      setStoredValue("blastName", name);
-      nameInput.setAttribute("aria-invalid", "false");
+      localStorage.setItem("blastName", name);
 
       const now = new Date();
       messageMeta.textContent = `Last updated: ${now.toLocaleDateString()} at ${now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
@@ -201,7 +165,6 @@ button.addEventListener("click", function () {
   messageMeta.textContent = "";
   button.textContent = "Show message";
   isVisible = false;
-  nameInput.setAttribute("aria-invalid", "false");
   updateButtonState();
   nameInput.focus();
 });
@@ -213,13 +176,12 @@ nameInput.addEventListener("keydown", function (event) {
 });
 
 resetBtn.addEventListener("click", function () {
-  removeStoredValue("blastName");
+  localStorage.removeItem("blastName");
   nameError.textContent = "";
   message.textContent = "";
   message.classList.remove("show");
   messageMeta.textContent = "";
   nameInput.value = "";
-  nameInput.setAttribute("aria-invalid", "false");
   button.textContent = "Show message";
   isVisible = false;
   updateButtonState();
@@ -231,7 +193,6 @@ nameInput.addEventListener("input", function () {
   if (nameError.textContent !== "") {
     nameError.textContent = "";
   }
-  nameInput.setAttribute("aria-invalid", "false");
   updateButtonState();
 });
 
@@ -242,9 +203,9 @@ const interest = document.getElementById("interest");
 const formFeedback = document.getElementById("formFeedback");
 const joinFields = [fullName, email, interest];
 const formButton = joinForm.querySelector(".form-button");
-const savedJoinName = getStoredValue("joinFullName");
-const savedJoinEmail = getStoredValue("joinEmail");
-const savedJoinInterest = getStoredValue("joinInterest");
+const savedJoinName = localStorage.getItem("joinFullName");
+const savedJoinEmail = localStorage.getItem("joinEmail");
+const savedJoinInterest = localStorage.getItem("joinInterest");
 const fullNameError = document.getElementById("fullNameError");
 const emailError = document.getElementById("emailError");
 const interestError = document.getElementById("interestError");
@@ -338,9 +299,9 @@ joinForm.addEventListener("submit", function (event) {
     formFeedback.textContent = "Your message has been submitted successfully.";
     joinForm.reset();
     updateJoinCounts();
-    removeStoredValue("joinFullName");
-    removeStoredValue("joinEmail");
-    removeStoredValue("joinInterest");
+    localStorage.removeItem("joinFullName");
+    localStorage.removeItem("joinEmail");
+    localStorage.removeItem("joinInterest");
     formButton.disabled = false;
     setTimeout(function () {
       formFeedback.textContent = "";
@@ -351,9 +312,9 @@ joinForm.addEventListener("submit", function (event) {
 
 joinFields.forEach(function (field) {
   field.addEventListener("input", function () {
-    setStoredValue("joinFullName", fullName.value);
-    setStoredValue("joinEmail", email.value);
-    setStoredValue("joinInterest", interest.value);
+    localStorage.setItem("joinFullName", fullName.value);
+    localStorage.setItem("joinEmail", email.value);
+    localStorage.setItem("joinInterest", interest.value);
     field.classList.remove("invalid");
     field.setAttribute("aria-invalid", "false");
     updateJoinCounts();
