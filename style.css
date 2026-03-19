@@ -225,12 +225,10 @@
                             cursor: not-allowed;
                      }
                      #nameInput {
-                            padding: 6px 10px;
+                            padding: 10px 12px;
                             border-radius: 8px;
                             border: 1px solid #cfc3c8;
                             font: inherit;
-                            font-size: 14px;
-                            line-height: 1.2;
                             box-sizing: border-box;
                             margin-bottom: 10px;
                      }
@@ -515,7 +513,7 @@
                      .name-row #nameInput {
                             flex: 1 1 220px;
                             min-width: 180px;
-                            max-width: 280px;
+                            max-width: 100%;
                             width: 100%;
                             margin-bottom: 0;
                      }
@@ -760,12 +758,12 @@
                                    align-items: center;
                             }
                             .name-row #nameInput {
-                                   max-width: 220px;
+                                   max-width: 100%;
                             }
                             .name-buttons {
                                    width: 100%;
                                    flex-direction: column;
-                                   max-width: 220px;
+                                   max-width: 100%;
                                    margin: 0 auto;
                             }
                             .name-buttons button {
