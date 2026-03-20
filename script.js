@@ -2,7 +2,12 @@ const button = document.getElementById("welcomeBtn");
 const message = document.getElementById("message");
 const nameInput = document.getElementById("nameInput");
 const nameError = document.getElementById("nameError");
-const savedName = localStorage.getItem("blastName");
+let savedName = "";
+try {
+  savedName = localStorage.getItem("blastName") || "";
+} catch (error) {
+  savedName = "";
+}
 const messageMeta = document.getElementById("messageMeta");
 const nameCount = document.getElementById("nameCount");
 const resetBtn = document.getElementById("resetBtn");
@@ -184,7 +189,11 @@ button.addEventListener("click", function () {
     setTimeout(function () {
       message.textContent = `Good ${partOfDay}, ${name}! Welcome to BLAST! We are thrilled to have you here. Let's embark on this journey of faith and growth together!`;
       message.classList.add("show");
-      localStorage.setItem("blastName", name);
+      try {
+        localStorage.setItem("blastName", name);
+      } catch (error) {
+        // ignore storage errors
+      }
 
       const now = new Date();
       messageMeta.textContent = `Last updated: ${now.toLocaleDateString()} at ${now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
@@ -213,7 +222,11 @@ nameInput.addEventListener("keydown", function (event) {
 });
 
 resetBtn.addEventListener("click", function () {
-  localStorage.removeItem("blastName");
+  try {
+    localStorage.removeItem("blastName");
+  } catch (error) {
+    // ignore storage errors
+  }
   nameError.textContent = "";
   message.textContent = "";
   message.classList.remove("show");
@@ -240,9 +253,18 @@ const interest = document.getElementById("interest");
 const formFeedback = document.getElementById("formFeedback");
 const joinFields = [fullName, email, interest];
 const formButton = joinForm.querySelector(".form-button");
-const savedJoinName = localStorage.getItem("joinFullName");
-const savedJoinEmail = localStorage.getItem("joinEmail");
-const savedJoinInterest = localStorage.getItem("joinInterest");
+let savedJoinName = "";
+let savedJoinEmail = "";
+let savedJoinInterest = "";
+try {
+  savedJoinName = localStorage.getItem("joinFullName") || "";
+  savedJoinEmail = localStorage.getItem("joinEmail") || "";
+  savedJoinInterest = localStorage.getItem("joinInterest") || "";
+} catch (error) {
+  savedJoinName = "";
+  savedJoinEmail = "";
+  savedJoinInterest = "";
+}
 const fullNameError = document.getElementById("fullNameError");
 const emailError = document.getElementById("emailError");
 const interestError = document.getElementById("interestError");
@@ -336,9 +358,13 @@ joinForm.addEventListener("submit", function (event) {
     formFeedback.textContent = "Your message has been submitted successfully.";
     joinForm.reset();
     updateJoinCounts();
-    localStorage.removeItem("joinFullName");
-    localStorage.removeItem("joinEmail");
-    localStorage.removeItem("joinInterest");
+    try {
+      localStorage.removeItem("joinFullName");
+      localStorage.removeItem("joinEmail");
+      localStorage.removeItem("joinInterest");
+    } catch (error) {
+      // ignore storage errors
+    }
     formButton.disabled = false;
     setTimeout(function () {
       formFeedback.textContent = "";
@@ -349,9 +375,13 @@ joinForm.addEventListener("submit", function (event) {
 
 joinFields.forEach(function (field) {
   field.addEventListener("input", function () {
-    localStorage.setItem("joinFullName", fullName.value);
-    localStorage.setItem("joinEmail", email.value);
-    localStorage.setItem("joinInterest", interest.value);
+    try {
+      localStorage.setItem("joinFullName", fullName.value);
+      localStorage.setItem("joinEmail", email.value);
+      localStorage.setItem("joinInterest", interest.value);
+    } catch (error) {
+      // ignore storage errors
+    }
     field.classList.remove("invalid");
     field.setAttribute("aria-invalid", "false");
     updateJoinCounts();
