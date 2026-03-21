@@ -259,7 +259,7 @@ const JOIN_API_URL =
   window.BLAST_JOIN_API_URL ||
   (isLocalHost
     ? "http://localhost:3000/api/join"
-    : "https://blast-backend.onrender.com/api/join");
+    : "https://blast-backend-4zkv.onrender.com/api/join");
 let savedJoinName = "";
 let savedJoinEmail = "";
 let savedJoinInterest = "";
