@@ -23,6 +23,14 @@ The backend lives in `backend/`.
 - Set `ALLOWED_ORIGINS` to the frontend origin you want to allow.
 - The frontend join form reads `window.BLAST_JOIN_API_URL`, so point that at your deployed backend URL when you publish.
 
+### Render deployment
+
+1. Push this repository to GitHub.
+2. In Render, create a new Blueprint and connect this repo.
+3. Render will use `render.yaml` to deploy the backend from `backend/`.
+4. After deploy, copy the Render service URL and update `window.BLAST_JOIN_API_URL` in the frontend to:
+   `https://<your-render-service>.onrender.com/api/join`
+
 ### API
 
 - `GET /health`

@@ -253,7 +253,13 @@ const interest = document.getElementById("interest");
 const formFeedback = document.getElementById("formFeedback");
 const joinFields = [fullName, email, interest];
 const formButton = joinForm.querySelector(".form-button");
-const JOIN_API_URL = window.BLAST_JOIN_API_URL || "http://localhost:3000/api/join";
+const isLocalHost =
+  window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+const JOIN_API_URL =
+  window.BLAST_JOIN_API_URL ||
+  (isLocalHost
+    ? "http://localhost:3000/api/join"
+    : "https://blast-backend.onrender.com/api/join");
 let savedJoinName = "";
 let savedJoinEmail = "";
 let savedJoinInterest = "";
