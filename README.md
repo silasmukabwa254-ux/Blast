@@ -1,10 +1,26 @@
 # BLAST
 
-Static BLAST website built with HTML, CSS, and JavaScript.
+BLAST is a website built with HTML, CSS, JavaScript, and a small Express backend for form submissions.
 
-## Entry File
+## Frontend
 
 Use `index.html` for deployment.
+
+## Backend
+
+The backend lives in `backend/`.
+
+### Run locally
+
+1. Install Node.js.
+2. Open a terminal in `backend/`.
+3. Run `npm install`.
+4. Start the server with `npm start`.
+
+### API
+
+- `GET /health`
+- `POST /api/join`
 
 ## Quick Publish Options
 
