@@ -7,12 +7,24 @@ const crypto = require("crypto");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*";
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || ALLOWED_ORIGIN)
+  .split(",")
+  .map(function (origin) {
+    return origin.trim();
+  })
+  .filter(Boolean);
 const STORAGE_DIR = path.join(__dirname, "data");
 const SUBMISSIONS_FILE = path.join(STORAGE_DIR, "submissions.json");
 
 app.use(
   cors({
-    origin: ALLOWED_ORIGIN === "*" ? "*" : ALLOWED_ORIGIN,
+    origin: function (origin, callback) {
+      if (!origin || ALLOWED_ORIGINS.includes("*") || ALLOWED_ORIGINS.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`Origin ${origin} is not allowed by CORS.`));
+    },
   })
 );
 app.use(express.json({ limit: "64kb" }));

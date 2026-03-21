@@ -17,6 +17,12 @@ The backend lives in `backend/`.
 3. Run `npm install`.
 4. Start the server with `npm start`.
 
+### Deployment prep
+
+- Set `PORT` on the host if needed.
+- Set `ALLOWED_ORIGINS` to the frontend origin you want to allow.
+- The frontend join form reads `window.BLAST_JOIN_API_URL`, so point that at your deployed backend URL when you publish.
+
 ### API
 
 - `GET /health`
