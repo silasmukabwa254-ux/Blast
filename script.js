@@ -253,6 +253,7 @@ const interest = document.getElementById("interest");
 const formFeedback = document.getElementById("formFeedback");
 const joinFields = [fullName, email, interest];
 const formButton = joinForm.querySelector(".form-button");
+const JOIN_API_URL = window.BLAST_JOIN_API_URL || "http://localhost:3000/api/join";
 let savedJoinName = "";
 let savedJoinEmail = "";
 let savedJoinInterest = "";
@@ -302,7 +303,7 @@ function updateJoinCounts() {
 
 updateJoinCounts();
 
-joinForm.addEventListener("submit", function (event) {
+joinForm.addEventListener("submit", async function (event) {
   event.preventDefault();
   clearJoinErrors();
   formFeedback.classList.remove("success");
@@ -353,9 +354,57 @@ joinForm.addEventListener("submit", function (event) {
   formFeedback.textContent = "Submitting...";
   formButton.disabled = true;
 
-  setTimeout(function () {
+  try {
+    const response = await fetch(JOIN_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        fullName: trimmedName,
+        email: trimmedEmail,
+        interest: trimmedInterest,
+      }),
+    });
+
+    const result = await response.json().catch(function () {
+      return {};
+    });
+
+    if (!response.ok) {
+      if (result.errors) {
+        if (result.errors.fullName) {
+          fullName.classList.add("invalid");
+          fullName.setAttribute("aria-invalid", "true");
+          fullNameError.textContent = result.errors.fullName;
+        }
+
+        if (result.errors.email) {
+          email.classList.add("invalid");
+          email.setAttribute("aria-invalid", "true");
+          emailError.textContent = result.errors.email;
+        }
+
+        if (result.errors.interest) {
+          interest.classList.add("invalid");
+          interest.setAttribute("aria-invalid", "true");
+          interestError.textContent = result.errors.interest;
+        }
+      }
+
+      formFeedback.textContent = result.message || "Please fix the highlighted fields.";
+      if (result.errors && result.errors.fullName) {
+        fullName.focus();
+      } else if (result.errors && result.errors.email) {
+        email.focus();
+      } else if (result.errors && result.errors.interest) {
+        interest.focus();
+      }
+      return;
+    }
+
     formFeedback.classList.add("success");
-    formFeedback.textContent = "Your message has been submitted successfully.";
+    formFeedback.textContent = result.message || "Your message has been submitted successfully.";
     joinForm.reset();
     updateJoinCounts();
     try {
@@ -365,12 +414,16 @@ joinForm.addEventListener("submit", function (event) {
     } catch (error) {
       // ignore storage errors
     }
-    formButton.disabled = false;
+    fullName.focus();
     setTimeout(function () {
       formFeedback.textContent = "";
       formFeedback.classList.remove("success");
     }, 2500);
-  }, 800);
+  } catch (error) {
+    formFeedback.textContent = "Could not reach the backend. Please try again.";
+  } finally {
+    formButton.disabled = false;
+  }
 });
 
 joinFields.forEach(function (field) {
