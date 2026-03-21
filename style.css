@@ -242,7 +242,7 @@
                         padding: 10px 14px;
                         border-radius: 6px;
                         cursor: pointer;
-                        margin-left: 8px;
+                        margin-left: 0;
                      }
                         #resetBtn:hover {
                             background-color: #333;
