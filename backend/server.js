@@ -25,6 +25,15 @@ function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 async function ensureStorage() {
   await fs.mkdir(STORAGE_DIR, { recursive: true });
 
@@ -67,6 +76,178 @@ app.get("/health", function (req, res) {
     service: "blast-backend",
     timestamp: new Date().toISOString(),
   });
+});
+
+app.get("/api/submissions", async function (req, res, next) {
+  try {
+    const submissions = await readSubmissions();
+    res.json({
+      count: submissions.length,
+      submissions,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+app.get("/submissions", async function (req, res, next) {
+  try {
+    const submissions = await readSubmissions();
+    const rows = submissions.length
+      ? submissions
+          .map(function (submission, index) {
+            return `
+              <tr>
+                <td>${index + 1}</td>
+                <td>${escapeHtml(submission.fullName)}</td>
+                <td>${escapeHtml(submission.email)}</td>
+                <td>${escapeHtml(submission.interest)}</td>
+                <td>${escapeHtml(new Date(submission.submittedAt).toLocaleString())}</td>
+              </tr>
+            `;
+          })
+          .join("")
+      : `
+          <tr>
+            <td colspan="5" style="text-align:center; padding: 1.5rem;">No submissions yet.</td>
+          </tr>
+        `;
+
+    res.set("Cache-Control", "no-store");
+    res.type("html").send(`<!doctype html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>BLAST Submissions</title>
+          <style>
+            :root {
+              color-scheme: light;
+              --bg: #f7f1f4;
+              --panel: #ffffff;
+              --text: #2f1f26;
+              --muted: #6f5a64;
+              --accent: #5d1029;
+              --border: #e4d7dd;
+            }
+            body {
+              margin: 0;
+              font-family: Arial, sans-serif;
+              background: linear-gradient(180deg, #fff7f9 0%, var(--bg) 100%);
+              color: var(--text);
+              padding: 2rem;
+            }
+            .wrap {
+              max-width: 1100px;
+              margin: 0 auto;
+            }
+            .card {
+              background: var(--panel);
+              border: 1px solid var(--border);
+              border-radius: 18px;
+              box-shadow: 0 12px 30px rgba(93, 16, 41, 0.08);
+              overflow: hidden;
+            }
+            header {
+              padding: 1.5rem 1.5rem 1rem;
+            }
+            h1 {
+              margin: 0 0 0.5rem;
+              color: var(--accent);
+              font-size: clamp(1.6rem, 4vw, 2.4rem);
+            }
+            p {
+              margin: 0;
+              color: var(--muted);
+              line-height: 1.6;
+            }
+            .meta {
+              display: flex;
+              gap: 1rem;
+              flex-wrap: wrap;
+              margin-top: 1rem;
+            }
+            .meta a {
+              color: var(--accent);
+              text-decoration: none;
+              font-weight: 700;
+            }
+            .table-wrap {
+              overflow-x: auto;
+              border-top: 1px solid var(--border);
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              min-width: 760px;
+            }
+            thead th {
+              background: #faf4f6;
+              color: var(--accent);
+              text-align: left;
+              padding: 1rem;
+              font-size: 0.95rem;
+              border-bottom: 1px solid var(--border);
+            }
+            tbody td {
+              padding: 1rem;
+              border-bottom: 1px solid var(--border);
+              vertical-align: top;
+              line-height: 1.5;
+            }
+            tbody tr:nth-child(even) {
+              background: #fcf9fb;
+            }
+            .note {
+              padding: 1rem 1.5rem 1.5rem;
+              color: var(--muted);
+              font-size: 0.95rem;
+            }
+            code {
+              background: #f4ebee;
+              padding: 0.15rem 0.35rem;
+              border-radius: 6px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="wrap">
+            <div class="card">
+              <header>
+                <h1>BLAST Submissions</h1>
+                <p>Saved form entries from the join form.</p>
+                <div class="meta">
+                  <span><strong>Total:</strong> ${submissions.length}</span>
+                  <a href="/api/submissions" target="_blank" rel="noreferrer">View JSON</a>
+                  <a href="/health" target="_blank" rel="noreferrer">Health check</a>
+                </div>
+              </header>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Full Name</th>
+                      <th>Email</th>
+                      <th>Message</th>
+                      <th>Submitted At</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${rows}
+                  </tbody>
+                </table>
+              </div>
+              <div class="note">
+                This page is for local development and review. The data is stored in <code>backend/data/submissions.json</code>.
+              </div>
+            </div>
+          </div>
+        </body>
+      </html>`);
+  } catch (error) {
+    return next(error);
+  }
 });
 
 app.post("/api/join", async function (req, res, next) {

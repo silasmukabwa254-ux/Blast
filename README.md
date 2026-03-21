@@ -20,6 +20,8 @@ The backend lives in `backend/`.
 ### API
 
 - `GET /health`
+- `GET /api/submissions`
+- `GET /submissions`
 - `POST /api/join`
 
 ## Quick Publish Options
