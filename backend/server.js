@@ -156,6 +156,19 @@ app.get("/submissions", async function (req, res, next) {
               color: var(--accent);
               font-size: clamp(1.6rem, 4vw, 2.4rem);
             }
+            .badge {
+              display: inline-flex;
+              align-items: center;
+              gap: 0.4rem;
+              margin-bottom: 0.8rem;
+              padding: 0.35rem 0.7rem;
+              border-radius: 999px;
+              background: #f4e6ea;
+              color: var(--accent);
+              font-size: 0.85rem;
+              font-weight: 700;
+              letter-spacing: 0.02em;
+            }
             p {
               margin: 0;
               color: var(--muted);
@@ -166,20 +179,24 @@ app.get("/submissions", async function (req, res, next) {
               gap: 1rem;
               flex-wrap: wrap;
               margin-top: 1rem;
+              align-items: center;
             }
             .meta a {
               color: var(--accent);
               text-decoration: none;
               font-weight: 700;
+              padding: 0.15rem 0;
             }
             .table-wrap {
               overflow-x: auto;
               border-top: 1px solid var(--border);
+              background: linear-gradient(180deg, #fff 0%, #fffdfd 100%);
             }
             table {
               width: 100%;
               border-collapse: collapse;
               min-width: 760px;
+              table-layout: fixed;
             }
             thead th {
               background: #faf4f6;
@@ -188,20 +205,49 @@ app.get("/submissions", async function (req, res, next) {
               padding: 1rem;
               font-size: 0.95rem;
               border-bottom: 1px solid var(--border);
+              position: sticky;
+              top: 0;
+              z-index: 1;
             }
             tbody td {
               padding: 1rem;
               border-bottom: 1px solid var(--border);
               vertical-align: top;
               line-height: 1.5;
+              word-break: break-word;
             }
             tbody tr:nth-child(even) {
               background: #fcf9fb;
+            }
+            tbody tr:hover {
+              background: #f8eef2;
+            }
+            thead th:nth-child(1),
+            tbody td:nth-child(1) {
+              width: 4rem;
+            }
+            thead th:nth-child(2),
+            tbody td:nth-child(2) {
+              width: 16%;
+            }
+            thead th:nth-child(3),
+            tbody td:nth-child(3) {
+              width: 20%;
+            }
+            thead th:nth-child(4),
+            tbody td:nth-child(4) {
+              width: 36%;
+            }
+            thead th:nth-child(5),
+            tbody td:nth-child(5) {
+              width: 24%;
             }
             .note {
               padding: 1rem 1.5rem 1.5rem;
               color: var(--muted);
               font-size: 0.95rem;
+              border-top: 1px solid var(--border);
+              background: #fffafc;
             }
             code {
               background: #f4ebee;
@@ -214,6 +260,7 @@ app.get("/submissions", async function (req, res, next) {
           <div class="wrap">
             <div class="card">
               <header>
+                <div class="badge">Admin review only</div>
                 <h1>BLAST Submissions</h1>
                 <p>Saved form entries from the join form.</p>
                 <div class="meta">
@@ -239,7 +286,7 @@ app.get("/submissions", async function (req, res, next) {
                 </table>
               </div>
               <div class="note">
-                This page is for local development and review. The data is stored in <code>backend/data/submissions.json</code>.
+                This page is for local development and internal review only. The data is stored in <code>backend/data/submissions.json</code>.
               </div>
             </div>
           </div>
