@@ -21,6 +21,7 @@ The backend lives in `backend/`.
 
 - Set `PORT` on the host if needed.
 - Set `ALLOWED_ORIGINS` to the frontend origin you want to allow.
+- The backend now stores submissions in Render Postgres when deployed through the blueprint.
 - The frontend join form reads `window.BLAST_JOIN_API_URL`, so point that at your deployed backend URL when you publish.
 
 ### Render deployment
@@ -28,7 +29,8 @@ The backend lives in `backend/`.
 1. Push this repository to GitHub.
 2. In Render, create a new Blueprint and connect this repo.
 3. Render will use `render.yaml` to deploy the backend from `backend/`.
-4. After deploy, copy the Render service URL and update `window.BLAST_JOIN_API_URL` in the frontend to:
+4. Render will also create a Postgres database and connect it to the backend through `DATABASE_URL`.
+5. After deploy, copy the Render service URL and update `window.BLAST_JOIN_API_URL` in the frontend to:
    `https://<your-render-service>.onrender.com/api/join`
 
 ### API

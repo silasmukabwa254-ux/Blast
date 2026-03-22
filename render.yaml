@@ -1,3 +1,7 @@
+databases:
+  - name: blast-postgres
+    plan: free
+
 services:
   - type: web
     name: blast-backend
@@ -8,5 +12,9 @@ services:
     startCommand: npm start
     healthCheckPath: /health
     envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: blast-postgres
+          property: connectionString
       - key: ALLOWED_ORIGINS
         value: https://silasmukabwa254-ux.github.io,http://localhost:3000

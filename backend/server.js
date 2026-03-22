@@ -1,8 +1,11 @@
 const express = require("express");
 const cors = require("cors");
-const fs = require("fs/promises");
-const path = require("path");
 const crypto = require("crypto");
+const {
+  isDatabaseEnabled,
+  readSubmissions,
+  saveSubmission,
+} = require("./submissionStore");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,8 +16,6 @@ const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || ALLOWED_ORIGIN)
     return origin.trim();
   })
   .filter(Boolean);
-const STORAGE_DIR = path.join(__dirname, "data");
-const SUBMISSIONS_FILE = path.join(STORAGE_DIR, "submissions.json");
 
 app.use(
   cors({
@@ -44,42 +45,6 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
-}
-
-async function ensureStorage() {
-  await fs.mkdir(STORAGE_DIR, { recursive: true });
-
-  try {
-    await fs.access(SUBMISSIONS_FILE);
-  } catch (error) {
-    if (error.code === "ENOENT") {
-      await fs.writeFile(SUBMISSIONS_FILE, "[]\n", "utf8");
-      return;
-    }
-
-    throw error;
-  }
-}
-
-async function readSubmissions() {
-  await ensureStorage();
-  const raw = await fs.readFile(SUBMISSIONS_FILE, "utf8");
-
-  try {
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (error) {
-    return [];
-  }
-}
-
-async function writeSubmissions(submissions) {
-  await ensureStorage();
-  await fs.writeFile(
-    SUBMISSIONS_FILE,
-    `${JSON.stringify(submissions, null, 2)}\n`,
-    "utf8"
-  );
 }
 
 app.get("/health", function (req, res) {
@@ -298,7 +263,7 @@ app.get("/submissions", async function (req, res, next) {
                 </table>
               </div>
               <div class="note">
-                This page is for local development and internal review only. The data is stored in <code>backend/data/submissions.json</code>.
+                This page is for local development and internal review only. The data is stored in <code>${isDatabaseEnabled() ? "Render Postgres" : "backend/data/submissions.json"}</code>.
               </div>
             </div>
           </div>
@@ -349,9 +314,7 @@ app.post("/api/join", async function (req, res, next) {
       submittedAt: new Date().toISOString(),
     };
 
-    const submissions = await readSubmissions();
-    submissions.push(submission);
-    await writeSubmissions(submissions);
+    await saveSubmission(submission);
 
     return res.status(201).json({
       message: "Submission saved successfully.",
