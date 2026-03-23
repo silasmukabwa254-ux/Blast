@@ -16,6 +16,7 @@ The backend lives in `backend/`.
 2. Open a terminal in `backend/`.
 3. Run `npm install`.
 4. Start the server with `npm start`.
+5. Open `http://localhost:3000/submissions` and sign in with `admin` / `blast123` if you did not set your own values.
 
 ### Deployment prep
 
@@ -23,6 +24,8 @@ The backend lives in `backend/`.
 - Set `ALLOWED_ORIGINS` to the frontend origin you want to allow.
 - The backend now stores submissions in Render Postgres when deployed through the blueprint.
 - The frontend join form reads `window.BLAST_JOIN_API_URL`, so point that at your deployed backend URL when you publish.
+- Set `ADMIN_USERNAME` and `ADMIN_PASSWORD` on the backend host before you open `/submissions` or `/api/submissions`.
+- In production, the submissions pages are protected with HTTP Basic Auth.
 
 ### Render deployment
 
@@ -32,6 +35,7 @@ The backend lives in `backend/`.
 4. Render will also create a Postgres database and connect it to the backend through `DATABASE_URL`.
 5. After deploy, copy the Render service URL and update `window.BLAST_JOIN_API_URL` in the frontend to:
    `https://<your-render-service>.onrender.com/api/join`
+6. Add `ADMIN_USERNAME` and `ADMIN_PASSWORD` in the Render service settings so the admin pages can be opened.
 
 ### API
 

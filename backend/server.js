@@ -16,6 +16,7 @@ const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || ALLOWED_ORIGIN)
     return origin.trim();
   })
   .filter(Boolean);
+const ADMIN_REALM = "BLAST Admin";
 
 app.use(
   cors({
@@ -34,6 +35,22 @@ function normalizeText(value) {
   return String(value ?? "").trim();
 }
 
+function getAdminCredentials() {
+  const isProduction = process.env.NODE_ENV === "production";
+  const username = normalizeText(process.env.ADMIN_USERNAME || (isProduction ? "" : "admin"));
+  const password = normalizeText(process.env.ADMIN_PASSWORD || (isProduction ? "" : "blast123"));
+
+  return {
+    username,
+    password,
+  };
+}
+
+function credentialsConfigured() {
+  const credentials = getAdminCredentials();
+  return credentials.username !== "" && credentials.password !== "";
+}
+
 function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
@@ -47,6 +64,56 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
+function safeCompare(expected, provided) {
+  if (expected.length !== provided.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(provided));
+}
+
+function sendAdminChallenge(res) {
+  res.set("WWW-Authenticate", `Basic realm="${ADMIN_REALM}", charset="UTF-8"`);
+  return res.status(401).send("Authentication required.");
+}
+
+function requireAdmin(req, res, next) {
+  if (!credentialsConfigured()) {
+    return res.status(503).send("Admin credentials are not configured.");
+  }
+
+  const authHeader = req.headers.authorization || "";
+
+  if (!authHeader.startsWith("Basic ")) {
+    return sendAdminChallenge(res);
+  }
+
+  let decoded;
+  try {
+    decoded = Buffer.from(authHeader.slice(6), "base64").toString("utf8");
+  } catch (error) {
+    return sendAdminChallenge(res);
+  }
+
+  const separatorIndex = decoded.indexOf(":");
+  if (separatorIndex === -1) {
+    return sendAdminChallenge(res);
+  }
+
+  const providedUsername = decoded.slice(0, separatorIndex);
+  const providedPassword = decoded.slice(separatorIndex + 1);
+  const credentials = getAdminCredentials();
+
+  if (
+    !safeCompare(credentials.username, providedUsername) ||
+    !safeCompare(credentials.password, providedPassword)
+  ) {
+    return sendAdminChallenge(res);
+  }
+
+  return next();
+}
+
 app.get("/health", function (req, res) {
   res.json({
     status: "ok",
@@ -55,7 +122,7 @@ app.get("/health", function (req, res) {
   });
 });
 
-app.get("/api/submissions", async function (req, res, next) {
+app.get("/api/submissions", requireAdmin, async function (req, res, next) {
   try {
     const submissions = await readSubmissions();
     res.json({
@@ -67,7 +134,7 @@ app.get("/api/submissions", async function (req, res, next) {
   }
 });
 
-app.get("/submissions", async function (req, res, next) {
+app.get("/submissions", requireAdmin, async function (req, res, next) {
   try {
     const submissions = await readSubmissions();
     const rows = submissions.length
