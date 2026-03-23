@@ -64,6 +64,381 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
+function getQueryText(value) {
+  if (Array.isArray(value)) {
+    return normalizeText(value[0]);
+  }
+
+  return normalizeText(value);
+}
+
+function normalizeSearch(value) {
+  return getQueryText(value).toLowerCase();
+}
+
+function formatSubmissionDate(value) {
+  return escapeHtml(new Date(value).toLocaleString());
+}
+
+function filterSubmissions(submissions, query) {
+  const normalizedQuery = normalizeSearch(query);
+
+  if (!normalizedQuery) {
+    return submissions;
+  }
+
+  return submissions.filter(function (submission) {
+    const haystack = [
+      submission.fullName,
+      submission.email,
+      submission.interest,
+      new Date(submission.submittedAt).toLocaleString(),
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return haystack.includes(normalizedQuery);
+  });
+}
+
+function escapeCsvCell(value) {
+  return `"${String(value ?? "").replace(/"/g, '""')}"`;
+}
+
+function buildSubmissionsCsv(submissions) {
+  const header = ["Full Name", "Email", "Message", "Submitted At"];
+  const lines = [header.map(escapeCsvCell).join(",")];
+
+  submissions.forEach(function (submission) {
+    lines.push(
+      [
+        submission.fullName,
+        submission.email,
+        submission.interest,
+        new Date(submission.submittedAt).toLocaleString(),
+      ]
+        .map(escapeCsvCell)
+        .join(",")
+    );
+  });
+
+  return `${lines.join("\n")}\n`;
+}
+
+function buildSubmissionsDashboard(submissions, query) {
+  const searchQuery = getQueryText(query);
+  const filteredSubmissions = filterSubmissions(submissions, searchQuery);
+  const exportHref = searchQuery
+    ? `/submissions/export.csv?q=${encodeURIComponent(searchQuery)}`
+    : "/submissions/export.csv";
+  const clearHref = searchQuery ? "/submissions" : "";
+  const latestSubmission = submissions.length ? submissions[submissions.length - 1] : null;
+  const latestLabel = latestSubmission
+    ? new Date(latestSubmission.submittedAt).toLocaleString()
+    : "No submissions yet";
+  const rows = filteredSubmissions.length
+    ? filteredSubmissions
+        .map(function (submission, index) {
+          return `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${escapeHtml(submission.fullName)}</td>
+              <td>${escapeHtml(submission.email)}</td>
+              <td>${escapeHtml(submission.interest)}</td>
+              <td>${formatSubmissionDate(submission.submittedAt)}</td>
+            </tr>
+          `;
+        })
+        .join("")
+    : `
+        <tr>
+          <td colspan="5" style="text-align:center; padding: 1.5rem;">
+            ${searchQuery ? "No submissions match your search." : "No submissions yet."}
+          </td>
+        </tr>
+      `;
+
+  return `<!doctype html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>BLAST Submissions</title>
+        <style>
+          :root {
+            color-scheme: light;
+            --bg: #f7f1f4;
+            --panel: #ffffff;
+            --text: #2f1f26;
+            --muted: #6f5a64;
+            --accent: #5d1029;
+            --border: #e4d7dd;
+            --accent-soft: #f4e6ea;
+          }
+          body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(180deg, #fff7f9 0%, var(--bg) 100%);
+            color: var(--text);
+            padding: 2rem;
+          }
+          .wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+          }
+          .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 12px 30px rgba(93, 16, 41, 0.08);
+            overflow: hidden;
+          }
+          header {
+            padding: 1.5rem 1.5rem 1rem;
+          }
+          h1 {
+            margin: 0 0 0.5rem;
+            color: var(--accent);
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+          }
+          .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 0.8rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+          }
+          p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+          }
+          .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+          }
+          .stat {
+            padding: 0.85rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: linear-gradient(180deg, #fff 0%, #fffafc 100%);
+          }
+          .stat span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+          }
+          .stat strong {
+            color: var(--accent);
+            font-size: 1.1rem;
+          }
+          .dashboard-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: end;
+            margin-top: 1rem;
+            padding: 0 1.5rem 1.25rem;
+          }
+          .search-group {
+            flex: 1 1 320px;
+          }
+          .search-group label {
+            display: block;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.4rem;
+          }
+          .search-group input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.85rem 0.95rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font: inherit;
+          }
+          .tool-button,
+          .tool-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            min-height: 44px;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            font: inherit;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+          }
+          .tool-button {
+            background: var(--accent);
+            color: #fff;
+          }
+          .tool-link {
+            background: #f4ebee;
+            color: var(--accent);
+            border-color: var(--border);
+          }
+          .tool-button:hover {
+            background: #6f1732;
+          }
+          .tool-link:hover {
+            background: #efe3e8;
+          }
+          .table-wrap {
+            overflow-x: auto;
+            border-top: 1px solid var(--border);
+            background: linear-gradient(180deg, #fff 0%, #fffdfd 100%);
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 760px;
+            table-layout: fixed;
+          }
+          thead th {
+            background: #faf4f6;
+            color: var(--accent);
+            text-align: left;
+            padding: 1rem;
+            font-size: 0.95rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+          }
+          tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+            line-height: 1.5;
+            word-break: break-word;
+          }
+          tbody tr:nth-child(even) {
+            background: #fcf9fb;
+          }
+          tbody tr:hover {
+            background: #f8eef2;
+          }
+          thead th:nth-child(1),
+          tbody td:nth-child(1) {
+            width: 4rem;
+          }
+          thead th:nth-child(2),
+          tbody td:nth-child(2) {
+            width: 16%;
+          }
+          thead th:nth-child(3),
+          tbody td:nth-child(3) {
+            width: 20%;
+          }
+          thead th:nth-child(4),
+          tbody td:nth-child(4) {
+            width: 36%;
+          }
+          thead th:nth-child(5),
+          tbody td:nth-child(5) {
+            width: 24%;
+          }
+          .note {
+            padding: 1rem 1.5rem 1.5rem;
+            color: var(--muted);
+            font-size: 0.95rem;
+            border-top: 1px solid var(--border);
+            background: #fffafc;
+          }
+          code {
+            background: #f4ebee;
+            padding: 0.15rem 0.35rem;
+            border-radius: 6px;
+          }
+          @media (max-width: 720px) {
+            body {
+              padding: 1rem;
+            }
+            .stats {
+              grid-template-columns: 1fr;
+            }
+            .dashboard-tools {
+              padding-inline: 1rem;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="wrap">
+          <div class="card">
+            <header>
+              <div class="badge">Protected admin dashboard</div>
+              <h1>BLAST Submissions</h1>
+              <p>Search, review, and export the entries people send through the join form.</p>
+              <div class="stats">
+                <div class="stat">
+                  <span>Total</span>
+                  <strong>${submissions.length}</strong>
+                </div>
+                <div class="stat">
+                  <span>Showing</span>
+                  <strong>${filteredSubmissions.length}</strong>
+                </div>
+                <div class="stat">
+                  <span>Latest</span>
+                  <strong>${escapeHtml(latestLabel)}</strong>
+                </div>
+              </div>
+            </header>
+            <form class="dashboard-tools" method="get" action="/submissions">
+              <div class="search-group">
+                <label for="submissionSearch">Search submissions</label>
+                <input
+                  id="submissionSearch"
+                  type="search"
+                  name="q"
+                  placeholder="Search name, email, message, or date"
+                  value="${escapeHtml(searchQuery)}"
+                >
+              </div>
+              <button class="tool-button" type="submit">Search</button>
+              <a class="tool-link" href="${exportHref}">Export CSV</a>
+              ${clearHref ? `<a class="tool-link" href="${clearHref}">Clear</a>` : ""}
+            </form>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Message</th>
+                    <th>Submitted At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rows}
+                </tbody>
+              </table>
+            </div>
+            <div class="note">
+              This dashboard is protected with Basic Auth. The data is stored in
+              <code>${isDatabaseEnabled() ? "Render Postgres" : "backend/data/submissions.json"}</code>.
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>`;
+}
+
 function safeCompare(expected, provided) {
   if (expected.length !== provided.length) {
     return false;
@@ -125,10 +500,28 @@ app.get("/health", function (req, res) {
 app.get("/api/submissions", requireAdmin, async function (req, res, next) {
   try {
     const submissions = await readSubmissions();
+    const filteredSubmissions = filterSubmissions(submissions, req.query.q);
     res.json({
-      count: submissions.length,
-      submissions,
+      count: filteredSubmissions.length,
+      total: submissions.length,
+      query: getQueryText(req.query.q),
+      submissions: filteredSubmissions,
     });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+app.get("/submissions/export.csv", requireAdmin, async function (req, res, next) {
+  try {
+    const submissions = await readSubmissions();
+    const filteredSubmissions = filterSubmissions(submissions, req.query.q);
+    const csv = buildSubmissionsCsv(filteredSubmissions);
+
+    res.set("Cache-Control", "no-store");
+    res.set("Content-Type", "text/csv; charset=utf-8");
+    res.set("Content-Disposition", 'attachment; filename="blast-submissions.csv"');
+    res.send(csv);
   } catch (error) {
     return next(error);
   }
@@ -136,206 +529,8 @@ app.get("/api/submissions", requireAdmin, async function (req, res, next) {
 
 app.get("/submissions", requireAdmin, async function (req, res, next) {
   try {
-    const submissions = await readSubmissions();
-    const rows = submissions.length
-      ? submissions
-          .map(function (submission, index) {
-            return `
-              <tr>
-                <td>${index + 1}</td>
-                <td>${escapeHtml(submission.fullName)}</td>
-                <td>${escapeHtml(submission.email)}</td>
-                <td>${escapeHtml(submission.interest)}</td>
-                <td>${escapeHtml(new Date(submission.submittedAt).toLocaleString())}</td>
-              </tr>
-            `;
-          })
-          .join("")
-      : `
-          <tr>
-            <td colspan="5" style="text-align:center; padding: 1.5rem;">No submissions yet.</td>
-          </tr>
-        `;
-
     res.set("Cache-Control", "no-store");
-    res.type("html").send(`<!doctype html>
-      <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>BLAST Submissions</title>
-          <style>
-            :root {
-              color-scheme: light;
-              --bg: #f7f1f4;
-              --panel: #ffffff;
-              --text: #2f1f26;
-              --muted: #6f5a64;
-              --accent: #5d1029;
-              --border: #e4d7dd;
-            }
-            body {
-              margin: 0;
-              font-family: Arial, sans-serif;
-              background: linear-gradient(180deg, #fff7f9 0%, var(--bg) 100%);
-              color: var(--text);
-              padding: 2rem;
-            }
-            .wrap {
-              max-width: 1100px;
-              margin: 0 auto;
-            }
-            .card {
-              background: var(--panel);
-              border: 1px solid var(--border);
-              border-radius: 18px;
-              box-shadow: 0 12px 30px rgba(93, 16, 41, 0.08);
-              overflow: hidden;
-            }
-            header {
-              padding: 1.5rem 1.5rem 1rem;
-            }
-            h1 {
-              margin: 0 0 0.5rem;
-              color: var(--accent);
-              font-size: clamp(1.6rem, 4vw, 2.4rem);
-            }
-            .badge {
-              display: inline-flex;
-              align-items: center;
-              gap: 0.4rem;
-              margin-bottom: 0.8rem;
-              padding: 0.35rem 0.7rem;
-              border-radius: 999px;
-              background: #f4e6ea;
-              color: var(--accent);
-              font-size: 0.85rem;
-              font-weight: 700;
-              letter-spacing: 0.02em;
-            }
-            p {
-              margin: 0;
-              color: var(--muted);
-              line-height: 1.6;
-            }
-            .meta {
-              display: flex;
-              gap: 1rem;
-              flex-wrap: wrap;
-              margin-top: 1rem;
-              align-items: center;
-            }
-            .meta a {
-              color: var(--accent);
-              text-decoration: none;
-              font-weight: 700;
-              padding: 0.15rem 0;
-            }
-            .table-wrap {
-              overflow-x: auto;
-              border-top: 1px solid var(--border);
-              background: linear-gradient(180deg, #fff 0%, #fffdfd 100%);
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-              min-width: 760px;
-              table-layout: fixed;
-            }
-            thead th {
-              background: #faf4f6;
-              color: var(--accent);
-              text-align: left;
-              padding: 1rem;
-              font-size: 0.95rem;
-              border-bottom: 1px solid var(--border);
-              position: sticky;
-              top: 0;
-              z-index: 1;
-            }
-            tbody td {
-              padding: 1rem;
-              border-bottom: 1px solid var(--border);
-              vertical-align: top;
-              line-height: 1.5;
-              word-break: break-word;
-            }
-            tbody tr:nth-child(even) {
-              background: #fcf9fb;
-            }
-            tbody tr:hover {
-              background: #f8eef2;
-            }
-            thead th:nth-child(1),
-            tbody td:nth-child(1) {
-              width: 4rem;
-            }
-            thead th:nth-child(2),
-            tbody td:nth-child(2) {
-              width: 16%;
-            }
-            thead th:nth-child(3),
-            tbody td:nth-child(3) {
-              width: 20%;
-            }
-            thead th:nth-child(4),
-            tbody td:nth-child(4) {
-              width: 36%;
-            }
-            thead th:nth-child(5),
-            tbody td:nth-child(5) {
-              width: 24%;
-            }
-            .note {
-              padding: 1rem 1.5rem 1.5rem;
-              color: var(--muted);
-              font-size: 0.95rem;
-              border-top: 1px solid var(--border);
-              background: #fffafc;
-            }
-            code {
-              background: #f4ebee;
-              padding: 0.15rem 0.35rem;
-              border-radius: 6px;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="wrap">
-            <div class="card">
-              <header>
-                <div class="badge">Admin review only</div>
-                <h1>BLAST Submissions</h1>
-                <p>Saved form entries from the join form.</p>
-                <div class="meta">
-                  <span><strong>Total:</strong> ${submissions.length}</span>
-                  <a href="/api/submissions" target="_blank" rel="noreferrer">View JSON</a>
-                  <a href="/health" target="_blank" rel="noreferrer">Health check</a>
-                </div>
-              </header>
-              <div class="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Full Name</th>
-                      <th>Email</th>
-                      <th>Message</th>
-                      <th>Submitted At</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${rows}
-                  </tbody>
-                </table>
-              </div>
-              <div class="note">
-                This page is for local development and internal review only. The data is stored in <code>${isDatabaseEnabled() ? "Render Postgres" : "backend/data/submissions.json"}</code>.
-              </div>
-            </div>
-          </div>
-        </body>
-      </html>`);
+    res.type("html").send(buildSubmissionsDashboard(await readSubmissions(), req.query.q));
   } catch (error) {
     return next(error);
   }
