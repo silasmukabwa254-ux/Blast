@@ -26,6 +26,8 @@ The backend lives in `backend/`.
 - The frontend join form reads `window.BLAST_JOIN_API_URL`, so point that at your deployed backend URL when you publish.
 - Set `ADMIN_USERNAME` and `ADMIN_PASSWORD` on the backend host before you open `/submissions` or `/api/submissions`.
 - In production, the submissions pages are protected with HTTP Basic Auth.
+- Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, and `NOTIFY_TO_EMAIL` if you want email alerts for new submissions.
+- `NOTIFY_FROM_EMAIL` is optional, but helps the email look cleaner.
 
 ### Render deployment
 
@@ -36,11 +38,13 @@ The backend lives in `backend/`.
 5. After deploy, copy the Render service URL and update `window.BLAST_JOIN_API_URL` in the frontend to:
    `https://<your-render-service>.onrender.com/api/join`
 6. Add `ADMIN_USERNAME` and `ADMIN_PASSWORD` in the Render service settings so the admin pages can be opened.
+7. Add SMTP settings in the Render service settings if you want the backend to email you whenever someone submits the join form.
 
 ### API
 
 - `GET /health`
 - `GET /api/submissions`
+- `POST /api/notifications/test`
 - `GET /submissions`
 - `POST /api/join`
 

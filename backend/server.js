@@ -6,6 +6,11 @@ const {
   readSubmissions,
   saveSubmission,
 } = require("./submissionStore");
+const {
+  getNotificationSummary,
+  sendSubmissionNotification,
+  sendTestNotification,
+} = require("./notificationService");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -128,6 +133,7 @@ function buildSubmissionsCsv(submissions) {
 function buildSubmissionsDashboard(submissions, query) {
   const searchQuery = getQueryText(query);
   const filteredSubmissions = filterSubmissions(submissions, searchQuery);
+  const notificationSummary = getNotificationSummary();
   const exportHref = searchQuery
     ? `/submissions/export.csv?q=${encodeURIComponent(searchQuery)}`
     : "/submissions/export.csv";
@@ -380,27 +386,31 @@ function buildSubmissionsDashboard(submissions, query) {
         <div class="wrap">
           <div class="card">
             <header>
-              <div class="badge">Protected admin dashboard</div>
-              <h1>BLAST Submissions</h1>
-              <p>Search, review, and export the entries people send through the join form.</p>
-              <div class="stats">
-                <div class="stat">
-                  <span>Total</span>
-                  <strong>${submissions.length}</strong>
-                </div>
-                <div class="stat">
-                  <span>Showing</span>
-                  <strong>${filteredSubmissions.length}</strong>
-                </div>
-                <div class="stat">
-                  <span>Latest</span>
-                  <strong>${escapeHtml(latestLabel)}</strong>
-                </div>
-              </div>
-            </header>
-            <form class="dashboard-tools" method="get" action="/submissions">
-              <div class="search-group">
-                <label for="submissionSearch">Search submissions</label>
+          <div class="badge">Protected admin dashboard</div>
+          <h1>BLAST Submissions</h1>
+          <p>Search, review, and export the entries people send through the join form.</p>
+          <div class="stats">
+            <div class="stat">
+              <span>Total</span>
+              <strong>${submissions.length}</strong>
+            </div>
+            <div class="stat">
+              <span>Showing</span>
+              <strong>${filteredSubmissions.length}</strong>
+            </div>
+            <div class="stat">
+              <span>Latest</span>
+              <strong>${escapeHtml(latestLabel)}</strong>
+            </div>
+            <div class="stat">
+              <span>Email alerts</span>
+              <strong>${notificationSummary.enabled ? "On" : "Off"}</strong>
+            </div>
+          </div>
+        </header>
+        <form class="dashboard-tools" method="get" action="/submissions">
+          <div class="search-group">
+            <label for="submissionSearch">Search submissions</label>
                 <input
                   id="submissionSearch"
                   type="search"
@@ -412,6 +422,7 @@ function buildSubmissionsDashboard(submissions, query) {
               <button class="tool-button" type="submit">Search</button>
               <a class="tool-link" href="${exportHref}">Export CSV</a>
               ${clearHref ? `<a class="tool-link" href="${clearHref}">Clear</a>` : ""}
+              <button class="tool-button" type="button" id="sendTestAlertBtn">Send test alert</button>
             </form>
             <div class="table-wrap">
               <table>
@@ -432,9 +443,44 @@ function buildSubmissionsDashboard(submissions, query) {
             <div class="note">
               This dashboard is protected with Basic Auth. The data is stored in
               <code>${isDatabaseEnabled() ? "Render Postgres" : "backend/data/submissions.json"}</code>.
+              ${notificationSummary.enabled
+                ? ` Email alerts are active for <code>${escapeHtml(notificationSummary.recipient)}</code>.`
+                : " Email alerts are not configured yet."}
             </div>
           </div>
         </div>
+        <script>
+          (function () {
+            const testButton = document.getElementById("sendTestAlertBtn");
+            if (!testButton) return;
+            testButton.addEventListener("click", async function () {
+              const originalText = testButton.textContent;
+              testButton.disabled = true;
+              testButton.textContent = "Sending...";
+              try {
+                const response = await fetch("/api/notifications/test", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                });
+
+                if (response.ok) {
+                  testButton.textContent = "Sent";
+                } else {
+                  testButton.textContent = "Failed";
+                }
+              } catch (error) {
+                testButton.textContent = "Failed";
+              }
+
+              setTimeout(function () {
+                testButton.disabled = false;
+                testButton.textContent = originalText;
+              }, 2000);
+            });
+          })();
+        </script>
       </body>
     </html>`;
 }
@@ -512,6 +558,26 @@ app.get("/api/submissions", requireAdmin, async function (req, res, next) {
   }
 });
 
+app.post("/api/notifications/test", requireAdmin, async function (req, res, next) {
+  try {
+    const result = await sendTestNotification();
+
+    if (result.status === "skipped") {
+      return res.status(503).json({
+        message: "Email alerts are not configured yet.",
+        notification: result,
+      });
+    }
+
+    return res.json({
+      message: "Test notification sent.",
+      notification: result,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 app.get("/submissions/export.csv", requireAdmin, async function (req, res, next) {
   try {
     const submissions = await readSubmissions();
@@ -577,10 +643,25 @@ app.post("/api/join", async function (req, res, next) {
     };
 
     await saveSubmission(submission);
+    let notification = {
+      status: "skipped",
+      reason: "not configured",
+    };
+
+    try {
+      notification = await sendSubmissionNotification(submission);
+    } catch (notificationError) {
+      console.error("Notification delivery failed:", notificationError);
+      notification = {
+        status: "failed",
+        reason: "delivery failed",
+      };
+    }
 
     return res.status(201).json({
       message: "Submission saved successfully.",
       submission,
+      notification,
     });
   } catch (error) {
     return next(error);
