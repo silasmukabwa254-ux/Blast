@@ -464,14 +464,21 @@ function buildSubmissionsDashboard(submissions, query) {
                     "Content-Type": "application/json",
                   },
                 });
+                const payload = await response.json().catch(function () {
+                  return null;
+                });
 
                 if (response.ok) {
                   testButton.textContent = "Sent";
                 } else {
                   testButton.textContent = "Failed";
+                  if (payload && (payload.error || payload.message)) {
+                    window.alert(payload.error || payload.message);
+                  }
                 }
               } catch (error) {
                 testButton.textContent = "Failed";
+                window.alert(error.message || "Unable to send the test alert.");
               }
 
               setTimeout(function () {
@@ -574,7 +581,11 @@ app.post("/api/notifications/test", requireAdmin, async function (req, res, next
       notification: result,
     });
   } catch (error) {
-    return next(error);
+    console.error("Test notification failed:", error);
+    return res.status(502).json({
+      message: "Test notification failed.",
+      error: error.message || "Unknown SMTP error.",
+    });
   }
 });
 
