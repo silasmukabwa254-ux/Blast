@@ -711,20 +711,22 @@ app.post("/api/join", async function (req, res, next) {
     };
 
     await saveSubmission(submission);
-    let notification = {
-      status: "skipped",
-      reason: "not configured",
+    const notification = {
+      status: "queued",
     };
 
-    try {
-      notification = await sendSubmissionNotification(submission);
-    } catch (notificationError) {
-      console.error("Notification delivery failed:", notificationError);
-      notification = {
-        status: "failed",
-        reason: "delivery failed",
-      };
-    }
+    Promise.resolve()
+      .then(function () {
+        return sendSubmissionNotification(submission);
+      })
+      .then(function (result) {
+        if (result && result.status !== "sent") {
+          console.log("Notification result:", result);
+        }
+      })
+      .catch(function (notificationError) {
+        console.error("Notification delivery failed:", notificationError);
+      });
 
     return res.status(201).json({
       message: "Submission saved successfully.",

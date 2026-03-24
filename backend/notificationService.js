@@ -49,7 +49,7 @@ function getNotificationConfig() {
 
 function isNotificationConfigured() {
   const config = getNotificationConfig();
-  return Boolean(config.host && config.port && config.to);
+  return Boolean(config.host && config.port && config.user && config.password && config.to);
 }
 
 function getNotificationSummary() {
@@ -82,6 +82,9 @@ function getTransporter(config) {
       host: config.host,
       port: config.port,
       secure: config.secure,
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 20000,
     };
 
     if (config.user && config.password) {
