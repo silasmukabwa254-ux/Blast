@@ -760,6 +760,15 @@
                             margin-top: 28px;
                             text-align: center;
                      }
+                     .contact-page__cta {
+                            display: flex;
+                            flex-wrap: wrap;
+                            justify-content: center;
+                            gap: 12px;
+                     }
+                     .contact-page__cta .join-button {
+                            margin-top: 8px;
+                     }
                      .site-nav {
                             display: flex;
                             justify-content: center;
