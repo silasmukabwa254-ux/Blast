@@ -209,41 +209,57 @@ async function saveDatabaseContent(content) {
   const pool = getPool();
   const normalized = normalizeContent(content);
 
-  await ensureDatabase();
-  await pool.query(
-    `
-      INSERT INTO site_content (content_key, payload, updated_at)
-      VALUES ($1, $2::jsonb, NOW())
-      ON CONFLICT (content_key)
-      DO UPDATE SET
-        payload = EXCLUDED.payload,
-        updated_at = NOW()
-    `,
-    [CONTENT_KEY, JSON.stringify(normalized)]
-  );
+  try {
+    await ensureDatabase();
+    await pool.query(
+      `
+        INSERT INTO site_content (content_key, payload, updated_at)
+        VALUES ($1, $2::jsonb, NOW())
+        ON CONFLICT (content_key)
+        DO UPDATE SET
+          payload = EXCLUDED.payload,
+          updated_at = NOW()
+      `,
+      [CONTENT_KEY, JSON.stringify(normalized)]
+    );
+  } catch (error) {
+    console.warn(
+      "Content database save failed, falling back to file storage:",
+      error && error.message ? error.message : error
+    );
+    await writeFileContent(normalized);
+  }
 }
 
 async function readDatabaseContent() {
   const pool = getPool();
-  await ensureDatabase();
+  try {
+    await ensureDatabase();
 
-  const result = await pool.query(
-    `
-      SELECT payload
-      FROM site_content
-      WHERE content_key = $1
-      LIMIT 1
-    `,
-    [CONTENT_KEY]
-  );
+    const result = await pool.query(
+      `
+        SELECT payload
+        FROM site_content
+        WHERE content_key = $1
+        LIMIT 1
+      `,
+      [CONTENT_KEY]
+    );
 
-  if (!result.rows.length) {
-    const defaults = normalizeContent(getDefaultContent());
-    await saveDatabaseContent(defaults);
-    return defaults;
+    if (!result.rows.length) {
+      const defaults = normalizeContent(getDefaultContent());
+      await saveDatabaseContent(defaults);
+      return defaults;
+    }
+
+    return normalizeContent(result.rows[0].payload);
+  } catch (error) {
+    console.warn(
+      "Content database read failed, falling back to file storage:",
+      error && error.message ? error.message : error
+    );
+    return readFileContent();
   }
-
-  return normalizeContent(result.rows[0].payload);
 }
 
 async function readContent() {

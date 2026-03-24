@@ -979,7 +979,7 @@ function buildContentDashboard(content) {
             </div>
             <div class="note">
               The public homepage reads this content from <code>/api/content</code>. The data is stored in
-              <code>${isDatabaseEnabled() ? "Render Postgres" : "backend/data/content.json"}</code>.
+              <code>${isDatabaseEnabled() ? "Render Postgres with file fallback" : "backend/data/content.json"}</code>.
             </div>
           </div>
         </div>
@@ -1184,7 +1184,7 @@ function buildContentDashboard(content) {
                 });
 
                 if (!response.ok) {
-                  setStatus(payload.message || "Unable to save content.");
+                  setStatus(payload.error || payload.message || "Unable to save content.");
                   syncButtons(false);
                   return;
                 }
@@ -1374,7 +1374,11 @@ app.put("/api/content", requireAdmin, async function (req, res, next) {
       content: normalized,
     });
   } catch (error) {
-    return next(error);
+    console.error("Content save failed:", error);
+    return res.status(502).json({
+      message: "Homepage content save failed.",
+      error: error && error.message ? error.message : "Unknown content storage error.",
+    });
   }
 });
 
