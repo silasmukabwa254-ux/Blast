@@ -609,27 +609,14 @@
                             box-shadow: 0 8px 18px rgba(93, 16, 41, 0.08);
                             position: relative;
                             overflow: hidden;
-                            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-                     }
-                     .page-card::after {
-                            content: "";
-                            position: absolute;
-                            inset: 0;
-                            background: linear-gradient(135deg, rgba(139, 30, 63, 0.05), transparent 45%);
-                            opacity: 0;
-                            transition: opacity 0.2s ease;
-                            pointer-events: none;
+                            transition: border-color 0.2s ease, box-shadow 0.2s ease;
                      }
                      .page-card:hover,
                      .page-card:focus-visible {
-                            transform: translateY(-4px);
-                            box-shadow: 0 14px 28px rgba(93, 16, 41, 0.14);
                             border-color: rgba(93, 16, 41, 0.2);
-                            outline: none;
-                     }
-                     .page-card:hover::after,
-                     .page-card:focus-visible::after {
-                            opacity: 1;
+                            box-shadow: 0 12px 24px rgba(93, 16, 41, 0.1);
+                            outline: 2px solid rgba(139, 30, 63, 0.14);
+                            outline-offset: 2px;
                      }
                      .page-card__tag {
                             display: inline-flex;
