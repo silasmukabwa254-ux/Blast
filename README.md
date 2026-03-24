@@ -47,6 +47,7 @@ The backend lives in `backend/`.
 - `GET /api/submissions`
 - `POST /api/notifications/test`
 - `PUT /api/content`
+- `GET /api/content/export.json`
 - `GET /submissions`
 - `GET /content`
 - `POST /api/join`
@@ -56,6 +57,7 @@ The backend lives in `backend/`.
 - Open `/content` on the backend service after signing in with Basic Auth.
 - Use it to edit the public homepage events and media without changing HTML.
 - The homepage reads those sections from `/api/content`.
+- Use `/api/content/export.json` to download a JSON backup of the homepage content.
 
 ## Quick Publish Options
 

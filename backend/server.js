@@ -954,6 +954,7 @@ function buildContentDashboard(content) {
             </header>
             <div class="dashboard-tools">
               <a class="tool-link" href="/submissions">Back to submissions</a>
+              <a class="tool-link" href="/api/content/export.json">Download backup</a>
               <button class="tool-button" type="button" id="restoreDefaultsBtn">Restore defaults</button>
               <button class="tool-button" type="button" id="saveContentBtn">Save changes</button>
             </div>
@@ -1334,6 +1335,29 @@ app.get("/api/content", async function (req, res, next) {
       source: isDatabaseEnabled() ? "Render Postgres" : "backend/data/content.json",
       content,
     });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+app.get("/api/content/export.json", requireAdmin, async function (req, res, next) {
+  try {
+    const content = await readContent();
+
+    res.set("Cache-Control", "no-store");
+    res.set("Content-Type", "application/json; charset=utf-8");
+    res.set("Content-Disposition", 'attachment; filename="blast-homepage-content.json"');
+    res.send(
+      `${JSON.stringify(
+        {
+          source: isDatabaseEnabled() ? "Render Postgres" : "backend/data/content.json",
+          exportedAt: new Date().toISOString(),
+          content,
+        },
+        null,
+        2
+      )}\n`
+    );
   } catch (error) {
     return next(error);
   }
