@@ -611,7 +611,6 @@
                             overflow: hidden;
                             transition: border-color 0.2s ease, box-shadow 0.2s ease;
                      }
-                     .page-card:hover,
                      .page-card:focus-visible {
                             border-color: rgba(93, 16, 41, 0.2);
                             box-shadow: 0 12px 24px rgba(93, 16, 41, 0.1);
