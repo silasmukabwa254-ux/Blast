@@ -570,6 +570,72 @@
                      .about--teaser .join-button {
                             margin-top: 18px;
                      }
+                     .page-hub {
+                            margin-top: 32px;
+                            padding: 22px 18px;
+                            border: 1px solid rgba(93, 16, 41, 0.08);
+                            border-radius: 16px;
+                            background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(252, 243, 247, 0.88));
+                            box-shadow: 0 12px 28px rgba(93, 16, 41, 0.08);
+                            text-align: center;
+                     }
+                     .page-hub h2 {
+                            margin: 6px 0 0;
+                            color: #5d1029;
+                     }
+                     .page-hub .page-intro {
+                            margin-top: 10px;
+                     }
+                     .page-hub__grid {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                            gap: 14px;
+                            margin-top: 18px;
+                     }
+                     .page-card {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 8px;
+                            min-height: 170px;
+                            padding: 18px;
+                            border-radius: 16px;
+                            border: 1px solid rgba(93, 16, 41, 0.1);
+                            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(250, 236, 242, 0.96));
+                            color: #3d2b32;
+                            text-decoration: none;
+                            text-align: left;
+                            box-shadow: 0 8px 18px rgba(93, 16, 41, 0.08);
+                            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+                     }
+                     .page-card:hover,
+                     .page-card:focus-visible {
+                            transform: translateY(-4px);
+                            box-shadow: 0 14px 28px rgba(93, 16, 41, 0.14);
+                            border-color: rgba(93, 16, 41, 0.2);
+                            outline: none;
+                     }
+                     .page-card__tag {
+                            display: inline-flex;
+                            align-self: flex-start;
+                            padding: 4px 10px;
+                            border-radius: 999px;
+                            background-color: rgba(139, 30, 63, 0.1);
+                            color: #8b1e3f;
+                            font-size: 12px;
+                            font-weight: 700;
+                            letter-spacing: 0.06em;
+                            text-transform: uppercase;
+                     }
+                     .page-card__title {
+                            color: #5d1029;
+                            font-size: 1.05rem;
+                            line-height: 1.35;
+                     }
+                     .page-card__link {
+                            margin-top: auto;
+                            color: #8b1e3f;
+                            font-weight: 700;
+                     }
                      .programs--teaser {
                             text-align: center;
                      }
