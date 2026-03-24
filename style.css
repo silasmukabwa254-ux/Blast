@@ -570,6 +570,14 @@
                      .about--teaser .join-button {
                             margin-top: 18px;
                      }
+                     .programs--teaser {
+                            text-align: center;
+                     }
+                     .programs--teaser p {
+                            max-width: 700px;
+                            margin-left: auto;
+                            margin-right: auto;
+                     }
                      .join-page {
                             max-width: 860px;
                      }
@@ -605,6 +613,9 @@
                      .about-page {
                             max-width: 980px;
                      }
+                     .programs-events-page {
+                            max-width: 980px;
+                      }
                      .page-kicker {
                             margin: 0;
                             color: #8b1e3f;
@@ -661,6 +672,10 @@
                             color: #8b1e3f;
                      }
                      .about-page__cta {
+                            margin-top: 28px;
+                            text-align: center;
+                     }
+                     .programs-events-page__cta {
                             margin-top: 28px;
                             text-align: center;
                      }
