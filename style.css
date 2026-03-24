@@ -572,12 +572,24 @@
                      }
                      .page-hub {
                             margin-top: 32px;
-                            padding: 22px 18px;
+                            padding: 24px 20px 22px;
                             border: 1px solid rgba(93, 16, 41, 0.08);
                             border-radius: 16px;
                             background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(252, 243, 247, 0.88));
                             box-shadow: 0 12px 28px rgba(93, 16, 41, 0.08);
                             text-align: center;
+                            position: relative;
+                            overflow: hidden;
+                     }
+                     .page-hub::before {
+                            content: "";
+                            position: absolute;
+                            inset: auto -80px -110px auto;
+                            width: 240px;
+                            height: 240px;
+                            border-radius: 50%;
+                            background: radial-gradient(circle, rgba(139, 30, 63, 0.1), rgba(139, 30, 63, 0) 70%);
+                            pointer-events: none;
                      }
                      .page-hub h2 {
                             margin: 6px 0 0;
@@ -589,7 +601,7 @@
                      .page-hub__grid {
                             display: grid;
                             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-                            gap: 14px;
+                            gap: 16px;
                             margin-top: 18px;
                      }
                      .page-card {
@@ -605,7 +617,18 @@
                             text-decoration: none;
                             text-align: left;
                             box-shadow: 0 8px 18px rgba(93, 16, 41, 0.08);
+                            position: relative;
+                            overflow: hidden;
                             transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+                     }
+                     .page-card::after {
+                            content: "";
+                            position: absolute;
+                            inset: 0;
+                            background: linear-gradient(135deg, rgba(139, 30, 63, 0.05), transparent 45%);
+                            opacity: 0;
+                            transition: opacity 0.2s ease;
+                            pointer-events: none;
                      }
                      .page-card:hover,
                      .page-card:focus-visible {
@@ -613,6 +636,10 @@
                             box-shadow: 0 14px 28px rgba(93, 16, 41, 0.14);
                             border-color: rgba(93, 16, 41, 0.2);
                             outline: none;
+                     }
+                     .page-card:hover::after,
+                     .page-card:focus-visible::after {
+                            opacity: 1;
                      }
                      .page-card__tag {
                             display: inline-flex;
@@ -635,6 +662,9 @@
                             margin-top: auto;
                             color: #8b1e3f;
                             font-weight: 700;
+                     }
+                     .page-card__link::after {
+                            content: " →";
                      }
                      .programs--teaser {
                             text-align: center;
@@ -974,6 +1004,23 @@
                                    margin-top: 10px;
                                    margin-bottom: 18px;
                                    padding: 8px 10px;
+                            }
+                            .page-hub {
+                                   margin-top: 24px;
+                                   padding: 18px 14px;
+                                   border-radius: 14px;
+                            }
+                            .page-hub__grid {
+                                   grid-template-columns: 1fr;
+                                   gap: 12px;
+                                   margin-top: 16px;
+                            }
+                            .page-card {
+                                   min-height: 0;
+                                   padding: 16px;
+                            }
+                            .page-card__title {
+                                   font-size: 1rem;
                             }
                             .welcome-modal__dialog {
                                    padding: 22px 16px;
