@@ -1,5 +1,4 @@
 const express = require("express");
-const cors = require("cors");
 const crypto = require("crypto");
 const {
   isDatabaseEnabled,
@@ -33,21 +32,61 @@ const JOIN_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const JOIN_RATE_LIMIT_MAX = 5;
 const joinRateLimitBuckets = new Map();
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || ALLOWED_ORIGINS.includes("*") || ALLOWED_ORIGINS.includes(origin)) {
-        return callback(null, true);
-      }
+app.use(function (req, res, next) {
+  const origin = req.headers.origin;
 
-      return callback(new Error(`Origin ${origin} is not allowed by CORS.`));
-    },
-  })
-);
+  if (!origin) {
+    return next();
+  }
+
+  if (!isAllowedOrigin(origin, req)) {
+    return res.status(403).json({
+      message: `Origin ${origin} is not allowed by CORS.`,
+    });
+  }
+
+  res.setHeader("Access-Control-Allow-Origin", origin);
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS");
+  res.setHeader("Vary", "Origin");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  return next();
+});
 app.use(express.json({ limit: "64kb" }));
 
 function normalizeText(value) {
   return String(value ?? "").trim();
+}
+
+function getRequestHost(req) {
+  return normalizeText(req.headers["x-forwarded-host"] || req.headers.host);
+}
+
+function isSameOriginRequest(origin, req) {
+  if (!origin) {
+    return true;
+  }
+
+  try {
+    const originUrl = new URL(origin);
+    const requestHost = getRequestHost(req);
+    return requestHost !== "" && originUrl.host === requestHost;
+  } catch (error) {
+    return false;
+  }
+}
+
+function isAllowedOrigin(origin, req) {
+  if (!origin || ALLOWED_ORIGINS.includes("*") || ALLOWED_ORIGINS.includes(origin)) {
+    return true;
+  }
+
+  return isSameOriginRequest(origin, req);
 }
 
 function getClientIdentifier(req) {

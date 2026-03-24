@@ -1,18 +1,54 @@
 {
-  "updatedAt": "2026-03-24T12:29:02.157Z",
+  "updatedAt": null,
   "events": [
     {
       "title": "Saturday Fellowship",
       "time": "Every Saturday at 4:00 PM",
       "location": "BLAST Youth Hall"
+    },
+    {
+      "title": "Prayer Gathering",
+      "time": "First Friday of each month at 6:00 PM",
+      "location": "Online Meeting"
     }
   ],
   "media": {
-    "intro": "Hello",
-    "images": [],
+    "intro": "Moments from fellowship, mentorship sessions, and community outreach.",
+    "images": [
+      {
+        "src": "media/img3.jpg-opt.jpg",
+        "alt": "Community gathering",
+        "caption": "Community"
+      },
+      {
+        "src": "media/img4.jpg-opt.jpg",
+        "alt": "Saturday fellowship group photo",
+        "caption": "Saturday Fellowship"
+      },
+      {
+        "src": "media/img2.jpg-opt.jpg",
+        "alt": "Bible study discussion session",
+        "caption": "Bible Study"
+      },
+      {
+        "src": "media/img7.png-opt.jpg",
+        "alt": "Mentorship moment with youth leaders",
+        "caption": "Mentorship"
+      },
+      {
+        "src": "blast.webp",
+        "alt": "Fellowship gathering",
+        "caption": "Fellowship"
+      },
+      {
+        "src": "media/img9.png-opt.jpg",
+        "alt": "Community outreach activity",
+        "caption": "Community Outreach"
+      }
+    ],
     "video": {
       "title": "Featured Video",
-      "caption": "A glimpse",
+      "caption": "A glimpse from our latest fellowship gathering.",
       "src": "VID 2.mp4",
       "poster": "blast.webp"
     }
