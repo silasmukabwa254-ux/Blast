@@ -560,6 +560,16 @@
                      .join-button:hover {
                             background-color: #6f1732;
                      }
+                     .about--teaser {
+                            text-align: center;
+                     }
+                     .about--teaser h2,
+                     .about--teaser p {
+                            text-align: center;
+                     }
+                     .about--teaser .join-button {
+                            margin-top: 18px;
+                     }
                      .join-page {
                             max-width: 860px;
                      }
@@ -591,6 +601,68 @@
                      }
                      .join-page__return:hover {
                             text-decoration: underline;
+                     }
+                     .about-page {
+                            max-width: 980px;
+                     }
+                     .page-kicker {
+                            margin: 0;
+                            color: #8b1e3f;
+                            font-size: 12px;
+                            font-weight: 700;
+                            letter-spacing: 0.14em;
+                            text-transform: uppercase;
+                            text-align: center;
+                     }
+                     .page-intro {
+                            max-width: 680px;
+                            margin: 12px auto 0;
+                            color: #4c3a43;
+                            text-align: center;
+                     }
+                     .about-page__grid {
+                            display: grid;
+                            grid-template-columns: repeat(3, minmax(0, 1fr));
+                            gap: 16px;
+                            margin-top: 28px;
+                     }
+                     .about-card,
+                     .value-card {
+                            padding: 18px;
+                            border: 1px solid rgba(93, 16, 41, 0.08);
+                            border-radius: 16px;
+                            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(252, 243, 247, 0.96));
+                            box-shadow: 0 10px 24px rgba(93, 16, 41, 0.06);
+                            text-align: left;
+                     }
+                     .about-card h2,
+                     .about-page__values h2,
+                     .about-page__cta h2 {
+                            margin-top: 0;
+                            color: #5d1029;
+                     }
+                     .about-card p,
+                     .value-card p,
+                     .about-page__cta p {
+                            color: #3d2b32;
+                     }
+                     .about-page__values {
+                            margin-top: 28px;
+                            text-align: left;
+                     }
+                     .value-grid {
+                            display: grid;
+                            grid-template-columns: repeat(4, minmax(0, 1fr));
+                            gap: 14px;
+                            margin-top: 14px;
+                     }
+                     .value-card h3 {
+                            margin-top: 0;
+                            color: #8b1e3f;
+                     }
+                     .about-page__cta {
+                            margin-top: 28px;
+                            text-align: center;
                      }
                      .site-nav {
                             display: flex;
@@ -849,6 +921,10 @@
                             }
                             .join-page__lead {
                                    margin-top: 8px;
+                            }
+                            .about-page__grid,
+                            .value-grid {
+                                   grid-template-columns: 1fr;
                             }
                             .name-row {
                                    flex-direction: column;
