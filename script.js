@@ -250,6 +250,7 @@ const joinForm = document.querySelector(".join-form");
 const fullName = document.getElementById("fullName");
 const email = document.getElementById("email");
 const interest = document.getElementById("interest");
+const spamTrap = document.getElementById("website");
 const formFeedback = document.getElementById("formFeedback");
 const joinFields = [fullName, email, interest];
 const formButton = joinForm.querySelector(".form-button");
@@ -370,6 +371,7 @@ joinForm.addEventListener("submit", async function (event) {
         fullName: trimmedName,
         email: trimmedEmail,
         interest: trimmedInterest,
+        website: spamTrap ? spamTrap.value : "",
       }),
     });
 

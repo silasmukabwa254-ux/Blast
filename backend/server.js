@@ -13,6 +13,7 @@ const {
 } = require("./notificationService");
 
 const app = express();
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 3000;
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*";
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || ALLOWED_ORIGIN)
@@ -22,6 +23,9 @@ const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || ALLOWED_ORIGIN)
   })
   .filter(Boolean);
 const ADMIN_REALM = "BLAST Admin";
+const JOIN_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const JOIN_RATE_LIMIT_MAX = 5;
+const joinRateLimitBuckets = new Map();
 
 app.use(
   cors({
@@ -38,6 +42,46 @@ app.use(express.json({ limit: "64kb" }));
 
 function normalizeText(value) {
   return String(value ?? "").trim();
+}
+
+function getClientIdentifier(req) {
+  const forwardedFor = normalizeText(req.headers["x-forwarded-for"]);
+  if (forwardedFor) {
+    return forwardedFor.split(",")[0].trim();
+  }
+
+  return normalizeText(req.ip || req.socket?.remoteAddress || "unknown");
+}
+
+function pruneJoinRateLimitBuckets(now) {
+  for (const [clientId, bucket] of joinRateLimitBuckets.entries()) {
+    if (now - bucket.windowStart >= JOIN_RATE_LIMIT_WINDOW_MS) {
+      joinRateLimitBuckets.delete(clientId);
+    }
+  }
+}
+
+function isJoinRateLimited(req) {
+  const now = Date.now();
+  const clientId = getClientIdentifier(req);
+
+  pruneJoinRateLimitBuckets(now);
+
+  const bucket = joinRateLimitBuckets.get(clientId);
+  if (!bucket) {
+    joinRateLimitBuckets.set(clientId, {
+      windowStart: now,
+      count: 1,
+    });
+    return false;
+  }
+
+  if (bucket.count >= JOIN_RATE_LIMIT_MAX) {
+    return true;
+  }
+
+  bucket.count += 1;
+  return false;
 }
 
 function getAdminCredentials() {
@@ -618,7 +662,14 @@ app.post("/api/join", async function (req, res, next) {
     const fullName = normalizeText(req.body.fullName);
     const email = normalizeText(req.body.email);
     const interest = normalizeText(req.body.interest);
+    const website = normalizeText(req.body.website);
     const errors = {};
+
+    if (website) {
+      return res.status(400).json({
+        message: "Please try again.",
+      });
+    }
 
     if (!fullName) {
       errors.fullName = "Full name is required.";
@@ -642,6 +693,12 @@ app.post("/api/join", async function (req, res, next) {
       return res.status(400).json({
         message: "Please fix the highlighted fields.",
         errors,
+      });
+    }
+
+    if (isJoinRateLimited(req)) {
+      return res.status(429).json({
+        message: "You are submitting too quickly. Please wait a few minutes and try again.",
       });
     }
 
