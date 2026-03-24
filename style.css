@@ -560,16 +560,6 @@
                      .join-button:hover {
                             background-color: #6f1732;
                      }
-                     .about--teaser {
-                            text-align: center;
-                     }
-                     .about--teaser h2,
-                     .about--teaser p {
-                            text-align: center;
-                     }
-                     .about--teaser .join-button {
-                            margin-top: 18px;
-                     }
                      .page-hub {
                             margin-top: 32px;
                             padding: 24px 20px 22px;
@@ -665,36 +655,6 @@
                      }
                      .page-card__link::after {
                             content: " →";
-                     }
-                     .programs--teaser {
-                            text-align: center;
-                     }
-                     .programs--teaser p {
-                            max-width: 700px;
-                            margin-left: auto;
-                            margin-right: auto;
-                     }
-                     .media--teaser {
-                            text-align: center;
-                     }
-                     .media--teaser p {
-                            max-width: 700px;
-                            margin-left: auto;
-                            margin-right: auto;
-                     }
-                     .media--teaser .join-button {
-                            margin-top: 18px;
-                     }
-                     .team--teaser {
-                            text-align: center;
-                     }
-                     .team--teaser p {
-                            max-width: 700px;
-                            margin-left: auto;
-                            margin-right: auto;
-                     }
-                     .team--teaser .join-button {
-                            margin-top: 18px;
                      }
                      .join-page {
                             max-width: 860px;
