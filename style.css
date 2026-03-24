@@ -560,6 +560,38 @@
                      .join-button:hover {
                             background-color: #6f1732;
                      }
+                     .join-page {
+                            max-width: 860px;
+                     }
+                     .join-page__eyebrow {
+                            margin: 0;
+                            color: #8b1e3f;
+                            font-size: 12px;
+                            font-weight: 700;
+                            letter-spacing: 0.14em;
+                            text-transform: uppercase;
+                     }
+                     .join-page__lead {
+                            max-width: 620px;
+                            margin: 10px auto 0;
+                            color: #4c3a43;
+                     }
+                     .join-page__callout {
+                            margin-top: 22px;
+                     }
+                     .join-page__callout p {
+                            margin-bottom: 8px;
+                     }
+                     .join-page__return {
+                            display: inline-block;
+                            margin-top: 18px;
+                            color: #8b1e3f;
+                            font-weight: 600;
+                            text-decoration: none;
+                     }
+                     .join-page__return:hover {
+                            text-decoration: underline;
+                     }
                      .site-nav {
                             display: flex;
                             justify-content: center;
@@ -814,6 +846,9 @@
                             .join-button {
                                    width: 100%;
                                    box-sizing: border-box;
+                            }
+                            .join-page__lead {
+                                   margin-top: 8px;
                             }
                             .name-row {
                                    flex-direction: column;
