@@ -641,7 +641,7 @@
                             font-weight: 700;
                      }
                      .page-card__link::after {
-                            content: " →";
+                            content: " ->";
                      }
                      .join-page {
                             max-width: 860px;
@@ -676,6 +676,9 @@
                             text-decoration: underline;
                      }
                      .about-page {
+                            max-width: 980px;
+                     }
+                     .contact-page {
                             max-width: 980px;
                      }
                      .media-page {
@@ -787,6 +790,17 @@
                      }
                      html {
                             scroll-behavior: smooth;
+                     }
+                     .sr-only {
+                            position: absolute;
+                            width: 1px;
+                            height: 1px;
+                            padding: 0;
+                            margin: -1px;
+                            overflow: hidden;
+                            clip: rect(0, 0, 0, 0);
+                            white-space: nowrap;
+                            border: 0;
                      }
 .about {
   margin-top: 28px;
