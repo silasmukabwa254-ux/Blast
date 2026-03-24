@@ -1,17 +1,9 @@
 const fs = require("fs/promises");
 const path = require("path");
-const { Pool } = require("pg");
+const { getPool, isDatabaseEnabled } = require("./database");
 
 const STORAGE_DIR = path.join(__dirname, "data");
 const SUBMISSIONS_FILE = path.join(STORAGE_DIR, "submissions.json");
-const DATABASE_URL = process.env.DATABASE_URL || "";
-const pool = DATABASE_URL
-  ? new Pool({
-      connectionString: DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
-    })
-  : null;
-
 let databaseReadyPromise = null;
 
 async function ensureFileStorage() {
@@ -51,6 +43,7 @@ async function writeFileSubmissions(submissions) {
 }
 
 async function ensureDatabase() {
+  const pool = getPool();
   if (!pool) return;
 
   if (!databaseReadyPromise) {
@@ -77,6 +70,7 @@ async function ensureDatabase() {
 }
 
 async function readDatabaseSubmissions() {
+  const pool = getPool();
   await ensureDatabase();
   const result = await pool.query(`
     SELECT
@@ -93,6 +87,7 @@ async function readDatabaseSubmissions() {
 }
 
 async function saveDatabaseSubmission(submission) {
+  const pool = getPool();
   await ensureDatabase();
   await pool.query(
     `
@@ -110,7 +105,7 @@ async function saveDatabaseSubmission(submission) {
 }
 
 async function readSubmissions() {
-  if (pool) {
+  if (getPool()) {
     return readDatabaseSubmissions();
   }
 
@@ -118,17 +113,13 @@ async function readSubmissions() {
 }
 
 async function saveSubmission(submission) {
-  if (pool) {
+  if (getPool()) {
     return saveDatabaseSubmission(submission);
   }
 
   const submissions = await readFileSubmissions();
   submissions.push(submission);
   await writeFileSubmissions(submissions);
-}
-
-function isDatabaseEnabled() {
-  return Boolean(pool);
 }
 
 module.exports = {

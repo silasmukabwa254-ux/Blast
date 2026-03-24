@@ -98,17 +98,18 @@
 </section>
 <section id="events" class="events">
        <h2>Upcoming Events</h2>
-
-       <div class="event-card">
-              <h3>Saturday Fellowship</h3>
-              <p><strong>Time:</strong> Every Saturday at 4:00 PM</p>
-              <p><strong>Location:</strong> BLAST Youth Hall</p>
+       <div class="event-list" id="eventList">
+              <div class="event-card">
+                     <h3>Saturday Fellowship</h3>
+                     <p><strong>Time:</strong> Every Saturday at 4:00 PM</p>
+                     <p><strong>Location:</strong> BLAST Youth Hall</p>
+              </div>
+              <div class="event-card">
+                     <h3>Prayer Gathering</h3>
+                     <p><strong>Time:</strong> First Friday of each month at 6:00 PM</p>
+                     <p><strong>Location:</strong> Online Meeting</p>
+              </div>
        </div>
-       <div class="event-card">
-              <h3>Prayer Gathering</h3>
-              <p><strong>Time:</strong> First Friday of each month at 6:00 PM</p>
-              <p><strong>Location:</strong> Online Meeting</p>
-</div>
 </section>
 <section class="testimonies">
   <h2>Testimonies</h2>
@@ -123,8 +124,8 @@
 </section>
 <section class="media">
   <h2>Media Highlights</h2>
-  <p class="media-intro">Moments from fellowship, mentorship sessions, and community outreach.</p>
-  <div class="media-grid">
+  <p class="media-intro" id="mediaIntro">Moments from fellowship, mentorship sessions, and community outreach.</p>
+  <div class="media-grid" id="mediaGrid">
     <figure class="media-card">
       <img src="media/img3.jpg-opt.jpg" alt="Community gathering" width="640" height="480" loading="lazy" decoding="async">
       <figcaption>Community</figcaption>
@@ -151,10 +152,11 @@
     </figure>
   </div>
   <div class="media-video">
-    <h3>Featured Video</h3>
+    <h3 id="featuredVideoTitle">Featured Video</h3>
+    <p class="media-video__caption" id="featuredVideoCaption">A glimpse from our latest fellowship gathering.</p>
     <div class="media-video__frame">
-      <video controls preload="metadata" poster="blast.webp">
-        <source src="VID%202.mp4" type="video/mp4">
+      <video id="featuredVideoElement" controls preload="metadata" poster="blast.webp">
+        <source id="featuredVideoSource" src="VID%202.mp4" type="video/mp4">
         Your browser does not support the video tag.
       </video>
     </div>

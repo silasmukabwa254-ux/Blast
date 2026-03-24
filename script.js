@@ -261,6 +261,15 @@ const JOIN_API_URL =
   (isLocalHost
     ? "http://localhost:3000/api/join"
     : "https://blast-backend-4zkv.onrender.com/api/join");
+let apiOrigin;
+try {
+  apiOrigin = new URL(JOIN_API_URL).origin;
+} catch (error) {
+  apiOrigin = isLocalHost
+    ? "http://localhost:3000"
+    : "https://blast-backend-4zkv.onrender.com";
+}
+const CONTENT_API_URL = `${apiOrigin}/api/content`;
 let savedJoinName = "";
 let savedJoinEmail = "";
 let savedJoinInterest = "";
@@ -469,3 +478,138 @@ if (backToTopBtn) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 }
+
+const eventList = document.getElementById("eventList");
+const mediaGrid = document.getElementById("mediaGrid");
+const mediaIntro = document.getElementById("mediaIntro");
+const featuredVideoTitle = document.getElementById("featuredVideoTitle");
+const featuredVideoCaption = document.getElementById("featuredVideoCaption");
+const featuredVideoElement = document.getElementById("featuredVideoElement");
+const featuredVideoSource = document.getElementById("featuredVideoSource");
+
+function buildEventCard(event) {
+  const card = document.createElement("div");
+  card.className = "event-card";
+
+  const heading = document.createElement("h3");
+  heading.textContent = event.title || "Untitled event";
+  card.appendChild(heading);
+
+  if (event.time) {
+    const time = document.createElement("p");
+    const strong = document.createElement("strong");
+    strong.textContent = "Time:";
+    time.appendChild(strong);
+    time.appendChild(document.createTextNode(` ${event.time}`));
+    card.appendChild(time);
+  }
+
+  if (event.location) {
+    const location = document.createElement("p");
+    const strong = document.createElement("strong");
+    strong.textContent = "Location:";
+    location.appendChild(strong);
+    location.appendChild(document.createTextNode(` ${event.location}`));
+    card.appendChild(location);
+  }
+
+  return card;
+}
+
+function buildMediaCard(item) {
+  const figure = document.createElement("figure");
+  figure.className = "media-card";
+
+  const image = document.createElement("img");
+  image.src = item.src || "blast.webp";
+  image.alt = item.alt || item.caption || "BLAST media";
+  image.width = 640;
+  image.height = 480;
+  image.loading = "lazy";
+  image.decoding = "async";
+  figure.appendChild(image);
+
+  const caption = document.createElement("figcaption");
+  caption.textContent = item.caption || "BLAST";
+  figure.appendChild(caption);
+
+  return figure;
+}
+
+function renderHomepageContent(content) {
+  if (!content) return;
+
+  const events = Array.isArray(content.events) ? content.events : [];
+  const media = content.media || {};
+  const images = Array.isArray(media.images) ? media.images : [];
+  const video = media.video || {};
+
+  if (eventList) {
+    eventList.innerHTML = "";
+    if (events.length) {
+      events.forEach(function (event) {
+        eventList.appendChild(buildEventCard(event));
+      });
+    } else {
+      const empty = document.createElement("div");
+      empty.className = "event-card";
+      empty.innerHTML = "<p>No upcoming events yet.</p>";
+      eventList.appendChild(empty);
+    }
+  }
+
+  if (mediaIntro && media.intro) {
+    mediaIntro.textContent = media.intro;
+  }
+
+  if (mediaGrid) {
+    mediaGrid.innerHTML = "";
+    if (images.length) {
+      images.forEach(function (item) {
+        mediaGrid.appendChild(buildMediaCard(item));
+      });
+    } else {
+      const empty = document.createElement("figure");
+      empty.className = "media-card";
+      empty.innerHTML = "<figcaption>No media highlights yet.</figcaption>";
+      mediaGrid.appendChild(empty);
+    }
+  }
+
+  if (featuredVideoTitle && video.title) {
+    featuredVideoTitle.textContent = video.title;
+  }
+
+  if (featuredVideoCaption && video.caption) {
+    featuredVideoCaption.textContent = video.caption;
+  }
+
+  if (featuredVideoElement && featuredVideoSource && video.src) {
+    featuredVideoSource.src = encodeURI(video.src);
+    if (video.poster) {
+      featuredVideoElement.setAttribute("poster", encodeURI(video.poster));
+    }
+    featuredVideoElement.load();
+  }
+}
+
+async function loadHomepageContent() {
+  try {
+    const response = await fetch(CONTENT_API_URL);
+    if (!response.ok) {
+      return;
+    }
+
+    const payload = await response.json().catch(function () {
+      return null;
+    });
+
+    if (payload && payload.content) {
+      renderHomepageContent(payload.content);
+    }
+  } catch (error) {
+    // Keep the static homepage fallback when the content API is unavailable.
+  }
+}
+
+loadHomepageContent();

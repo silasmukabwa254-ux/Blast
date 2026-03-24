@@ -411,6 +411,11 @@
                             color: #5d1029;
                             text-align: center;
                      }
+                     .media-video__caption {
+                            margin: 0 0 12px;
+                            color: #5d1029;
+                            text-align: center;
+                     }
                      .media-video__frame {
                             position: relative;
                             padding-top: 56.25%;

@@ -43,10 +43,19 @@ The backend lives in `backend/`.
 ### API
 
 - `GET /health`
+- `GET /api/content`
 - `GET /api/submissions`
 - `POST /api/notifications/test`
+- `PUT /api/content`
 - `GET /submissions`
+- `GET /content`
 - `POST /api/join`
+
+### Content management
+
+- Open `/content` on the backend service after signing in with Basic Auth.
+- Use it to edit the public homepage events and media without changing HTML.
+- The homepage reads those sections from `/api/content`.
 
 ## Quick Publish Options
 
