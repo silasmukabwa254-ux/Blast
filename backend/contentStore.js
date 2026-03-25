@@ -12,6 +12,12 @@ function normalizeText(value) {
   return String(value ?? "").trim();
 }
 
+function getContentTimestamp(content) {
+  const value = content && content.updatedAt ? content.updatedAt : "";
+  const parsed = Date.parse(normalizeText(value));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
 function getDefaultContent() {
   return {
     updatedAt: null,
@@ -180,6 +186,41 @@ async function writeFileContent(content) {
   );
 }
 
+async function persistFileMirror(content) {
+  try {
+    await writeFileContent(content);
+  } catch (error) {
+    console.warn(
+      "Content file mirror update failed:",
+      error && error.message ? error.message : error
+    );
+  }
+}
+
+async function writeDatabaseContent(content) {
+  const pool = getPool();
+  const normalized = normalizeContent(content);
+
+  if (!pool) {
+    throw new Error("Database is not available.");
+  }
+
+  await ensureDatabase();
+  await pool.query(
+    `
+      INSERT INTO site_content (content_key, payload, updated_at)
+      VALUES ($1, $2::jsonb, NOW())
+      ON CONFLICT (content_key)
+      DO UPDATE SET
+        payload = EXCLUDED.payload,
+        updated_at = NOW()
+    `,
+    [CONTENT_KEY, JSON.stringify(normalized)]
+  );
+
+  return normalized;
+}
+
 async function ensureDatabase() {
   const pool = getPool();
   if (!pool) return;
@@ -206,22 +247,11 @@ async function ensureDatabase() {
 }
 
 async function saveDatabaseContent(content) {
-  const pool = getPool();
   const normalized = normalizeContent(content);
 
   try {
-    await ensureDatabase();
-    await pool.query(
-      `
-        INSERT INTO site_content (content_key, payload, updated_at)
-        VALUES ($1, $2::jsonb, NOW())
-        ON CONFLICT (content_key)
-        DO UPDATE SET
-          payload = EXCLUDED.payload,
-          updated_at = NOW()
-      `,
-      [CONTENT_KEY, JSON.stringify(normalized)]
-    );
+    await writeDatabaseContent(normalized);
+    await persistFileMirror(normalized);
   } catch (error) {
     console.warn(
       "Content database save failed, falling back to file storage:",
@@ -252,7 +282,23 @@ async function readDatabaseContent() {
       return defaults;
     }
 
-    return normalizeContent(result.rows[0].payload);
+    const databaseContent = normalizeContent(result.rows[0].payload);
+    const fileContent = await readFileContent();
+
+    if (getContentTimestamp(fileContent) > getContentTimestamp(databaseContent)) {
+      try {
+        await writeDatabaseContent(fileContent);
+      } catch (syncError) {
+        console.warn(
+          "Content database sync from file failed:",
+          syncError && syncError.message ? syncError.message : syncError
+        );
+      }
+      return normalizeContent(fileContent);
+    }
+
+    await persistFileMirror(databaseContent);
+    return databaseContent;
   } catch (error) {
     console.warn(
       "Content database read failed, falling back to file storage:",

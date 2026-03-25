@@ -266,7 +266,7 @@ const interest = document.getElementById("interest");
 const spamTrap = document.getElementById("website");
 const formFeedback = document.getElementById("formFeedback");
 const joinFields = [fullName, email, interest];
-const formButton = joinForm.querySelector(".form-button");
+const formButton = joinForm ? joinForm.querySelector(".form-button") : null;
 const isLocalHost =
   window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 const JOIN_API_URL =
