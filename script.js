@@ -649,3 +649,320 @@ async function loadHomepageContent() {
 }
 
 loadHomepageContent();
+
+const BLAST_BOT_LINKS = [
+  { label: "About", href: "about.html" },
+  { label: "Programs", href: "programs-events.html#programs" },
+  { label: "Media", href: "media.html#gallery" },
+  { label: "Leadership", href: "leadership.html#leadership" },
+  { label: "Join", href: "join.html#join-form" },
+  { label: "Contact", href: "contact.html" },
+];
+
+function createBlastBotResponse(query) {
+  const text = String(query || "").toLowerCase();
+  const has = function (terms) {
+    return terms.some(function (term) {
+      return text.includes(term);
+    });
+  };
+
+  if (has(["patron", "patrons"])) {
+    return {
+      text:
+        "Our patrons guide BLAST with prayer, wisdom, and loving support. They have been a real blessing to the journey, and you can meet them on the homepage after the testimonies section.",
+      links: [{ label: "Go to Homepage", href: "index.html#main-content" }],
+    };
+  }
+
+  if (has(["about", "story", "mission", "vision", "values", "who are you", "what is blast"])) {
+    return {
+      text:
+        "BLAST is a youth-centered Christian community built on faith, mentorship, fellowship, and purposeful living. The About page shares our story, mission, and values in more detail.",
+      links: [{ label: "Open About", href: "about.html" }],
+    };
+  }
+
+  if (has(["program", "programs", "event", "events", "fellowship", "prayer", "bible", "study", "mentorship"])) {
+    return {
+      text:
+        "Our Programs & Events page covers Bible study, fellowship, prayer gatherings, and the rhythms that keep BLAST growing together.",
+      links: [{ label: "Open Programs & Events", href: "programs-events.html#programs" }],
+    };
+  }
+
+  if (has(["media", "photo", "photos", "picture", "pictures", "video", "gallery"])) {
+    return {
+      text:
+        "The Media page shows BLAST moments in pictures and video, with outreach, prayer, school visits, kids camp, and worship highlights.",
+      links: [{ label: "Open Media", href: "media.html#gallery" }],
+    };
+  }
+
+  if (
+    has([
+      "leader",
+      "leaders",
+      "leadership",
+      "founder",
+      "founders",
+      "team",
+      "wesley",
+      "kelvin",
+      "ian",
+      "nelson",
+      "joshua",
+      "mathew",
+      "hope",
+      "audia",
+      "caroline",
+      "shillah",
+      "cynthia",
+      "anado",
+      "elisha",
+      "justin",
+    ])
+  ) {
+    return {
+      text:
+        "The Leadership page introduces our founders, leaders, and members who carry BLAST forward with faith, service, and courage.",
+      links: [{ label: "Meet the Team", href: "leadership.html#leadership" }],
+    };
+  }
+
+  if (has(["join", "join blast", "become a member", "sign up"])) {
+    return {
+      text:
+        "We’d love to have you with us. The Join page has the form you can use to get connected with BLAST.",
+      links: [{ label: "Open Join", href: "join.html#join-form" }],
+    };
+  }
+
+  if (has(["contact", "email", "phone", "reach us", "talk to", "message"])) {
+    return {
+      text:
+        "You can reach BLAST through the Contact page for email details and the best ways to get in touch.",
+      links: [{ label: "Open Contact", href: "contact.html" }],
+    };
+  }
+
+  return {
+    text:
+      "I can help with About, Programs & Events, Media, Leadership, Join, Contact, or Patrons. Try one of the quick prompts below, and I’ll point you in the right direction.",
+    links: [],
+  };
+}
+
+function initBlastBot() {
+  if (document.getElementById("blastBotWidget")) {
+    return;
+  }
+
+  const widget = document.createElement("section");
+  widget.className = "blast-bot";
+  widget.id = "blastBotWidget";
+
+  const panel = document.createElement("div");
+  panel.className = "blast-bot__panel";
+  panel.hidden = true;
+
+  const header = document.createElement("div");
+  header.className = "blast-bot__header";
+
+  const headingWrap = document.createElement("div");
+  const eyebrow = document.createElement("p");
+  eyebrow.className = "blast-bot__eyebrow";
+  eyebrow.textContent = "BLAST helper";
+  const title = document.createElement("h2");
+  title.textContent = "Ask the BLAST Bot";
+  const subtitle = document.createElement("p");
+  subtitle.className = "blast-bot__subtitle";
+  subtitle.textContent = "A small guide for pages, programs, and ways to get involved.";
+  headingWrap.appendChild(eyebrow);
+  headingWrap.appendChild(title);
+  headingWrap.appendChild(subtitle);
+
+  const closeButton = document.createElement("button");
+  closeButton.type = "button";
+  closeButton.className = "blast-bot__close";
+  closeButton.setAttribute("aria-label", "Close BLAST Bot");
+  closeButton.textContent = "×";
+
+  header.appendChild(headingWrap);
+  header.appendChild(closeButton);
+
+  const messages = document.createElement("div");
+  messages.className = "blast-bot__messages";
+  messages.setAttribute("role", "log");
+  messages.setAttribute("aria-live", "polite");
+  messages.setAttribute("aria-relevant", "additions text");
+
+  const promptRow = document.createElement("div");
+  promptRow.className = "blast-bot__prompts";
+  const promptItems = [
+    "About BLAST",
+    "Programs & Events",
+    "Media",
+    "Leadership",
+    "Join BLAST",
+    "Contact",
+  ];
+
+  function addMessage(role, text, links) {
+    const bubble = document.createElement("div");
+    bubble.className = `blast-bot__message blast-bot__message--${role}`;
+
+    const paragraph = document.createElement("p");
+    paragraph.textContent = text;
+    bubble.appendChild(paragraph);
+
+    if (Array.isArray(links) && links.length) {
+      const linkRow = document.createElement("div");
+      linkRow.className = "blast-bot__message-links";
+
+      links.forEach(function (link) {
+        const anchor = document.createElement("a");
+        anchor.className = "blast-bot__message-link";
+        anchor.href = link.href;
+        anchor.textContent = link.label;
+        linkRow.appendChild(anchor);
+      });
+
+      bubble.appendChild(linkRow);
+    }
+
+    messages.appendChild(bubble);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function addTypingIndicator() {
+    const typing = document.createElement("div");
+    typing.className = "blast-bot__message blast-bot__message--assistant blast-bot__message--typing";
+    typing.setAttribute("aria-live", "polite");
+
+    const dotWrap = document.createElement("span");
+    dotWrap.className = "blast-bot__typing";
+    dotWrap.textContent = "BLAST Bot is typing";
+    typing.appendChild(dotWrap);
+
+    messages.appendChild(typing);
+    messages.scrollTop = messages.scrollHeight;
+    return typing;
+  }
+
+  function showReply(query) {
+    const cleaned = String(query || "").trim();
+    if (!cleaned) return;
+
+    addMessage("user", cleaned);
+    input.value = "";
+
+    const typing = addTypingIndicator();
+    window.setTimeout(function () {
+      typing.remove();
+      const response = createBlastBotResponse(cleaned);
+      addMessage("assistant", response.text, response.links);
+    }, 500);
+  }
+
+  promptItems.forEach(function (label) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "blast-bot__prompt";
+    button.textContent = label;
+    button.addEventListener("click", function () {
+      showReply(label);
+      openBot();
+    });
+    promptRow.appendChild(button);
+  });
+
+  const form = document.createElement("form");
+  form.className = "blast-bot__form";
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "blast-bot__input";
+  input.placeholder = "Ask me about BLAST...";
+  input.setAttribute("aria-label", "Ask the BLAST Bot a question");
+
+  const sendButton = document.createElement("button");
+  sendButton.type = "submit";
+  sendButton.className = "blast-bot__send";
+  sendButton.textContent = "Send";
+
+  form.appendChild(input);
+  form.appendChild(sendButton);
+
+  const quickLinks = document.createElement("div");
+  quickLinks.className = "blast-bot__quick-links";
+
+  BLAST_BOT_LINKS.forEach(function (link) {
+    const anchor = document.createElement("a");
+    anchor.href = link.href;
+    anchor.textContent = link.label;
+    quickLinks.appendChild(anchor);
+  });
+
+  function openBot() {
+    panel.hidden = false;
+    panel.classList.add("is-open");
+    toggle.setAttribute("aria-expanded", "true");
+    toggle.textContent = "Close BLAST Bot";
+    window.setTimeout(function () {
+      input.focus();
+    }, 0);
+  }
+
+  function closeBot() {
+    panel.hidden = true;
+    panel.classList.remove("is-open");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.textContent = "Open BLAST Bot";
+  }
+
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "blast-bot__toggle";
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.setAttribute("aria-controls", "blastBotPanel");
+  toggle.textContent = "Open BLAST Bot";
+  toggle.addEventListener("click", function () {
+    if (panel.hidden) {
+      openBot();
+    } else {
+      closeBot();
+    }
+  });
+
+  closeButton.addEventListener("click", closeBot);
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    showReply(input.value);
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && !panel.hidden) {
+      closeBot();
+    }
+  });
+
+  addMessage(
+    "assistant",
+    "Hi, I’m BLAST Bot. I can help you find the right page, learn about BLAST, or get connected. Try one of the quick prompts below."
+  );
+
+  panel.id = "blastBotPanel";
+  panel.appendChild(header);
+  panel.appendChild(messages);
+  panel.appendChild(promptRow);
+  panel.appendChild(form);
+  panel.appendChild(quickLinks);
+
+  widget.appendChild(panel);
+  widget.appendChild(toggle);
+  document.body.appendChild(widget);
+}
+
+initBlastBot();
