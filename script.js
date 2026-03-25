@@ -1,4 +1,4 @@
-const button = document.getElementById("welcomeBtn");
+﻿const button = document.getElementById("welcomeBtn");
 const message = document.getElementById("message");
 const nameInput = document.getElementById("nameInput");
 const nameError = document.getElementById("nameError");
@@ -670,7 +670,7 @@ function createBlastBotResponse(query) {
   if (has(["patron", "patrons"])) {
     return {
       text:
-        "Our patrons guide BLAST with prayer, wisdom, and loving support. They have been a real blessing to the journey, and you can meet them on the homepage after the testimonies section.",
+        "Our patrons guide BLAST with prayer, wisdom, and loving support. They are a blessing to the journey, and you can meet them on the homepage after the testimonies section.",
       links: [{ label: "Go to Homepage", href: "index.html#main-content" }],
     };
   }
@@ -733,7 +733,7 @@ function createBlastBotResponse(query) {
   if (has(["join", "join blast", "become a member", "sign up"])) {
     return {
       text:
-        "We’d love to have you with us. The Join page has the form you can use to get connected with BLAST.",
+        "We'd love to have you with us. The Join page has the form you can use to get connected with BLAST.",
       links: [{ label: "Open Join", href: "join.html#join-form" }],
     };
   }
@@ -748,9 +748,40 @@ function createBlastBotResponse(query) {
 
   return {
     text:
-      "I can help with About, Programs & Events, Media, Leadership, Join, Contact, or Patrons. Try one of the quick prompts below, and I’ll point you in the right direction.",
+      "I can help with About, Programs & Events, Media, Leadership, Join, Contact, or Patrons. Try one of the quick prompts below, and I'll point you in the right direction.",
     links: [],
   };
+}
+
+async function getBlastBotResponse(query) {
+  const fallback = createBlastBotResponse(query);
+  if (typeof window !== "undefined" && typeof window.BLAST_BOT_PROVIDER === "function") {
+    try {
+      const result = await window.BLAST_BOT_PROVIDER(query, {
+        fallback: fallback,
+        links: BLAST_BOT_LINKS,
+      });
+
+      if (typeof result === "string") {
+        return {
+          text: result,
+          links: fallback.links,
+        };
+      }
+
+      if (result && typeof result === "object") {
+        return {
+          text:
+            typeof result.text === "string" && result.text.trim() ? result.text.trim() : fallback.text,
+          links: Array.isArray(result.links) ? result.links : fallback.links,
+        };
+      }
+    } catch (error) {
+      console.warn("BLAST Bot provider failed, using fallback reply.", error);
+    }
+  }
+
+  return fallback;
 }
 
 function initBlastBot() {
@@ -777,7 +808,7 @@ function initBlastBot() {
   title.textContent = "Ask the BLAST Bot";
   const subtitle = document.createElement("p");
   subtitle.className = "blast-bot__subtitle";
-  subtitle.textContent = "A small guide for pages, programs, and ways to get involved.";
+  subtitle.textContent = "A friendly guide to pages, programs, and ways to get involved.";
   headingWrap.appendChild(eyebrow);
   headingWrap.appendChild(title);
   headingWrap.appendChild(subtitle);
@@ -786,7 +817,7 @@ function initBlastBot() {
   closeButton.type = "button";
   closeButton.className = "blast-bot__close";
   closeButton.setAttribute("aria-label", "Close BLAST Bot");
-  closeButton.textContent = "×";
+  closeButton.textContent = "Ã—";
 
   header.appendChild(headingWrap);
   header.appendChild(closeButton);
@@ -804,6 +835,7 @@ function initBlastBot() {
     "Programs & Events",
     "Media",
     "Leadership",
+    "Patrons",
     "Join BLAST",
     "Contact",
   ];
@@ -850,7 +882,7 @@ function initBlastBot() {
     return typing;
   }
 
-  function showReply(query) {
+  async function showReply(query) {
     const cleaned = String(query || "").trim();
     if (!cleaned) return;
 
@@ -858,9 +890,9 @@ function initBlastBot() {
     input.value = "";
 
     const typing = addTypingIndicator();
-    window.setTimeout(function () {
+    window.setTimeout(async function () {
       typing.remove();
-      const response = createBlastBotResponse(cleaned);
+      const response = await getBlastBotResponse(cleaned);
       addMessage("assistant", response.text, response.links);
     }, 500);
   }
@@ -950,7 +982,7 @@ function initBlastBot() {
 
   addMessage(
     "assistant",
-    "Hi, I’m BLAST Bot. I can help you find the right page, learn about BLAST, or get connected. Try one of the quick prompts below."
+    "Hi, I'm BLAST Bot. I can help you find the right page, learn about BLAST, or get connected. Try one of the quick prompts below."
   );
 
   panel.id = "blastBotPanel";
