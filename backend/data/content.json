@@ -1,5 +1,5 @@
 {
-  "updatedAt": null,
+  "updatedAt": "2026-03-25T23:59:59.000Z",
   "events": [
     {
       "title": "Saturday Fellowship",
@@ -13,37 +13,57 @@
     }
   ],
   "media": {
-    "intro": "Moments from fellowship, mentorship sessions, and community outreach.",
+    "intro": "Highlights from fellowship, outreach, kids camp, school visits, prayer, and community moments.",
     "images": [
       {
-        "src": "media/img3.jpg-opt.jpg",
-        "alt": "Community gathering",
-        "caption": "Community"
+        "src": "img.outreach.jpg",
+        "alt": "BLAST members serving during outreach",
+        "caption": "Outreach"
       },
       {
-        "src": "media/img4.jpg-opt.jpg",
-        "alt": "Saturday fellowship group photo",
-        "caption": "Saturday Fellowship"
+        "src": "img.praying.jpg",
+        "alt": "BLAST members praying together",
+        "caption": "Prayer"
       },
       {
-        "src": "media/img2.jpg-opt.jpg",
-        "alt": "Bible study discussion session",
-        "caption": "Bible Study"
+        "src": "img.kids camp.jpg",
+        "alt": "Children at BLAST kids camp",
+        "caption": "Kids Camp"
       },
       {
-        "src": "media/img7.png-opt.jpg",
-        "alt": "Mentorship moment with youth leaders",
-        "caption": "Mentorship"
+        "src": "img.kids activities.jpg",
+        "alt": "Children taking part in BLAST kids activities",
+        "caption": "Kids Activities"
       },
       {
-        "src": "blast.webp",
-        "alt": "Fellowship gathering",
+        "src": "img.school visit 1.jpg",
+        "alt": "BLAST members on a school visit",
+        "caption": "School Visit 1"
+      },
+      {
+        "src": "img.school visit 2.jpg",
+        "alt": "BLAST members on another school visit",
+        "caption": "School Visit 2"
+      },
+      {
+        "src": "img.glory band.jpg",
+        "alt": "Glory band leading worship",
+        "caption": "Glory Band"
+      },
+      {
+        "src": "FB_IMG_1744660253225.jpg",
+        "alt": "BLAST fellowship moment",
         "caption": "Fellowship"
       },
       {
-        "src": "media/img9.png-opt.jpg",
-        "alt": "Community outreach activity",
-        "caption": "Community Outreach"
+        "src": "FB_IMG_1744660256340.jpg",
+        "alt": "Community moment with BLAST members",
+        "caption": "Community"
+      },
+      {
+        "src": "IMG-20250326-WA0007.jpg",
+        "alt": "BLAST event highlight",
+        "caption": "Event Highlight"
       }
     ],
     "video": {
