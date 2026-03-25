@@ -651,15 +651,6 @@ async function loadHomepageContent() {
 
 loadHomepageContent();
 
-const BLAST_BOT_LINKS = [
-  { label: "About", href: "about.html" },
-  { label: "Programs", href: "programs-events.html#programs" },
-  { label: "Media", href: "media.html#gallery" },
-  { label: "Leadership", href: "leadership.html#leadership" },
-  { label: "Join", href: "join.html#join-form" },
-  { label: "Contact", href: "contact.html" },
-];
-
 function createBlastBotResponse(query) {
   const text = String(query || "").toLowerCase();
   const has = function (terms) {
@@ -937,16 +928,6 @@ function initBlastBot() {
   form.appendChild(input);
   form.appendChild(sendButton);
 
-  const quickLinks = document.createElement("div");
-  quickLinks.className = "blast-bot__quick-links";
-
-  BLAST_BOT_LINKS.forEach(function (link) {
-    const anchor = document.createElement("a");
-    anchor.href = link.href;
-    anchor.textContent = link.label;
-    quickLinks.appendChild(anchor);
-  });
-
   function openBot() {
     panel.hidden = false;
     panel.classList.add("is-open");
@@ -1001,7 +982,6 @@ function initBlastBot() {
   panel.appendChild(messages);
   panel.appendChild(promptRow);
   panel.appendChild(form);
-  panel.appendChild(quickLinks);
 
   widget.appendChild(panel);
   widget.appendChild(toggle);

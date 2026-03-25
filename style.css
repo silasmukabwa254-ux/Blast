@@ -1201,28 +1201,6 @@
                             outline: 3px solid #6ea8ff;
                             outline-offset: 2px;
                      }
-                     .blast-bot__quick-links {
-                            display: flex;
-                            flex-wrap: wrap;
-                            gap: 8px;
-                            padding: 0 14px 14px;
-                     }
-                     .blast-bot__quick-links a {
-                            display: inline-flex;
-                            align-items: center;
-                            justify-content: center;
-                            padding: 8px 10px;
-                            border-radius: 999px;
-                            border: 1px solid rgba(93, 16, 41, 0.12);
-                            color: #8b1e3f;
-                            background: rgba(139, 30, 63, 0.06);
-                            text-decoration: none;
-                            font-size: 13px;
-                            font-weight: 700;
-                     }
-                     .blast-bot__quick-links a:hover {
-                            background: rgba(139, 30, 63, 0.12);
-                     }
                      @keyframes blast-bot-pulse {
                             0%, 100% {
                                    opacity: 0.45;
