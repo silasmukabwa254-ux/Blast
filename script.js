@@ -517,6 +517,7 @@ const featuredVideoTitle = document.getElementById("featuredVideoTitle");
 const featuredVideoCaption = document.getElementById("featuredVideoCaption");
 const featuredVideoElement = document.getElementById("featuredVideoElement");
 const featuredVideoSource = document.getElementById("featuredVideoSource");
+const isDedicatedMediaPage = Boolean(document.querySelector("main.media-page"));
 
 function buildEventCard(event) {
   const card = document.createElement("div");
@@ -625,6 +626,10 @@ function renderHomepageContent(content) {
 }
 
 async function loadHomepageContent() {
+  if (isDedicatedMediaPage) {
+    return;
+  }
+
   try {
     const response = await fetch(CONTENT_API_URL);
     if (!response.ok) {
