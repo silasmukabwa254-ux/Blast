@@ -429,9 +429,13 @@
                             transform: scale(1.04);
                      }
                      .media-card figcaption {
-                            padding: 10px 12px 12px;
+                            padding: 12px 12px 14px;
                             font-weight: 600;
+                            font-size: 0.95rem;
+                            line-height: 1.55;
                             color: #5d1029;
+                            background: linear-gradient(180deg, rgba(255, 248, 250, 0.96), rgba(255, 255, 255, 0.98));
+                            border-top: 1px solid #eadde2;
                      }
                      .media-video {
                             margin-top: 22px;
