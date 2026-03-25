@@ -503,6 +503,9 @@
                      .team-photo--top {
                             object-position: center top;
                      }
+                     .team-photo--nelson-founder {
+                            object-position: center 18%;
+                     }
                      .team-card h3 {
                             margin: 0 0 4px;
                             color: #5d1029;
