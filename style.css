@@ -1104,6 +1104,16 @@
                             .patron-card img {
                                    max-height: 220px;
                             }
+                            #founders .team-grid {
+                                   grid-template-columns: repeat(2, minmax(0, 1fr));
+                                   gap: 10px;
+                            }
+                            #founders .team-card {
+                                   padding: 12px;
+                            }
+                            #founders .team-photo {
+                                   height: 165px;
+                            }
                             .name-row {
                                    flex-direction: column;
                                    align-items: center;
