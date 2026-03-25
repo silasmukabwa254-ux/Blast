@@ -18,3 +18,5 @@ services:
           property: connectionString
       - key: ALLOWED_ORIGINS
         value: https://silasmukabwa254-ux.github.io,http://localhost:3000
+      - key: BLAST_AI_MODEL
+        value: gpt-5.4-mini

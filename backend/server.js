@@ -16,6 +16,7 @@ const {
   sendSubmissionNotification,
   sendTestNotification,
 } = require("./notificationService");
+const { generateBlastBotReply } = require("./blastBotService");
 
 const app = express();
 app.set("trust proxy", 1);
@@ -1399,6 +1400,32 @@ app.post("/api/notifications/test", requireAdmin, async function (req, res, next
       message: "Test notification failed.",
       error: error.message || "Unknown SMTP error.",
     });
+  }
+});
+
+app.post("/api/bot/chat", async function (req, res, next) {
+  try {
+    const message = normalizeText(req.body.message);
+    const page = normalizeText(req.body.page);
+
+    if (!message) {
+      return res.status(400).json({
+        message: "A message is required.",
+      });
+    }
+
+    const content = await readContent();
+    const reply = await generateBlastBotReply(message, content, page);
+
+    res.json({
+      message: "Blast bot reply generated.",
+      text: reply.text,
+      links: reply.links,
+      source: reply.source,
+      model: reply.model,
+    });
+  } catch (error) {
+    return next(error);
   }
 });
 

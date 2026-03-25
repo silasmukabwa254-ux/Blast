@@ -283,6 +283,7 @@ try {
     : "https://blast-backend-4zkv.onrender.com";
 }
 const CONTENT_API_URL = `${apiOrigin}/api/content`;
+const BLAST_BOT_API_URL = `${apiOrigin}/api/bot/chat`;
 let savedJoinName = "";
 let savedJoinEmail = "";
 let savedJoinInterest = "";
@@ -671,7 +672,7 @@ function createBlastBotResponse(query) {
     return {
       text:
         "Our patrons guide BLAST with prayer, wisdom, and loving support. They are a blessing to the journey, and you can meet them on the homepage after the testimonies section.",
-      links: [{ label: "Go to Homepage", href: "index.html#main-content" }],
+      links: [{ label: "Go to Patrons", href: "index.html#patrons" }],
     };
   }
 
@@ -755,33 +756,43 @@ function createBlastBotResponse(query) {
 
 async function getBlastBotResponse(query) {
   const fallback = createBlastBotResponse(query);
-  if (typeof window !== "undefined" && typeof window.BLAST_BOT_PROVIDER === "function") {
-    try {
-      const result = await window.BLAST_BOT_PROVIDER(query, {
-        fallback: fallback,
-        links: BLAST_BOT_LINKS,
-      });
 
-      if (typeof result === "string") {
-        return {
-          text: result,
-          links: fallback.links,
-        };
-      }
+  try {
+    const response = await fetch(BLAST_BOT_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: query,
+        page: window.location.pathname,
+      }),
+    });
 
-      if (result && typeof result === "object") {
-        return {
-          text:
-            typeof result.text === "string" && result.text.trim() ? result.text.trim() : fallback.text,
-          links: Array.isArray(result.links) ? result.links : fallback.links,
-        };
-      }
-    } catch (error) {
-      console.warn("BLAST Bot provider failed, using fallback reply.", error);
+    const payload = await response.json().catch(function () {
+      return null;
+    });
+
+    if (!response.ok) {
+      return fallback;
     }
-  }
 
-  return fallback;
+    if (!payload || typeof payload.text !== "string") {
+      return fallback;
+    }
+
+    const text = payload.text.trim();
+    if (!text) {
+      return fallback;
+    }
+
+    return {
+      text: text,
+      links: Array.isArray(payload.links) ? payload.links : fallback.links,
+    };
+  } catch (error) {
+    return fallback;
+  }
 }
 
 function initBlastBot() {
@@ -803,12 +814,12 @@ function initBlastBot() {
   const headingWrap = document.createElement("div");
   const eyebrow = document.createElement("p");
   eyebrow.className = "blast-bot__eyebrow";
-  eyebrow.textContent = "BLAST helper";
+  eyebrow.textContent = "AI assistant";
   const title = document.createElement("h2");
-  title.textContent = "Ask the BLAST Bot";
+  title.textContent = "Ask the BLAST Assistant";
   const subtitle = document.createElement("p");
   subtitle.className = "blast-bot__subtitle";
-  subtitle.textContent = "A friendly guide to pages, programs, and ways to get involved.";
+  subtitle.textContent = "A smart guide to pages, programs, and ways to get involved.";
   headingWrap.appendChild(eyebrow);
   headingWrap.appendChild(title);
   headingWrap.appendChild(subtitle);
@@ -916,7 +927,7 @@ function initBlastBot() {
   input.type = "text";
   input.className = "blast-bot__input";
   input.placeholder = "Ask me about BLAST...";
-  input.setAttribute("aria-label", "Ask the BLAST Bot a question");
+  input.setAttribute("aria-label", "Ask the BLAST Assistant a question");
 
   const sendButton = document.createElement("button");
   sendButton.type = "submit";
