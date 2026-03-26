@@ -6,6 +6,10 @@ const {
   saveSubmission,
 } = require("./submissionStore");
 const {
+  readFeedback,
+  saveFeedback,
+} = require("./feedbackStore");
+const {
   getDefaultContent,
   normalizeContent,
   readContent,
@@ -32,6 +36,9 @@ const ADMIN_REALM = "BLAST Admin";
 const JOIN_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const JOIN_RATE_LIMIT_MAX = 5;
 const joinRateLimitBuckets = new Map();
+const FEEDBACK_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const FEEDBACK_RATE_LIMIT_MAX = 5;
+const feedbackRateLimitBuckets = new Map();
 
 app.use(function (req, res, next) {
   const origin = req.headers.origin;
@@ -123,6 +130,37 @@ function isJoinRateLimited(req) {
   }
 
   if (bucket.count >= JOIN_RATE_LIMIT_MAX) {
+    return true;
+  }
+
+  bucket.count += 1;
+  return false;
+}
+
+function pruneFeedbackRateLimitBuckets(now) {
+  for (const [clientId, bucket] of feedbackRateLimitBuckets.entries()) {
+    if (now - bucket.windowStart >= FEEDBACK_RATE_LIMIT_WINDOW_MS) {
+      feedbackRateLimitBuckets.delete(clientId);
+    }
+  }
+}
+
+function isFeedbackRateLimited(req) {
+  const now = Date.now();
+  const clientId = getClientIdentifier(req);
+
+  pruneFeedbackRateLimitBuckets(now);
+
+  const bucket = feedbackRateLimitBuckets.get(clientId);
+  if (!bucket) {
+    feedbackRateLimitBuckets.set(clientId, {
+      windowStart: now,
+      count: 1,
+    });
+    return false;
+  }
+
+  if (bucket.count >= FEEDBACK_RATE_LIMIT_MAX) {
     return true;
   }
 
@@ -222,6 +260,371 @@ function buildSubmissionsCsv(submissions) {
   });
 
   return `${lines.join("\n")}\n`;
+}
+
+function filterFeedback(feedbackEntries, query) {
+  const normalizedQuery = normalizeSearch(query);
+
+  if (!normalizedQuery) {
+    return feedbackEntries;
+  }
+
+  return feedbackEntries.filter(function (entry) {
+    const haystack = [
+      entry.fullName,
+      entry.email,
+      entry.topic,
+      entry.message,
+      new Date(entry.submittedAt).toLocaleString(),
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return haystack.includes(normalizedQuery);
+  });
+}
+
+function buildFeedbackCsv(feedbackEntries) {
+  const header = ["Full Name", "Email", "Topic", "Message", "Submitted At"];
+  const lines = [header.map(escapeCsvCell).join(",")];
+
+  feedbackEntries.forEach(function (entry) {
+    lines.push(
+      [
+        entry.fullName,
+        entry.email,
+        entry.topic,
+        entry.message,
+        new Date(entry.submittedAt).toLocaleString(),
+      ]
+        .map(escapeCsvCell)
+        .join(",")
+    );
+  });
+
+  return `${lines.join("\n")}\n`;
+}
+
+function buildFeedbackDashboard(feedbackEntries, query) {
+  const searchQuery = getQueryText(query);
+  const filteredFeedback = filterFeedback(feedbackEntries, searchQuery);
+  const exportHref = searchQuery
+    ? `/feedback/export.csv?q=${encodeURIComponent(searchQuery)}`
+    : "/feedback/export.csv";
+  const clearHref = searchQuery ? "/feedback" : "";
+  const latestFeedback = feedbackEntries.length ? feedbackEntries[feedbackEntries.length - 1] : null;
+  const latestLabel = latestFeedback
+    ? new Date(latestFeedback.submittedAt).toLocaleString()
+    : "No feedback yet";
+  const rows = filteredFeedback.length
+    ? filteredFeedback
+        .map(function (entry, index) {
+          return `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${escapeHtml(entry.fullName)}</td>
+              <td>${escapeHtml(entry.email || "—")}</td>
+              <td>${escapeHtml(entry.topic)}</td>
+              <td>${escapeHtml(entry.message)}</td>
+              <td>${formatSubmissionDate(entry.submittedAt)}</td>
+            </tr>
+          `;
+        })
+        .join("")
+    : `
+        <tr>
+          <td colspan="6" style="text-align:center; padding: 1.5rem;">
+            ${searchQuery ? "No feedback matches your search." : "No feedback yet."}
+          </td>
+        </tr>
+      `;
+
+  return `<!doctype html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>BLAST Feedback</title>
+        <style>
+          :root {
+            color-scheme: light;
+            --bg: #f7f1f4;
+            --panel: #ffffff;
+            --text: #2f1f26;
+            --muted: #6f5a64;
+            --accent: #5d1029;
+            --border: #e4d7dd;
+            --accent-soft: #f4e6ea;
+          }
+          body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(180deg, #fff7f9 0%, var(--bg) 100%);
+            color: var(--text);
+            padding: 2rem;
+          }
+          .wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+          }
+          .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 12px 30px rgba(93, 16, 41, 0.08);
+            overflow: hidden;
+          }
+          header {
+            padding: 1.5rem 1.5rem 1rem;
+          }
+          h1 {
+            margin: 0 0 0.5rem;
+            color: var(--accent);
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+          }
+          .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 0.8rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+          }
+          p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+          }
+          .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+          }
+          .stat {
+            padding: 0.85rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: linear-gradient(180deg, #fff 0%, #fffafc 100%);
+          }
+          .stat span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+          }
+          .stat strong {
+            color: var(--accent);
+            font-size: 1.1rem;
+          }
+          .dashboard-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: end;
+            margin-top: 1rem;
+            padding: 0 1.5rem 1.25rem;
+          }
+          .search-group {
+            flex: 1 1 320px;
+          }
+          .search-group label {
+            display: block;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.4rem;
+          }
+          .search-group input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.85rem 0.95rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font: inherit;
+          }
+          .tool-button,
+          .tool-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            min-height: 44px;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            font: inherit;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+          }
+          .tool-button {
+            background: var(--accent);
+            color: #fff;
+          }
+          .tool-link {
+            background: #f4ebee;
+            color: var(--accent);
+            border-color: var(--border);
+          }
+          .tool-button:hover {
+            background: #6f1732;
+          }
+          .tool-link:hover {
+            background: #efe3e8;
+          }
+          .table-wrap {
+            overflow-x: auto;
+            border-top: 1px solid var(--border);
+            background: linear-gradient(180deg, #fff 0%, #fffdfd 100%);
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+            table-layout: fixed;
+          }
+          thead th {
+            background: #faf4f6;
+            color: var(--accent);
+            text-align: left;
+            padding: 1rem;
+            font-size: 0.95rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+          }
+          tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+            line-height: 1.5;
+            word-break: break-word;
+          }
+          tbody tr:nth-child(even) {
+            background: #fcf9fb;
+          }
+          tbody tr:hover {
+            background: #f8eef2;
+          }
+          thead th:nth-child(1),
+          tbody td:nth-child(1) {
+            width: 4rem;
+          }
+          thead th:nth-child(2),
+          tbody td:nth-child(2) {
+            width: 15%;
+          }
+          thead th:nth-child(3),
+          tbody td:nth-child(3) {
+            width: 15%;
+          }
+          thead th:nth-child(4),
+          tbody td:nth-child(4) {
+            width: 14%;
+          }
+          thead th:nth-child(5),
+          tbody td:nth-child(5) {
+            width: 32%;
+          }
+          thead th:nth-child(6),
+          tbody td:nth-child(6) {
+            width: 20%;
+          }
+          .note {
+            padding: 1rem 1.5rem 1.5rem;
+            color: var(--muted);
+            font-size: 0.95rem;
+            border-top: 1px solid var(--border);
+            background: #fffafc;
+          }
+          code {
+            background: #f4ebee;
+            padding: 0.15rem 0.35rem;
+            border-radius: 6px;
+          }
+          @media (max-width: 720px) {
+            body {
+              padding: 1rem;
+            }
+            .stats {
+              grid-template-columns: 1fr;
+            }
+            .dashboard-tools {
+              padding-inline: 1rem;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="wrap">
+          <div class="card">
+            <header>
+              <div class="badge">Protected admin dashboard</div>
+              <h1>BLAST Feedback</h1>
+              <p>Read the messages people send about BLAST services, pages, and community experience.</p>
+              <div class="stats">
+                <div class="stat">
+                  <span>Total</span>
+                  <strong>${feedbackEntries.length}</strong>
+                </div>
+                <div class="stat">
+                  <span>Showing</span>
+                  <strong>${filteredFeedback.length}</strong>
+                </div>
+                <div class="stat">
+                  <span>Latest</span>
+                  <strong>${escapeHtml(latestLabel)}</strong>
+                </div>
+              </div>
+            </header>
+            <form class="dashboard-tools" method="get" action="/feedback">
+              <div class="search-group">
+                <label for="feedbackSearch">Search feedback</label>
+                <input
+                  id="feedbackSearch"
+                  type="search"
+                  name="q"
+                  placeholder="Search name, email, topic, message, or date"
+                  value="${escapeHtml(searchQuery)}"
+                >
+              </div>
+              <button class="tool-button" type="submit">Search</button>
+              <a class="tool-link" href="${exportHref}">Export CSV</a>
+              ${clearHref ? `<a class="tool-link" href="${clearHref}">Clear</a>` : ""}
+              <a class="tool-link" href="/submissions">Review submissions</a>
+              <a class="tool-link" href="/content">Manage Content</a>
+            </form>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Topic</th>
+                    <th>Message</th>
+                    <th>Submitted At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rows}
+                </tbody>
+              </table>
+            </div>
+            <div class="note">
+              This dashboard is protected with Basic Auth. The data is stored in
+              <code>${isDatabaseEnabled() ? "Render Postgres" : "backend/data/feedback.json"}</code>.
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>`;
 }
 
 function buildSubmissionsDashboard(submissions, query) {
@@ -518,6 +921,7 @@ function buildSubmissionsDashboard(submissions, query) {
               ${clearHref ? `<a class="tool-link" href="${clearHref}">Clear</a>` : ""}
               <button class="tool-button" type="button" id="sendTestAlertBtn">Send test alert</button>
               <a class="tool-link" href="/content">Manage Content</a>
+              <a class="tool-link" href="/feedback">Review Feedback</a>
             </form>
             <div class="table-wrap">
               <table>
@@ -1379,6 +1783,21 @@ app.get("/api/submissions", requireAdmin, async function (req, res, next) {
   }
 });
 
+app.get("/api/feedback", requireAdmin, async function (req, res, next) {
+  try {
+    const feedbackEntries = await readFeedback();
+    const filteredFeedback = filterFeedback(feedbackEntries, req.query.q);
+    res.json({
+      count: filteredFeedback.length,
+      total: feedbackEntries.length,
+      query: getQueryText(req.query.q),
+      feedback: filteredFeedback,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 app.post("/api/notifications/test", requireAdmin, async function (req, res, next) {
   try {
     const result = await sendTestNotification();
@@ -1444,10 +1863,34 @@ app.get("/submissions/export.csv", requireAdmin, async function (req, res, next)
   }
 });
 
+app.get("/feedback/export.csv", requireAdmin, async function (req, res, next) {
+  try {
+    const feedbackEntries = await readFeedback();
+    const filteredFeedback = filterFeedback(feedbackEntries, req.query.q);
+    const csv = buildFeedbackCsv(filteredFeedback);
+
+    res.set("Cache-Control", "no-store");
+    res.set("Content-Type", "text/csv; charset=utf-8");
+    res.set("Content-Disposition", 'attachment; filename="blast-feedback.csv"');
+    res.send(csv);
+  } catch (error) {
+    return next(error);
+  }
+});
+
 app.get("/submissions", requireAdmin, async function (req, res, next) {
   try {
     res.set("Cache-Control", "no-store");
     res.type("html").send(buildSubmissionsDashboard(await readSubmissions(), req.query.q));
+  } catch (error) {
+    return next(error);
+  }
+});
+
+app.get("/feedback", requireAdmin, async function (req, res, next) {
+  try {
+    res.set("Cache-Control", "no-store");
+    res.type("html").send(buildFeedbackDashboard(await readFeedback(), req.query.q));
   } catch (error) {
     return next(error);
   }
@@ -1556,6 +1999,76 @@ app.post("/api/join", async function (req, res, next) {
       message: "Submission saved successfully.",
       submission,
       notification,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+app.post("/api/feedback", async function (req, res, next) {
+  try {
+    const fullName = normalizeText(req.body.fullName);
+    const email = normalizeText(req.body.email);
+    const topic = normalizeText(req.body.topic);
+    const message = normalizeText(req.body.message);
+    const website = normalizeText(req.body.website);
+    const errors = {};
+
+    if (website) {
+      return res.status(400).json({
+        message: "Please try again.",
+      });
+    }
+
+    if (!fullName) {
+      errors.fullName = "Full name is required.";
+    } else if (fullName.length > 50) {
+      errors.fullName = "Full name must be 50 characters or less.";
+    }
+
+    if (email && (email.length > 80 || !isValidEmail(email))) {
+      errors.email = "Please enter a valid email address.";
+    }
+
+    if (!topic) {
+      errors.topic = "Please choose what your feedback is about.";
+    } else if (topic.length > 80) {
+      errors.topic = "Topic must be 80 characters or less.";
+    }
+
+    if (!message) {
+      errors.message = "Please share your feedback.";
+    } else if (message.length > 500) {
+      errors.message = "Your message must be 500 characters or less.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return res.status(400).json({
+        message: "Please fix the highlighted fields.",
+        errors,
+      });
+    }
+
+    if (isFeedbackRateLimited(req)) {
+      return res.status(429).json({
+        message: "You are submitting too quickly. Please wait a few minutes and try again.",
+      });
+    }
+
+    const feedback = {
+      id: crypto.randomUUID(),
+      fullName,
+      email,
+      topic,
+      message,
+      submittedAt: new Date().toISOString(),
+    };
+
+    await saveFeedback(feedback);
+
+    return res.status(201).json({
+      message: "Thanks for sharing your feedback.",
+      feedback,
     });
   } catch (error) {
     return next(error);

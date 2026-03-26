@@ -497,6 +497,200 @@ if (
   });
 }
 
+const feedbackForm = document.querySelector(".feedback-form");
+const feedbackName = document.getElementById("feedbackName");
+const feedbackEmail = document.getElementById("feedbackEmail");
+const feedbackTopic = document.getElementById("feedbackTopic");
+const feedbackMessage = document.getElementById("feedbackMessage");
+const feedbackWebsite = document.getElementById("feedbackWebsite");
+const feedbackFormStatus = document.getElementById("feedbackFormStatus");
+const feedbackNameError = document.getElementById("feedbackNameError");
+const feedbackEmailError = document.getElementById("feedbackEmailError");
+const feedbackTopicError = document.getElementById("feedbackTopicError");
+const feedbackMessageError = document.getElementById("feedbackMessageError");
+const feedbackButton = feedbackForm ? feedbackForm.querySelector(".form-button") : null;
+
+if (
+  feedbackForm &&
+  feedbackName &&
+  feedbackEmail &&
+  feedbackTopic &&
+  feedbackMessage &&
+  feedbackWebsite &&
+  feedbackFormStatus &&
+  feedbackNameError &&
+  feedbackEmailError &&
+  feedbackTopicError &&
+  feedbackMessageError &&
+  feedbackButton
+) {
+  function clearFeedbackErrors() {
+    feedbackNameError.textContent = "";
+    feedbackEmailError.textContent = "";
+    feedbackTopicError.textContent = "";
+    feedbackMessageError.textContent = "";
+
+    [feedbackName, feedbackEmail, feedbackTopic, feedbackMessage].forEach(function (field) {
+      field.classList.remove("invalid");
+      field.setAttribute("aria-invalid", "false");
+    });
+  }
+
+  function isValidFeedbackEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
+
+  feedbackForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    clearFeedbackErrors();
+    feedbackFormStatus.classList.remove("success");
+
+    const trimmedName = feedbackName.value.trim();
+    const trimmedEmail = feedbackEmail.value.trim();
+    const trimmedTopic = feedbackTopic.value.trim();
+    const trimmedMessage = feedbackMessage.value.trim();
+
+    if (trimmedName === "") {
+      feedbackName.classList.add("invalid");
+      feedbackName.setAttribute("aria-invalid", "true");
+      feedbackNameError.textContent = "Full name is required.";
+    }
+
+    if (trimmedEmail && !isValidFeedbackEmail(trimmedEmail)) {
+      feedbackEmail.classList.add("invalid");
+      feedbackEmail.setAttribute("aria-invalid", "true");
+      feedbackEmailError.textContent = "Please enter a valid email address.";
+    }
+
+    if (trimmedTopic === "") {
+      feedbackTopic.classList.add("invalid");
+      feedbackTopic.setAttribute("aria-invalid", "true");
+      feedbackTopicError.textContent = "Please choose what your feedback is about.";
+    }
+
+    if (trimmedMessage === "") {
+      feedbackMessage.classList.add("invalid");
+      feedbackMessage.setAttribute("aria-invalid", "true");
+      feedbackMessageError.textContent = "Please share your feedback.";
+    }
+
+    if (
+      trimmedName === "" ||
+      (trimmedEmail && !isValidFeedbackEmail(trimmedEmail)) ||
+      trimmedTopic === "" ||
+      trimmedMessage === ""
+    ) {
+      if (trimmedName === "") {
+        feedbackName.focus();
+      } else if (trimmedEmail && !isValidFeedbackEmail(trimmedEmail)) {
+        feedbackEmail.focus();
+      } else if (trimmedTopic === "") {
+        feedbackTopic.focus();
+      } else {
+        feedbackMessage.focus();
+      }
+
+      feedbackFormStatus.textContent = "Please fill in the highlighted fields.";
+      return;
+    }
+
+    feedbackFormStatus.textContent = "Submitting...";
+    feedbackButton.disabled = true;
+
+    try {
+      const response = await fetch(`${apiOrigin}/api/feedback`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: trimmedName,
+          email: trimmedEmail,
+          topic: trimmedTopic,
+          message: trimmedMessage,
+          website: feedbackWebsite ? feedbackWebsite.value : "",
+        }),
+      });
+
+      const result = await response.json().catch(function () {
+        return {};
+      });
+
+      if (!response.ok) {
+        if (result.errors) {
+          if (result.errors.fullName) {
+            feedbackName.classList.add("invalid");
+            feedbackName.setAttribute("aria-invalid", "true");
+            feedbackNameError.textContent = result.errors.fullName;
+          }
+
+          if (result.errors.email) {
+            feedbackEmail.classList.add("invalid");
+            feedbackEmail.setAttribute("aria-invalid", "true");
+            feedbackEmailError.textContent = result.errors.email;
+          }
+
+          if (result.errors.topic) {
+            feedbackTopic.classList.add("invalid");
+            feedbackTopic.setAttribute("aria-invalid", "true");
+            feedbackTopicError.textContent = result.errors.topic;
+          }
+
+          if (result.errors.message) {
+            feedbackMessage.classList.add("invalid");
+            feedbackMessage.setAttribute("aria-invalid", "true");
+            feedbackMessageError.textContent = result.errors.message;
+          }
+        }
+
+        feedbackFormStatus.textContent = result.message || "Please fix the highlighted fields.";
+        if (result.errors && result.errors.fullName) {
+          feedbackName.focus();
+        } else if (result.errors && result.errors.email) {
+          feedbackEmail.focus();
+        } else if (result.errors && result.errors.topic) {
+          feedbackTopic.focus();
+        } else if (result.errors && result.errors.message) {
+          feedbackMessage.focus();
+        }
+        return;
+      }
+
+      feedbackFormStatus.classList.add("success");
+      feedbackFormStatus.textContent = result.message || "Thanks for sharing your feedback.";
+      feedbackForm.reset();
+      clearFeedbackErrors();
+      feedbackName.focus();
+      setTimeout(function () {
+        feedbackFormStatus.textContent = "";
+        feedbackFormStatus.classList.remove("success");
+      }, 2500);
+    } catch (error) {
+      feedbackFormStatus.textContent = "Could not reach the backend. Please try again.";
+    } finally {
+      feedbackButton.disabled = false;
+    }
+  });
+
+  [feedbackName, feedbackEmail, feedbackTopic, feedbackMessage].forEach(function (field) {
+    field.addEventListener("input", function () {
+      field.classList.remove("invalid");
+      field.setAttribute("aria-invalid", "false");
+      feedbackFormStatus.textContent = "";
+      feedbackFormStatus.classList.remove("success");
+      if (field === feedbackName) {
+        feedbackNameError.textContent = "";
+      } else if (field === feedbackEmail) {
+        feedbackEmailError.textContent = "";
+      } else if (field === feedbackTopic) {
+        feedbackTopicError.textContent = "";
+      } else if (field === feedbackMessage) {
+        feedbackMessageError.textContent = "";
+      }
+    });
+  });
+}
+
 const backToTopBtn = document.getElementById("backToTopBtn");
 
 if (backToTopBtn) {
@@ -730,6 +924,14 @@ function createBlastBotResponse(query) {
     };
   }
 
+  if (has(["feedback", "review", "suggestion", "suggestions", "message about services", "share thoughts"])) {
+    return {
+      text:
+        "The Feedback page lets you share encouragement, ideas, and suggestions about BLAST services so the team can keep improving.",
+      links: [{ label: "Open Feedback", href: "feedback.html#feedback-form" }],
+    };
+  }
+
   if (has(["contact", "email", "phone", "reach us", "talk to", "message"])) {
     return {
       text:
@@ -740,7 +942,7 @@ function createBlastBotResponse(query) {
 
   return {
     text:
-      "I can help with About, Programs & Events, Media, Leadership, Join, Contact, or Patrons. Try one of the quick prompts below, and I'll point you in the right direction.",
+      "I can help with About, Programs & Events, Media, Leadership, Join, Feedback, Contact, or Patrons. Try one of the quick prompts below, and I'll point you in the right direction.",
     links: [],
   };
 }
@@ -837,6 +1039,7 @@ function initBlastBot() {
     "Programs & Events",
     "Media",
     "Leadership",
+    "Feedback",
     "Patrons",
     "Join BLAST",
     "Contact",

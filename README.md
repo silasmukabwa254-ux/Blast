@@ -26,6 +26,7 @@ The backend lives in `backend/`.
 - The frontend join form reads `window.BLAST_JOIN_API_URL`, so point that at your deployed backend URL when you publish.
 - Set `ADMIN_USERNAME` and `ADMIN_PASSWORD` on the backend host before you open `/submissions` or `/api/submissions`.
 - In production, the submissions pages are protected with HTTP Basic Auth.
+- BLAST also includes a public feedback form on `feedback.html` and a protected review page at `/feedback`.
 - Set `OPENAI_API_KEY` if you want the BLAST Bot to use the AI assistant mode.
 - `BLAST_AI_MODEL` defaults to `gpt-5.4-mini` and can be changed later if you want a different model.
 - Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, and `NOTIFY_TO_EMAIL` if you want email alerts for new submissions.
@@ -48,13 +49,18 @@ The backend lives in `backend/`.
 - `GET /health`
 - `GET /api/content`
 - `GET /api/submissions`
+- `GET /api/feedback`
 - `POST /api/bot/chat`
 - `POST /api/notifications/test`
 - `PUT /api/content`
 - `GET /api/content/export.json`
 - `GET /submissions`
+- `GET /feedback`
 - `GET /content`
 - `POST /api/join`
+- `POST /api/feedback`
+- `GET /submissions/export.csv`
+- `GET /feedback/export.csv`
 
 ### Content management
 

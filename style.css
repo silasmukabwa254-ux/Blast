@@ -898,7 +898,8 @@
                             overflow: hidden;
                      }
                      .join-form input,
-                     .join-form textarea {
+                     .join-form textarea,
+                     .join-form select {
                             padding: 10px 12px;
                             border: 1px solid #cfc3c8;
                             border-radius: 8px;
@@ -907,6 +908,7 @@
                      }
                      .join-form input:focus,
                      .join-form textarea:focus,
+                     .join-form select:focus,
                      .form-button:focus {
                             outline: 3px solid #6ea8ff;
                             outline-offset: 2px;
@@ -923,6 +925,14 @@
                      .join-form textarea.invalid {
                             border-color: #b00020;
                             box-shadow: 0 0 0 3px rgba(176, 0, 32, 0.12);
+                     }
+                     .join-form select.invalid {
+                            border-color: #b00020;
+                            box-shadow: 0 0 0 3px rgba(176, 0, 32, 0.12);
+                     }
+                     .optional-note {
+                            font-weight: 400;
+                            color: #6f5a64;
                      }
                      .form-button {
                             background-color: #8b1e3f;
