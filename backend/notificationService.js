@@ -68,9 +68,24 @@ function getNotificationSummary() {
 let cachedTransporter = null;
 let cachedTransporterKey = "";
 
-function getTransporter(config) {
+function buildTransportOptions(config, resolvedHost) {
+  return {
+    host: resolvedHost,
+    port: config.port,
+    secure: config.secure,
+    requireTLS: !config.secure,
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000,
+    tls: {
+      servername: config.host,
+    },
+  };
+}
+
+function getTransporter(config, resolvedHost) {
   const cacheKey = [
-    config.host,
+    resolvedHost,
     config.port,
     config.secure ? "1" : "0",
     config.user,
@@ -79,7 +94,7 @@ function getTransporter(config) {
   ].join("|");
 
   if (!cachedTransporter || cachedTransporterKey !== cacheKey) {
-    const transportOptions = buildTransportOptions(config);
+    const transportOptions = buildTransportOptions(config, resolvedHost);
 
     if (config.user && config.password) {
       transportOptions.auth = {
@@ -93,25 +108,6 @@ function getTransporter(config) {
   }
 
   return cachedTransporter;
-}
-
-function buildTransportOptions(config) {
-  return {
-    host: config.host,
-    port: config.port,
-    secure: config.secure,
-    family: 4,
-    requireTLS: !config.secure,
-    connectionTimeout: 30000,
-    greetingTimeout: 30000,
-    socketTimeout: 30000,
-    lookup(hostname, options, callback) {
-      return dns.lookup(hostname, { family: 4, all: false }, callback);
-    },
-    tls: {
-      servername: config.host,
-    },
-  };
 }
 
 function buildFallbackConfig(config) {
@@ -134,8 +130,19 @@ function buildFallbackConfig(config) {
   return null;
 }
 
+async function resolveTransportHost(hostname) {
+  try {
+    const resolved = await dns.promises.lookup(hostname, { family: 4 });
+    return resolved && resolved.address ? resolved.address : hostname;
+  } catch (error) {
+    console.warn(`SMTP host lookup failed for ${hostname}:`, error.message);
+    return hostname;
+  }
+}
+
 async function sendWithConfig(config, message) {
-  return getTransporter(config).sendMail(message);
+  const resolvedHost = await resolveTransportHost(config.host);
+  return getTransporter(config, resolvedHost).sendMail(message);
 }
 
 async function sendMail({ subject, text, html, replyTo }) {
