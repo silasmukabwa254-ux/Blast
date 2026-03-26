@@ -1,3 +1,4 @@
+const dns = require("node:dns");
 const nodemailer = require("nodemailer");
 
 function normalizeText(value) {
@@ -83,9 +84,16 @@ function getTransporter(config) {
       port: config.port,
       secure: config.secure,
       family: 4,
+      requireTLS: !config.secure,
       connectionTimeout: 10000,
       greetingTimeout: 10000,
       socketTimeout: 20000,
+      lookup(hostname, options, callback) {
+        return dns.lookup(hostname, { family: 4, all: false }, callback);
+      },
+      tls: {
+        servername: config.host,
+      },
     };
 
     if (config.user && config.password) {
