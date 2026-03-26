@@ -79,22 +79,7 @@ function getTransporter(config) {
   ].join("|");
 
   if (!cachedTransporter || cachedTransporterKey !== cacheKey) {
-    const transportOptions = {
-      host: config.host,
-      port: config.port,
-      secure: config.secure,
-      family: 4,
-      requireTLS: !config.secure,
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 20000,
-      lookup(hostname, options, callback) {
-        return dns.lookup(hostname, { family: 4, all: false }, callback);
-      },
-      tls: {
-        servername: config.host,
-      },
-    };
+    const transportOptions = buildTransportOptions(config);
 
     if (config.user && config.password) {
       transportOptions.auth = {
@@ -110,6 +95,49 @@ function getTransporter(config) {
   return cachedTransporter;
 }
 
+function buildTransportOptions(config) {
+  return {
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    family: 4,
+    requireTLS: !config.secure,
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000,
+    lookup(hostname, options, callback) {
+      return dns.lookup(hostname, { family: 4, all: false }, callback);
+    },
+    tls: {
+      servername: config.host,
+    },
+  };
+}
+
+function buildFallbackConfig(config) {
+  if (config.host === "smtp.gmail.com" && config.port === 587) {
+    return {
+      ...config,
+      port: 465,
+      secure: true,
+    };
+  }
+
+  if (config.host === "smtp.gmail.com" && config.port === 465) {
+    return {
+      ...config,
+      port: 587,
+      secure: false,
+    };
+  }
+
+  return null;
+}
+
+async function sendWithConfig(config, message) {
+  return getTransporter(config).sendMail(message);
+}
+
 async function sendMail({ subject, text, html, replyTo }) {
   const config = getNotificationConfig();
 
@@ -120,14 +148,26 @@ async function sendMail({ subject, text, html, replyTo }) {
     };
   }
 
-  await getTransporter(config).sendMail({
+  const message = {
     from: config.from,
     to: config.to,
     subject,
     text,
     html,
     replyTo: replyTo || undefined,
-  });
+  };
+
+  try {
+    await sendWithConfig(config, message);
+  } catch (error) {
+    const fallbackConfig = buildFallbackConfig(config);
+
+    if (!fallbackConfig) {
+      throw error;
+    }
+
+    await sendWithConfig(fallbackConfig, message);
+  }
 
   return {
     status: "sent",
