@@ -359,6 +359,13 @@ function buildDashboardReplyStyles() {
             font-weight: 700;
             cursor: pointer;
           }
+          .reply-row {
+            cursor: pointer;
+          }
+          .reply-row:focus-visible {
+            outline: 2px solid rgba(139, 30, 63, 0.25);
+            outline-offset: -2px;
+          }
           .reply-trigger:hover {
             background: #efe3e8;
           }
@@ -447,7 +454,16 @@ function buildReplyPanelScript({ kind, endpoint, defaultSubject }) {
         const contextLabelInput = document.getElementById(${JSON.stringify(`${prefix}ContextLabel`)});
         const draftLink = document.getElementById(${JSON.stringify(`${prefix}DraftLink`)});
         const status = document.getElementById(${JSON.stringify(`${prefix}Status`)});
-        const buttons = Array.from(document.querySelectorAll(${JSON.stringify(replySelector)}));
+        const replyRows = Array.from(document.querySelectorAll(${JSON.stringify(`[data-reply-row-kind="${kind}"]`)}));
+
+        function getReplyData(element) {
+          return {
+            recipientName: element.getAttribute("data-recipient-name") || "",
+            recipientEmail: element.getAttribute("data-recipient-email") || "",
+            contextLabel: element.getAttribute("data-context-label") || "",
+            defaultSubject: element.getAttribute("data-default-subject") || subjectInput.value,
+          };
+        }
 
         function buildMailtoLink() {
           const recipientEmail = recipientEmailInput.value.trim();
@@ -510,11 +526,12 @@ function buildReplyPanelScript({ kind, endpoint, defaultSubject }) {
           setStatus("Choose a submission or feedback entry to start replying.", false);
         }
 
-        function applySelection(button) {
-          const recipientName = button.getAttribute("data-recipient-name") || "";
-          const recipientEmail = button.getAttribute("data-recipient-email") || "";
-          const contextLabel = button.getAttribute("data-context-label") || "";
-          const defaultSubject = button.getAttribute("data-default-subject") || subjectInput.value;
+        function applySelection(element) {
+          const replyData = getReplyData(element);
+          const recipientName = replyData.recipientName;
+          const recipientEmail = replyData.recipientEmail;
+          const contextLabel = replyData.contextLabel;
+          const defaultSubject = replyData.defaultSubject;
 
           recipientNameInput.value = recipientName;
           recipientEmailInput.value = recipientEmail;
@@ -528,9 +545,16 @@ function buildReplyPanelScript({ kind, endpoint, defaultSubject }) {
           panel.scrollIntoView({ behavior: "smooth", block: "start" });
         }
 
-        buttons.forEach(function (button) {
-          button.addEventListener("click", function () {
-            applySelection(button);
+        replyRows.forEach(function (row) {
+          row.addEventListener("click", function () {
+            applySelection(row);
+          });
+
+          row.addEventListener("keydown", function (event) {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              applySelection(row);
+            }
           });
         });
 
@@ -638,9 +662,12 @@ function buildFeedbackDashboard(feedbackEntries, query) {
                 </button>
               `
             : `<span class="reply-empty">No email</span>`;
+          const rowAttributes = entry.email
+            ? ` class="reply-row" data-reply-row-kind="feedback" data-recipient-name="${escapeHtml(entry.fullName)}" data-recipient-email="${escapeHtml(entry.email)}" data-context-label="${escapeHtml(`Feedback about ${entry.topic}`)}" data-default-subject="${escapeHtml("Re: Your BLAST feedback")}" tabindex="0" role="button" aria-label="Reply to ${escapeHtml(entry.fullName)}"`
+            : "";
 
           return `
-            <tr>
+            <tr${rowAttributes}>
               <td>${index + 1}</td>
               <td>${escapeHtml(entry.fullName)}</td>
               <td>${escapeHtml(entry.email || "—")}</td>
@@ -1001,9 +1028,12 @@ function buildSubmissionsDashboard(submissions, query) {
                 </button>
               `
             : `<span class="reply-empty">No email</span>`;
+          const rowAttributes = submission.email
+            ? ` class="reply-row" data-reply-row-kind="submission" data-recipient-name="${escapeHtml(submission.fullName)}" data-recipient-email="${escapeHtml(submission.email)}" data-context-label="${escapeHtml(`Join message from ${submission.fullName}`)}" data-default-subject="${escapeHtml("Re: Your BLAST join message")}" tabindex="0" role="button" aria-label="Reply to ${escapeHtml(submission.fullName)}"`
+            : "";
 
           return `
-            <tr>
+            <tr${rowAttributes}>
               <td>${index + 1}</td>
               <td>${escapeHtml(submission.fullName)}</td>
               <td>${escapeHtml(submission.email)}</td>
