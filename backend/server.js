@@ -9,6 +9,7 @@ const {
   readFeedback,
   saveFeedback,
 } = require("./feedbackStore");
+const { isRateLimited } = require("./rateLimitStore");
 const {
   getDefaultContent,
   normalizeContent,
@@ -35,10 +36,8 @@ const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || ALLOWED_ORIGIN)
 const ADMIN_REALM = "BLAST Admin";
 const JOIN_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const JOIN_RATE_LIMIT_MAX = 5;
-const joinRateLimitBuckets = new Map();
 const FEEDBACK_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const FEEDBACK_RATE_LIMIT_MAX = 5;
-const feedbackRateLimitBuckets = new Map();
 
 app.use(function (req, res, next) {
   const origin = req.headers.origin;
@@ -106,66 +105,22 @@ function getClientIdentifier(req) {
   return normalizeText(req.ip || req.socket?.remoteAddress || "unknown");
 }
 
-function pruneJoinRateLimitBuckets(now) {
-  for (const [clientId, bucket] of joinRateLimitBuckets.entries()) {
-    if (now - bucket.windowStart >= JOIN_RATE_LIMIT_WINDOW_MS) {
-      joinRateLimitBuckets.delete(clientId);
-    }
-  }
+async function isJoinRateLimited(req) {
+  return isRateLimited(
+    "join",
+    getClientIdentifier(req),
+    JOIN_RATE_LIMIT_WINDOW_MS,
+    JOIN_RATE_LIMIT_MAX
+  );
 }
 
-function isJoinRateLimited(req) {
-  const now = Date.now();
-  const clientId = getClientIdentifier(req);
-
-  pruneJoinRateLimitBuckets(now);
-
-  const bucket = joinRateLimitBuckets.get(clientId);
-  if (!bucket) {
-    joinRateLimitBuckets.set(clientId, {
-      windowStart: now,
-      count: 1,
-    });
-    return false;
-  }
-
-  if (bucket.count >= JOIN_RATE_LIMIT_MAX) {
-    return true;
-  }
-
-  bucket.count += 1;
-  return false;
-}
-
-function pruneFeedbackRateLimitBuckets(now) {
-  for (const [clientId, bucket] of feedbackRateLimitBuckets.entries()) {
-    if (now - bucket.windowStart >= FEEDBACK_RATE_LIMIT_WINDOW_MS) {
-      feedbackRateLimitBuckets.delete(clientId);
-    }
-  }
-}
-
-function isFeedbackRateLimited(req) {
-  const now = Date.now();
-  const clientId = getClientIdentifier(req);
-
-  pruneFeedbackRateLimitBuckets(now);
-
-  const bucket = feedbackRateLimitBuckets.get(clientId);
-  if (!bucket) {
-    feedbackRateLimitBuckets.set(clientId, {
-      windowStart: now,
-      count: 1,
-    });
-    return false;
-  }
-
-  if (bucket.count >= FEEDBACK_RATE_LIMIT_MAX) {
-    return true;
-  }
-
-  bucket.count += 1;
-  return false;
+async function isFeedbackRateLimited(req) {
+  return isRateLimited(
+    "feedback",
+    getClientIdentifier(req),
+    FEEDBACK_RATE_LIMIT_WINDOW_MS,
+    FEEDBACK_RATE_LIMIT_MAX
+  );
 }
 
 function getAdminCredentials() {
@@ -1963,7 +1918,7 @@ app.post("/api/join", async function (req, res, next) {
       });
     }
 
-    if (isJoinRateLimited(req)) {
+    if (await isJoinRateLimited(req)) {
       return res.status(429).json({
         message: "You are submitting too quickly. Please wait a few minutes and try again.",
       });
@@ -2049,7 +2004,7 @@ app.post("/api/feedback", async function (req, res, next) {
       });
     }
 
-    if (isFeedbackRateLimited(req)) {
+    if (await isFeedbackRateLimited(req)) {
       return res.status(429).json({
         message: "You are submitting too quickly. Please wait a few minutes and try again.",
       });
