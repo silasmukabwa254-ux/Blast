@@ -455,6 +455,7 @@ function buildReplyPanelScript({ kind, endpoint, defaultSubject }) {
         const draftLink = document.getElementById(${JSON.stringify(`${prefix}DraftLink`)});
         const status = document.getElementById(${JSON.stringify(`${prefix}Status`)});
         const replyRows = Array.from(document.querySelectorAll(${JSON.stringify(`[data-reply-row-kind="${kind}"]`)}));
+        const replyButtons = Array.from(document.querySelectorAll(${JSON.stringify(`[data-reply-kind="${kind}"]`)}));
 
         function getReplyData(element) {
           return {
@@ -544,6 +545,14 @@ function buildReplyPanelScript({ kind, endpoint, defaultSubject }) {
           messageInput.focus();
           panel.scrollIntoView({ behavior: "smooth", block: "start" });
         }
+
+        replyButtons.forEach(function (button) {
+          button.addEventListener("click", function (event) {
+            event.preventDefault();
+            const row = button.closest(${JSON.stringify(`[data-reply-row-kind="${kind}"]`)});
+            applySelection(row || button);
+          });
+        });
 
         replyRows.forEach(function (row) {
           row.addEventListener("click", function () {
