@@ -18,6 +18,7 @@ const {
 } = require("./contentStore");
 const {
   getNotificationSummary,
+  sendAdminReplyEmail,
   sendFeedbackConfirmation,
   sendFeedbackNotification,
   sendSubmissionConfirmation,
@@ -263,6 +264,294 @@ function buildFeedbackCsv(feedbackEntries) {
   return `${lines.join("\n")}\n`;
 }
 
+function buildDashboardReplyStyles() {
+  return `
+          .reply-panel {
+            margin: 0 1.5rem 1.25rem;
+            padding: 1.1rem 1.1rem 1.2rem;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: linear-gradient(180deg, #fffafc 0%, #fff 100%);
+          }
+          .reply-panel__header {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: flex-start;
+          }
+          .reply-panel__eyebrow {
+            margin: 0 0 0.25rem;
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+          }
+          .reply-panel__header h2 {
+            margin: 0 0 0.35rem;
+            color: var(--accent);
+            font-size: 1.1rem;
+          }
+          .reply-panel__target {
+            margin-top: 0.9rem;
+            padding: 0.85rem 1rem;
+            border: 1px dashed var(--border);
+            border-radius: 14px;
+            background: #fff;
+          }
+          .reply-panel__target strong {
+            display: block;
+            color: var(--accent);
+          }
+          .reply-panel__target span {
+            display: block;
+            margin-top: 0.15rem;
+            color: var(--muted);
+          }
+          .reply-panel__form {
+            display: grid;
+            gap: 0.75rem;
+            margin-top: 1rem;
+          }
+          .reply-panel__form label {
+            font-weight: 700;
+            color: var(--accent);
+          }
+          .reply-panel__form input,
+          .reply-panel__form textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.85rem 0.95rem;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font: inherit;
+          }
+          .reply-panel__form textarea {
+            min-height: 120px;
+            resize: vertical;
+          }
+          .reply-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+          }
+          .reply-status {
+            margin: 0;
+            color: var(--muted);
+          }
+          .reply-trigger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 0.55rem 0.85rem;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #f4ebee;
+            color: var(--accent);
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+          }
+          .reply-trigger:hover {
+            background: #efe3e8;
+          }
+          .reply-trigger:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+          }
+          .reply-empty {
+            color: var(--muted);
+            font-size: 0.9rem;
+          }
+  `;
+}
+
+function buildReplyPanelMarkup({
+  kind,
+  title,
+  description,
+  defaultSubject,
+  placeholder,
+  recipientLabel,
+  emptyText,
+}) {
+  const prefix = `${kind}Reply`;
+  return `
+    <section class="reply-panel" id="${prefix}Panel">
+      <div class="reply-panel__header">
+        <div>
+          <p class="reply-panel__eyebrow">Reply</p>
+          <h2>${escapeHtml(title)}</h2>
+          <p>${escapeHtml(description)}</p>
+        </div>
+        <button class="tool-link" type="button" id="${prefix}Clear">Clear selection</button>
+      </div>
+      <div class="reply-panel__target">
+        <strong id="${prefix}TargetName">No recipient selected</strong>
+        <span id="${prefix}TargetEmail">${escapeHtml(emptyText)}</span>
+      </div>
+      <form class="reply-panel__form" id="${prefix}Form">
+        <label for="${prefix}Subject">Subject</label>
+        <input
+          id="${prefix}Subject"
+          type="text"
+          maxlength="140"
+          value="${escapeHtml(defaultSubject)}"
+          placeholder="Enter a short subject"
+          autocomplete="off"
+        >
+        <label for="${prefix}Message">${escapeHtml(recipientLabel)}</label>
+        <textarea
+          id="${prefix}Message"
+          rows="5"
+          maxlength="4000"
+          placeholder="${escapeHtml(placeholder)}"
+        ></textarea>
+        <input type="hidden" id="${prefix}RecipientName" value="">
+        <input type="hidden" id="${prefix}RecipientEmail" value="">
+        <input type="hidden" id="${prefix}ContextLabel" value="">
+        <div class="reply-actions">
+          <button class="tool-button" type="submit">Send reply</button>
+          <p class="reply-status" id="${prefix}Status" aria-live="polite"></p>
+        </div>
+      </form>
+    </section>
+  `;
+}
+
+function buildReplyPanelScript({ kind, endpoint, defaultSubject }) {
+  const prefix = `${kind}Reply`;
+  const replySelector = `[data-reply-kind="${kind}"]`;
+  return `
+    <script>
+      (function () {
+        const form = document.getElementById(${JSON.stringify(`${prefix}Form`)});
+        if (!form) return;
+
+        const panel = document.getElementById(${JSON.stringify(`${prefix}Panel`)});
+        const clearButton = document.getElementById(${JSON.stringify(`${prefix}Clear`)});
+        const targetName = document.getElementById(${JSON.stringify(`${prefix}TargetName`)});
+        const targetEmail = document.getElementById(${JSON.stringify(`${prefix}TargetEmail`)});
+        const subjectInput = document.getElementById(${JSON.stringify(`${prefix}Subject`)});
+        const messageInput = document.getElementById(${JSON.stringify(`${prefix}Message`)});
+        const recipientNameInput = document.getElementById(${JSON.stringify(`${prefix}RecipientName`)});
+        const recipientEmailInput = document.getElementById(${JSON.stringify(`${prefix}RecipientEmail`)});
+        const contextLabelInput = document.getElementById(${JSON.stringify(`${prefix}ContextLabel`)});
+        const status = document.getElementById(${JSON.stringify(`${prefix}Status`)});
+        const buttons = Array.from(document.querySelectorAll(${JSON.stringify(replySelector)}));
+
+        function setStatus(message, isError) {
+          status.textContent = message;
+          status.style.color = isError ? "#8b1e3f" : "";
+        }
+
+        function clearSelection() {
+          recipientNameInput.value = "";
+          recipientEmailInput.value = "";
+          contextLabelInput.value = "";
+          targetName.textContent = "No recipient selected";
+          targetEmail.textContent = "Pick a row to prepare a reply.";
+          subjectInput.value = ${JSON.stringify(defaultSubject)};
+          messageInput.value = "";
+          setStatus("Choose a submission or feedback entry to start replying.", false);
+        }
+
+        function applySelection(button) {
+          const recipientName = button.getAttribute("data-recipient-name") || "";
+          const recipientEmail = button.getAttribute("data-recipient-email") || "";
+          const contextLabel = button.getAttribute("data-context-label") || "";
+          const defaultSubject = button.getAttribute("data-default-subject") || subjectInput.value;
+
+          recipientNameInput.value = recipientName;
+          recipientEmailInput.value = recipientEmail;
+          contextLabelInput.value = contextLabel;
+          targetName.textContent = recipientName || recipientEmail || "No recipient selected";
+          targetEmail.textContent = recipientEmail || "No recipient email available";
+          subjectInput.value = defaultSubject || subjectInput.value;
+          setStatus("Reply composer ready.", false);
+          messageInput.focus();
+          panel.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        buttons.forEach(function (button) {
+          button.addEventListener("click", function () {
+            applySelection(button);
+          });
+        });
+
+        clearButton.addEventListener("click", function () {
+          clearSelection();
+          subjectInput.focus();
+        });
+
+        form.addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const recipientName = recipientNameInput.value.trim();
+          const recipientEmail = recipientEmailInput.value.trim();
+          const contextLabel = contextLabelInput.value.trim();
+          const subject = subjectInput.value.trim();
+          const message = messageInput.value.trim();
+
+          if (!recipientEmail) {
+            setStatus("Pick a row with an email address first.", true);
+            return;
+          }
+
+          if (!message) {
+            setStatus("Write a reply message before sending.", true);
+            messageInput.focus();
+            return;
+          }
+
+          const originalText = form.querySelector("button[type='submit']").textContent;
+          const submitButton = form.querySelector("button[type='submit']");
+          submitButton.disabled = true;
+          submitButton.textContent = "Sending...";
+          setStatus("Sending reply...", false);
+
+          try {
+            const response = await fetch(${JSON.stringify(endpoint)}, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                recipientName,
+                recipientEmail,
+                contextLabel,
+                subject,
+                message,
+              }),
+            });
+
+            const payload = await response.json().catch(function () {
+              return null;
+            });
+
+            if (!response.ok) {
+              setStatus((payload && (payload.error || payload.message)) || "Could not send the reply.", true);
+              return;
+            }
+
+            setStatus((payload && payload.message) || "Reply sent successfully.", false);
+            messageInput.value = "";
+          } catch (error) {
+            setStatus(error.message || "Could not reach the backend. Please try again.", true);
+          } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+          }
+        });
+
+        clearSelection();
+      })();
+    </script>
+  `;
+}
+
 function buildFeedbackDashboard(feedbackEntries, query) {
   const searchQuery = getQueryText(query);
   const filteredFeedback = filterFeedback(feedbackEntries, searchQuery);
@@ -277,6 +566,22 @@ function buildFeedbackDashboard(feedbackEntries, query) {
   const rows = filteredFeedback.length
     ? filteredFeedback
         .map(function (entry, index) {
+          const replyButton = entry.email
+            ? `
+                <button
+                  type="button"
+                  class="reply-trigger"
+                  data-reply-kind="feedback"
+                  data-recipient-name="${escapeHtml(entry.fullName)}"
+                  data-recipient-email="${escapeHtml(entry.email)}"
+                  data-context-label="${escapeHtml(`Feedback about ${entry.topic}`)}"
+                  data-default-subject="${escapeHtml("Re: Your BLAST feedback")}"
+                >
+                  Reply
+                </button>
+              `
+            : `<span class="reply-empty">No email</span>`;
+
           return `
             <tr>
               <td>${index + 1}</td>
@@ -285,13 +590,14 @@ function buildFeedbackDashboard(feedbackEntries, query) {
               <td>${escapeHtml(entry.topic)}</td>
               <td>${escapeHtml(entry.message)}</td>
               <td>${formatSubmissionDate(entry.submittedAt)}</td>
+              <td>${replyButton}</td>
             </tr>
           `;
         })
         .join("")
     : `
         <tr>
-          <td colspan="6" style="text-align:center; padding: 1.5rem;">
+          <td colspan="7" style="text-align:center; padding: 1.5rem;">
             ${searchQuery ? "No feedback matches your search." : "No feedback yet."}
           </td>
         </tr>
@@ -435,6 +741,7 @@ function buildFeedbackDashboard(feedbackEntries, query) {
           .tool-link:hover {
             background: #efe3e8;
           }
+          ${buildDashboardReplyStyles()}
           .table-wrap {
             overflow-x: auto;
             border-top: 1px solid var(--border);
@@ -494,6 +801,10 @@ function buildFeedbackDashboard(feedbackEntries, query) {
           tbody td:nth-child(6) {
             width: 20%;
           }
+          thead th:nth-child(7),
+          tbody td:nth-child(7) {
+            width: 10%;
+          }
           .note {
             padding: 1rem 1.5rem 1.5rem;
             color: var(--muted);
@@ -515,6 +826,9 @@ function buildFeedbackDashboard(feedbackEntries, query) {
             }
             .dashboard-tools {
               padding-inline: 1rem;
+            }
+            .reply-panel {
+              margin-inline: 1rem;
             }
           }
         </style>
@@ -558,6 +872,15 @@ function buildFeedbackDashboard(feedbackEntries, query) {
               <a class="tool-link" href="/submissions">Review submissions</a>
               <a class="tool-link" href="/content">Manage Content</a>
             </form>
+            ${buildReplyPanelMarkup({
+              kind: "feedback",
+              title: "Reply to feedback",
+              description: "Pick a message from the list below, write a warm response, and send it back to the person.",
+              defaultSubject: "Re: Your BLAST feedback",
+              placeholder: "Write a kind reply that speaks to their message.",
+              recipientLabel: "Reply message",
+              emptyText: "Choose a feedback entry to start a reply.",
+            })}
             <div class="table-wrap">
               <table>
                 <thead>
@@ -568,6 +891,7 @@ function buildFeedbackDashboard(feedbackEntries, query) {
                     <th>Topic</th>
                     <th>Message</th>
                     <th>Submitted At</th>
+                    <th>Reply</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -581,6 +905,11 @@ function buildFeedbackDashboard(feedbackEntries, query) {
             </div>
           </div>
         </div>
+        ${buildReplyPanelScript({
+          kind: "feedback",
+          endpoint: "/api/admin/reply",
+          defaultSubject: "Re: Your BLAST feedback",
+        })}
       </body>
     </html>`;
 }
@@ -600,6 +929,22 @@ function buildSubmissionsDashboard(submissions, query) {
   const rows = filteredSubmissions.length
     ? filteredSubmissions
         .map(function (submission, index) {
+          const replyButton = submission.email
+            ? `
+                <button
+                  type="button"
+                  class="reply-trigger"
+                  data-reply-kind="submission"
+                  data-recipient-name="${escapeHtml(submission.fullName)}"
+                  data-recipient-email="${escapeHtml(submission.email)}"
+                  data-context-label="${escapeHtml(`Join message from ${submission.fullName}`)}"
+                  data-default-subject="${escapeHtml("Re: Your BLAST join message")}"
+                >
+                  Reply
+                </button>
+              `
+            : `<span class="reply-empty">No email</span>`;
+
           return `
             <tr>
               <td>${index + 1}</td>
@@ -607,13 +952,14 @@ function buildSubmissionsDashboard(submissions, query) {
               <td>${escapeHtml(submission.email)}</td>
               <td>${escapeHtml(submission.interest)}</td>
               <td>${formatSubmissionDate(submission.submittedAt)}</td>
+              <td>${replyButton}</td>
             </tr>
           `;
         })
         .join("")
     : `
         <tr>
-          <td colspan="5" style="text-align:center; padding: 1.5rem;">
+          <td colspan="6" style="text-align:center; padding: 1.5rem;">
             ${searchQuery ? "No submissions match your search." : "No submissions yet."}
           </td>
         </tr>
@@ -757,6 +1103,7 @@ function buildSubmissionsDashboard(submissions, query) {
           .tool-link:hover {
             background: #efe3e8;
           }
+          ${buildDashboardReplyStyles()}
           .table-wrap {
             overflow-x: auto;
             border-top: 1px solid var(--border);
@@ -810,7 +1157,11 @@ function buildSubmissionsDashboard(submissions, query) {
           }
           thead th:nth-child(5),
           tbody td:nth-child(5) {
-            width: 24%;
+            width: 20%;
+          }
+          thead th:nth-child(6),
+          tbody td:nth-child(6) {
+            width: 10%;
           }
           .note {
             padding: 1rem 1.5rem 1.5rem;
@@ -833,6 +1184,9 @@ function buildSubmissionsDashboard(submissions, query) {
             }
             .dashboard-tools {
               padding-inline: 1rem;
+            }
+            .reply-panel {
+              margin-inline: 1rem;
             }
           }
         </style>
@@ -863,9 +1217,9 @@ function buildSubmissionsDashboard(submissions, query) {
             </div>
           </div>
         </header>
-        <form class="dashboard-tools" method="get" action="/submissions">
-          <div class="search-group">
-            <label for="submissionSearch">Search submissions</label>
+            <form class="dashboard-tools" method="get" action="/submissions">
+              <div class="search-group">
+                <label for="submissionSearch">Search submissions</label>
                 <input
                   id="submissionSearch"
                   type="search"
@@ -881,6 +1235,15 @@ function buildSubmissionsDashboard(submissions, query) {
               <a class="tool-link" href="/content">Manage Content</a>
               <a class="tool-link" href="/feedback">Review Feedback</a>
             </form>
+            ${buildReplyPanelMarkup({
+              kind: "submission",
+              title: "Reply to a join message",
+              description: "Select a submission below, write your response, and send it back to the person who wants to join.",
+              defaultSubject: "Re: Your BLAST join message",
+              placeholder: "Write a warm reply to the person who joined BLAST.",
+              recipientLabel: "Reply message",
+              emptyText: "Choose a submission to start a reply.",
+            })}
             <div class="table-wrap">
               <table>
                 <thead>
@@ -890,6 +1253,7 @@ function buildSubmissionsDashboard(submissions, query) {
                     <th>Email</th>
                     <th>Message</th>
                     <th>Submitted At</th>
+                    <th>Reply</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -906,6 +1270,11 @@ function buildSubmissionsDashboard(submissions, query) {
             </div>
           </div>
         </div>
+        ${buildReplyPanelScript({
+          kind: "submission",
+          endpoint: "/api/admin/reply",
+          defaultSubject: "Re: Your BLAST join message",
+        })}
         <script>
           (function () {
             const testButton = document.getElementById("sendTestAlertBtn");
@@ -1775,6 +2144,66 @@ app.post("/api/notifications/test", requireAdmin, async function (req, res, next
     console.error("Test notification failed:", error);
     return res.status(502).json({
       message: "Test notification failed.",
+      error: error.message || "Unknown SMTP error.",
+    });
+  }
+});
+
+app.post("/api/admin/reply", requireAdmin, async function (req, res, next) {
+  try {
+    const recipientName = normalizeText(req.body.recipientName);
+    const recipientEmail = normalizeText(req.body.recipientEmail);
+    const contextLabel = normalizeText(req.body.contextLabel);
+    const subject = normalizeText(req.body.subject);
+    const message = normalizeText(req.body.message);
+    const errors = {};
+
+    if (!recipientEmail) {
+      errors.recipientEmail = "A recipient email is required.";
+    } else if (!isValidEmail(recipientEmail)) {
+      errors.recipientEmail = "Please enter a valid recipient email address.";
+    }
+
+    if (!message) {
+      errors.message = "Please write a reply message.";
+    } else if (message.length > 4000) {
+      errors.message = "Reply message must be 4000 characters or less.";
+    }
+
+    if (subject && subject.length > 140) {
+      errors.subject = "Subject must be 140 characters or less.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return res.status(400).json({
+        message: "Please fix the highlighted fields.",
+        errors,
+      });
+    }
+
+    const result = await sendAdminReplyEmail({
+      recipientName,
+      recipientEmail,
+      contextLabel,
+      subject,
+      message,
+    });
+
+    if (result.status === "skipped") {
+      return res.status(503).json({
+        message: "Email alerts are not configured yet.",
+        notification: result,
+      });
+    }
+
+    return res.json({
+      message: "Reply sent.",
+      notification: result,
+    });
+  } catch (error) {
+    console.error("Admin reply failed:", error);
+    return res.status(502).json({
+      message: "Reply failed.",
       error: error.message || "Unknown SMTP error.",
     });
   }

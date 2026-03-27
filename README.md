@@ -32,6 +32,7 @@ The backend lives in `backend/`.
 - Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, and `NOTIFY_TO_EMAIL` if you want email alerts for new submissions.
 - `NOTIFY_FROM_EMAIL` is optional, but helps the email look cleaner.
 - When SMTP is configured, BLAST sends an admin notification and a warm confirmation reply for join submissions. Feedback submissions also send a confirmation reply when the user includes an email address.
+- The submissions and feedback dashboards also include a reply composer so you can answer people directly from the admin panel.
 
 ### Render deployment
 

@@ -349,6 +349,58 @@ async function sendFeedbackConfirmation(feedback) {
   });
 }
 
+function buildReplyEmail(details) {
+  const recipientName = normalizeText(details && details.recipientName);
+  const recipientEmail = normalizeText(details && details.recipientEmail);
+  const subject = normalizeText(details && details.subject);
+  const message = normalizeText(details && details.message);
+  const contextLabel = normalizeText(details && details.contextLabel) || "BLAST";
+  const safeRecipientName = escapeHtml(recipientName || recipientEmail || "friend");
+  const safeMessage = escapeHtml(message).replace(/\n/g, "<br>");
+
+  return {
+    subject: subject || `Re: ${contextLabel}`,
+    text: [
+      `Hi ${recipientName || recipientEmail || "there"},`,
+      "",
+      message,
+      "",
+      "Warmly,",
+      "BLAST Team",
+    ].join("\n"),
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #2f1f26; line-height: 1.6;">
+        <h2 style="margin: 0 0 12px; color: #5d1029;">${escapeHtml(subject || `Re: ${contextLabel}`)}</h2>
+        <p style="margin: 0 0 8px;">Hi ${safeRecipientName},</p>
+        <div style="margin: 0 0 12px;">${safeMessage}</div>
+        <p style="margin: 0;">Warmly,<br>BLAST Team</p>
+      </div>
+    `,
+  };
+}
+
+async function sendAdminReplyEmail(details) {
+  const recipientEmail = normalizeText(details && details.recipientEmail);
+
+  if (!recipientEmail) {
+    return {
+      status: "skipped",
+      reason: "recipient email is required",
+    };
+  }
+
+  const email = buildReplyEmail(details);
+  const config = getNotificationConfig();
+
+  return sendMail({
+    to: recipientEmail,
+    subject: email.subject,
+    text: email.text,
+    html: email.html,
+    replyTo: config.to,
+  });
+}
+
 async function sendTestNotification() {
   const now = new Date().toLocaleString();
   return sendMail({
@@ -372,6 +424,7 @@ async function sendTestNotification() {
 module.exports = {
   getNotificationSummary,
   isNotificationConfigured,
+  sendAdminReplyEmail,
   sendFeedbackConfirmation,
   sendFeedbackNotification,
   sendSubmissionNotification,
