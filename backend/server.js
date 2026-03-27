@@ -18,6 +18,9 @@ const {
 } = require("./contentStore");
 const {
   getNotificationSummary,
+  sendFeedbackConfirmation,
+  sendFeedbackNotification,
+  sendSubmissionConfirmation,
   sendSubmissionNotification,
   sendTestNotification,
 } = require("./notificationService");
@@ -1939,12 +1942,10 @@ app.post("/api/join", async function (req, res, next) {
 
     Promise.resolve()
       .then(function () {
-        return sendSubmissionNotification(submission);
-      })
-      .then(function (result) {
-        if (result && result.status !== "sent") {
-          console.log("Notification result:", result);
-        }
+        return Promise.all([
+          sendSubmissionNotification(submission),
+          sendSubmissionConfirmation(submission),
+        ]);
       })
       .catch(function (notificationError) {
         console.error("Notification delivery failed:", notificationError);
@@ -2020,6 +2021,17 @@ app.post("/api/feedback", async function (req, res, next) {
     };
 
     await saveFeedback(feedback);
+
+    Promise.resolve()
+      .then(function () {
+        return Promise.all([
+          sendFeedbackNotification(feedback),
+          sendFeedbackConfirmation(feedback),
+        ]);
+      })
+      .catch(function (notificationError) {
+        console.error("Feedback notification delivery failed:", notificationError);
+      });
 
     return res.status(201).json({
       message: "Thanks for sharing your feedback.",

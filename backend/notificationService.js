@@ -145,7 +145,7 @@ async function sendWithConfig(config, message) {
   return getTransporter(config, resolvedHost).sendMail(message);
 }
 
-async function sendMail({ subject, text, html, replyTo }) {
+async function sendMail({ to, subject, text, html, replyTo }) {
   const config = getNotificationConfig();
 
   if (!isNotificationConfigured()) {
@@ -157,7 +157,7 @@ async function sendMail({ subject, text, html, replyTo }) {
 
   const message = {
     from: config.from,
-    to: config.to,
+    to: normalizeText(to) || config.to,
     subject,
     text,
     html,
@@ -210,9 +210,37 @@ function buildSubmissionEmail(submission) {
   };
 }
 
+function buildSubmissionConfirmation(submission) {
+  const safeName = escapeHtml(submission.fullName);
+
+  return {
+    subject: "Thanks for joining BLAST",
+    text: [
+      `Hi ${submission.fullName},`,
+      "",
+      "Thanks for reaching out to BLAST. We have received your join message and we are glad you want to be part of the journey.",
+      "",
+      "We will review your message and get back to you soon.",
+      "",
+      "With gratitude,",
+      "BLAST Team",
+    ].join("\n"),
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #2f1f26; line-height: 1.6;">
+        <h2 style="margin: 0 0 12px; color: #5d1029;">Thanks for joining BLAST</h2>
+        <p style="margin: 0 0 8px;">Hi ${safeName},</p>
+        <p style="margin: 0 0 8px;">Thanks for reaching out to BLAST. We have received your join message and we are glad you want to be part of the journey.</p>
+        <p style="margin: 0 0 8px;">We will review your message and get back to you soon.</p>
+        <p style="margin: 0;">With gratitude,<br>BLAST Team</p>
+      </div>
+    `,
+  };
+}
+
 async function sendSubmissionNotification(submission) {
   const email = buildSubmissionEmail(submission);
   return sendMail({
+    to: undefined,
     subject: email.subject,
     text: email.text,
     html: email.html,
@@ -220,9 +248,111 @@ async function sendSubmissionNotification(submission) {
   });
 }
 
+async function sendSubmissionConfirmation(submission) {
+  const email = buildSubmissionConfirmation(submission);
+  return sendMail({
+    to: submission.email,
+    subject: email.subject,
+    text: email.text,
+    html: email.html,
+    replyTo: undefined,
+  });
+}
+
+function buildFeedbackEmail(feedback) {
+  const submittedAt = new Date(feedback.submittedAt).toLocaleString();
+  const safeName = escapeHtml(feedback.fullName);
+  const safeEmail = escapeHtml(feedback.email || "Not provided");
+  const safeTopic = escapeHtml(feedback.topic);
+  const safeMessage = escapeHtml(feedback.message).replace(/\n/g, "<br>");
+
+  return {
+    subject: `[BLAST] New feedback from ${feedback.fullName}`,
+    text: [
+      "A new BLAST feedback message was received.",
+      "",
+      `Name: ${feedback.fullName}`,
+      `Email: ${feedback.email || "Not provided"}`,
+      `Topic: ${feedback.topic}`,
+      `Message: ${feedback.message}`,
+      `Submitted at: ${submittedAt}`,
+    ].join("\n"),
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #2f1f26; line-height: 1.6;">
+        <h2 style="margin: 0 0 12px; color: #5d1029;">New BLAST feedback</h2>
+        <p style="margin: 0 0 8px;">A new feedback message was received from the website.</p>
+        <p><strong>Name:</strong> ${safeName}</p>
+        <p><strong>Email:</strong> ${safeEmail}</p>
+        <p><strong>Topic:</strong> ${safeTopic}</p>
+        <p><strong>Message:</strong><br>${safeMessage}</p>
+        <p><strong>Submitted at:</strong> ${escapeHtml(submittedAt)}</p>
+      </div>
+    `,
+  };
+}
+
+function buildFeedbackConfirmation(feedback) {
+  const safeName = escapeHtml(feedback.fullName);
+  const safeTopic = escapeHtml(feedback.topic);
+
+  return {
+    subject: "Thanks for your feedback",
+    text: [
+      `Hi ${feedback.fullName},`,
+      "",
+      "Thank you for taking the time to share your thoughts with BLAST.",
+      `We received your feedback about ${feedback.topic}.`,
+      "",
+      "Your voice matters to us, and we will keep it in mind as we keep growing.",
+      "",
+      "Warmly,",
+      "BLAST Team",
+    ].join("\n"),
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #2f1f26; line-height: 1.6;">
+        <h2 style="margin: 0 0 12px; color: #5d1029;">Thanks for your feedback</h2>
+        <p style="margin: 0 0 8px;">Hi ${safeName},</p>
+        <p style="margin: 0 0 8px;">Thank you for taking the time to share your thoughts with BLAST.</p>
+        <p style="margin: 0 0 8px;">We received your feedback about <strong>${safeTopic}</strong>.</p>
+        <p style="margin: 0 0 8px;">Your voice matters to us, and we will keep it in mind as we keep growing.</p>
+        <p style="margin: 0;">Warmly,<br>BLAST Team</p>
+      </div>
+    `,
+  };
+}
+
+async function sendFeedbackNotification(feedback) {
+  const email = buildFeedbackEmail(feedback);
+  return sendMail({
+    subject: email.subject,
+    text: email.text,
+    html: email.html,
+    replyTo: feedback.email || undefined,
+  });
+}
+
+async function sendFeedbackConfirmation(feedback) {
+  if (!feedback.email) {
+    return {
+      status: "skipped",
+      reason: "feedback email not provided",
+    };
+  }
+
+  const email = buildFeedbackConfirmation(feedback);
+  return sendMail({
+    to: feedback.email,
+    subject: email.subject,
+    text: email.text,
+    html: email.html,
+    replyTo: undefined,
+  });
+}
+
 async function sendTestNotification() {
   const now = new Date().toLocaleString();
   return sendMail({
+    to: undefined,
     subject: "[BLAST] Test notification",
     text: [
       "This is a test notification from the BLAST admin dashboard.",
@@ -242,6 +372,9 @@ async function sendTestNotification() {
 module.exports = {
   getNotificationSummary,
   isNotificationConfigured,
+  sendFeedbackConfirmation,
+  sendFeedbackNotification,
   sendSubmissionNotification,
+  sendSubmissionConfirmation,
   sendTestNotification,
 };
