@@ -336,6 +336,11 @@ function buildDashboardReplyStyles() {
             gap: 0.75rem;
             align-items: center;
           }
+          .reply-actions .tool-link.is-disabled {
+            pointer-events: none;
+            opacity: 0.5;
+            filter: grayscale(0.1);
+          }
           .reply-status {
             margin: 0;
             color: var(--muted);
@@ -414,6 +419,7 @@ function buildReplyPanelMarkup({
         <input type="hidden" id="${prefix}ContextLabel" value="">
         <div class="reply-actions">
           <button class="tool-button" type="submit">Send reply</button>
+          <a class="tool-link is-disabled" href="#" target="_blank" rel="noopener" id="${prefix}DraftLink" aria-disabled="true">Open mail draft</a>
           <p class="reply-status" id="${prefix}Status" aria-live="polite"></p>
         </div>
       </form>
@@ -439,8 +445,53 @@ function buildReplyPanelScript({ kind, endpoint, defaultSubject }) {
         const recipientNameInput = document.getElementById(${JSON.stringify(`${prefix}RecipientName`)});
         const recipientEmailInput = document.getElementById(${JSON.stringify(`${prefix}RecipientEmail`)});
         const contextLabelInput = document.getElementById(${JSON.stringify(`${prefix}ContextLabel`)});
+        const draftLink = document.getElementById(${JSON.stringify(`${prefix}DraftLink`)});
         const status = document.getElementById(${JSON.stringify(`${prefix}Status`)});
         const buttons = Array.from(document.querySelectorAll(${JSON.stringify(replySelector)}));
+
+        function buildMailtoLink() {
+          const recipientEmail = recipientEmailInput.value.trim();
+          const recipientName = recipientNameInput.value.trim();
+          const contextLabel = contextLabelInput.value.trim();
+          const subject = subjectInput.value.trim();
+          const message = messageInput.value.trim();
+
+          if (!recipientEmail) {
+            return "#";
+          }
+
+          const bodyLines = [
+            "Hi " + (recipientName || "there") + ",",
+            "",
+            message || "I wanted to follow up on your message to BLAST.",
+            "",
+          ];
+
+          if (contextLabel) {
+            bodyLines.push("Context: " + contextLabel);
+            bodyLines.push("");
+          }
+
+          bodyLines.push("Warmly,");
+          bodyLines.push("BLAST Team");
+
+          const mailtoSubject = subject || ${JSON.stringify(defaultSubject)};
+          const mailtoBody = bodyLines.join("\n");
+
+          return "mailto:" + encodeURIComponent(recipientEmail) + "?subject=" + encodeURIComponent(mailtoSubject) + "&body=" + encodeURIComponent(mailtoBody);
+        }
+
+        function updateDraftLink() {
+          if (!draftLink) {
+            return;
+          }
+
+          const hasRecipient = Boolean(recipientEmailInput.value.trim());
+          const href = hasRecipient ? buildMailtoLink() : "#";
+          draftLink.setAttribute("href", href);
+          draftLink.setAttribute("aria-disabled", hasRecipient ? "false" : "true");
+          draftLink.classList.toggle("is-disabled", !hasRecipient);
+        }
 
         function setStatus(message, isError) {
           status.textContent = message;
@@ -455,6 +506,7 @@ function buildReplyPanelScript({ kind, endpoint, defaultSubject }) {
           targetEmail.textContent = "Pick a row to prepare a reply.";
           subjectInput.value = ${JSON.stringify(defaultSubject)};
           messageInput.value = "";
+          updateDraftLink();
           setStatus("Choose a submission or feedback entry to start replying.", false);
         }
 
@@ -470,6 +522,7 @@ function buildReplyPanelScript({ kind, endpoint, defaultSubject }) {
           targetName.textContent = recipientName || recipientEmail || "No recipient selected";
           targetEmail.textContent = recipientEmail || "No recipient email available";
           subjectInput.value = defaultSubject || subjectInput.value;
+          updateDraftLink();
           setStatus("Reply composer ready.", false);
           messageInput.focus();
           panel.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -485,6 +538,9 @@ function buildReplyPanelScript({ kind, endpoint, defaultSubject }) {
           clearSelection();
           subjectInput.focus();
         });
+
+        subjectInput.addEventListener("input", updateDraftLink);
+        messageInput.addEventListener("input", updateDraftLink);
 
         form.addEventListener("submit", async function (event) {
           event.preventDefault();
@@ -538,6 +594,7 @@ function buildReplyPanelScript({ kind, endpoint, defaultSubject }) {
 
             setStatus((payload && payload.message) || "Reply sent successfully.", false);
             messageInput.value = "";
+            updateDraftLink();
           } catch (error) {
             setStatus(error.message || "Could not reach the backend. Please try again.", true);
           } finally {
