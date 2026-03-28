@@ -2161,7 +2161,7 @@ app.post("/api/notifications/test", requireAdmin, async function (req, res, next
 
     if (result.status === "skipped") {
       return res.status(503).json({
-        message: "Email alerts are not configured yet.",
+        message: "Reply email service is not configured yet.",
         notification: result,
       });
     }

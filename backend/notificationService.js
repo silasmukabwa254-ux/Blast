@@ -1,5 +1,6 @@
 const dns = require("node:dns");
 const nodemailer = require("nodemailer");
+const RESEND_API_URL = "https://api.resend.com/emails";
 
 function normalizeText(value) {
   return String(value ?? "").trim();
@@ -44,6 +45,18 @@ function getNotificationConfig() {
     user,
     password,
     to,
+    from,
+  };
+}
+
+function getReplyConfig() {
+  const apiKey = normalizeText(process.env.RESEND_API_KEY);
+  const from = normalizeText(
+    process.env.RESEND_FROM_EMAIL || process.env.NOTIFY_FROM_EMAIL || "BLAST <onboarding@resend.dev>"
+  );
+
+  return {
+    apiKey,
     from,
   };
 }
@@ -390,15 +403,43 @@ async function sendAdminReplyEmail(details) {
   }
 
   const email = buildReplyEmail(details);
-  const config = getNotificationConfig();
+  const replyConfig = getReplyConfig();
 
-  return sendMail({
-    to: recipientEmail,
-    subject: email.subject,
-    text: email.text,
-    html: email.html,
-    replyTo: config.to,
+  if (!replyConfig.apiKey) {
+    return {
+      status: "skipped",
+      reason: "reply service is not configured",
+    };
+  }
+
+  const config = getNotificationConfig();
+  const response = await fetch(RESEND_API_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${replyConfig.apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: replyConfig.from,
+      to: recipientEmail,
+      subject: email.subject,
+      text: email.text,
+      html: email.html,
+      reply_to: config.to || undefined,
+    }),
   });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(function () {
+      return "";
+    });
+    throw new Error(errorText || `Resend reply request failed with status ${response.status}.`);
+  }
+
+  return {
+    status: "sent",
+    provider: "resend",
+  };
 }
 
 async function sendTestNotification() {

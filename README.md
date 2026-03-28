@@ -33,6 +33,7 @@ The backend lives in `backend/`.
 - `NOTIFY_FROM_EMAIL` is optional, but helps the email look cleaner.
 - When SMTP is configured, BLAST sends an admin notification and a warm confirmation reply for join submissions. Feedback submissions also send a confirmation reply when the user includes an email address.
 - The submissions and feedback dashboards also include a reply composer so you can answer people directly from the admin panel.
+- Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` if you want the reply composer to send through Resend instead of SMTP. That path is used for admin replies because it is more reliable than SMTP on Render.
 
 ### Render deployment
 
@@ -45,6 +46,7 @@ The backend lives in `backend/`.
 6. Add `ADMIN_USERNAME` and `ADMIN_PASSWORD` in the Render service settings so the admin pages can be opened.
 7. Add `OPENAI_API_KEY` in the Render service settings if you want the BLAST Bot to use OpenAI.
 8. Add SMTP settings in the Render service settings if you want the backend to email you whenever someone submits the join form.
+9. Add `RESEND_API_KEY` and `RESEND_FROM_EMAIL` if you want admin replies to use the Resend mail API instead of SMTP.
 
 ### API
 
