@@ -17,6 +17,7 @@ const {
   saveContent,
 } = require("./contentStore");
 const {
+  getReplySummary,
   getNotificationSummary,
   sendAdminReplyEmail,
   sendFeedbackConfirmation,
@@ -292,6 +293,15 @@ function buildDashboardReplyStyles() {
             color: var(--accent);
             font-size: 1.1rem;
           }
+          .reply-panel__notice {
+            margin: 0.9rem 0 0;
+            padding: 0.75rem 0.9rem;
+            border-radius: 12px;
+            background: #f8eef2;
+            color: var(--accent);
+            font-size: 0.92rem;
+            line-height: 1.5;
+          }
           .reply-panel__target {
             margin-top: 0.9rem;
             padding: 0.85rem 1rem;
@@ -335,6 +345,10 @@ function buildDashboardReplyStyles() {
             flex-wrap: wrap;
             gap: 0.75rem;
             align-items: center;
+          }
+          .reply-actions .tool-button:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
           }
           .reply-actions .tool-link.is-disabled {
             pointer-events: none;
@@ -388,6 +402,8 @@ function buildReplyPanelMarkup({
   placeholder,
   recipientLabel,
   emptyText,
+  replyEnabled = true,
+  replyNotice = "",
 }) {
   const prefix = `${kind}Reply`;
   return `
@@ -400,6 +416,7 @@ function buildReplyPanelMarkup({
         </div>
         <button class="tool-link" type="button" id="${prefix}Clear">Clear selection</button>
       </div>
+      ${replyEnabled ? "" : `<p class="reply-panel__notice">${escapeHtml(replyNotice || "Replies are paused until a verified domain is configured.")}</p>`}
       <div class="reply-panel__target">
         <strong id="${prefix}TargetName">No recipient selected</strong>
         <span id="${prefix}TargetEmail">${escapeHtml(emptyText)}</span>
@@ -425,7 +442,7 @@ function buildReplyPanelMarkup({
         <input type="hidden" id="${prefix}RecipientEmail" value="">
         <input type="hidden" id="${prefix}ContextLabel" value="">
         <div class="reply-actions">
-          <button class="tool-button" type="submit">Send reply</button>
+          <button class="tool-button" type="submit"${replyEnabled ? "" : " disabled"}>${replyEnabled ? "Send reply" : "Replies paused"}</button>
           <p class="reply-status" id="${prefix}Status" aria-live="polite"></p>
         </div>
       </form>
@@ -433,7 +450,7 @@ function buildReplyPanelMarkup({
   `;
 }
 
-function buildReplyPanelScript({ kind, endpoint, defaultSubject }) {
+function buildReplyPanelScript({ kind, endpoint, defaultSubject, replyEnabled = true, replyNotice = "" }) {
   const prefix = `${kind}Reply`;
   const replySelector = `[data-reply-kind="${kind}"]`;
   return `
@@ -453,6 +470,8 @@ function buildReplyPanelScript({ kind, endpoint, defaultSubject }) {
         const contextLabelInput = document.getElementById(${JSON.stringify(`${prefix}ContextLabel`)});
         const status = document.getElementById(${JSON.stringify(`${prefix}Status`)});
         const replyButtons = Array.from(document.querySelectorAll(${JSON.stringify(`[data-reply-kind="${kind}"]`)}));
+        const replyEnabled = ${JSON.stringify(Boolean(replyEnabled))};
+        const replyNotice = ${JSON.stringify(replyNotice || "Replies are paused until a verified domain is configured.")};
 
         function getReplyData(element) {
           return {
@@ -476,7 +495,7 @@ function buildReplyPanelScript({ kind, endpoint, defaultSubject }) {
           targetEmail.textContent = "Pick a row to prepare a reply.";
           subjectInput.value = ${JSON.stringify(defaultSubject)};
           messageInput.value = "";
-          setStatus("Choose a submission or feedback entry to start replying.", false);
+          setStatus(replyEnabled ? "Choose a submission or feedback entry to start replying." : replyNotice, false);
         }
 
         function applySelection(element) {
@@ -512,6 +531,11 @@ function buildReplyPanelScript({ kind, endpoint, defaultSubject }) {
 
         form.addEventListener("submit", async function (event) {
           event.preventDefault();
+
+          if (!replyEnabled) {
+            setStatus(replyNotice, true);
+            return;
+          }
 
           const recipientName = recipientNameInput.value.trim();
           const recipientEmail = recipientEmailInput.value.trim();
@@ -579,6 +603,7 @@ function buildReplyPanelScript({ kind, endpoint, defaultSubject }) {
 function buildFeedbackDashboard(feedbackEntries, query) {
   const searchQuery = getQueryText(query);
   const filteredFeedback = filterFeedback(feedbackEntries, searchQuery);
+  const replySummary = getReplySummary();
   const exportHref = searchQuery
     ? `/feedback/export.csv?q=${encodeURIComponent(searchQuery)}`
     : "/feedback/export.csv";
@@ -907,6 +932,8 @@ function buildFeedbackDashboard(feedbackEntries, query) {
               placeholder: "Write a kind reply that speaks to their message.",
               recipientLabel: "Reply message",
               emptyText: "Choose a feedback entry to start a reply.",
+              replyEnabled: replySummary.enabled,
+              replyNotice: "Replies are paused until a verified sending domain is configured in Resend.",
             })}
             <div class="table-wrap">
               <table>
@@ -936,6 +963,8 @@ function buildFeedbackDashboard(feedbackEntries, query) {
           kind: "feedback",
           endpoint: "/api/admin/reply",
           defaultSubject: "Re: Your BLAST feedback",
+          replyEnabled: replySummary.enabled,
+          replyNotice: "Replies are paused until a verified sending domain is configured in Resend.",
         })}
       </body>
     </html>`;
@@ -945,6 +974,7 @@ function buildSubmissionsDashboard(submissions, query) {
   const searchQuery = getQueryText(query);
   const filteredSubmissions = filterSubmissions(submissions, searchQuery);
   const notificationSummary = getNotificationSummary();
+  const replySummary = getReplySummary();
   const exportHref = searchQuery
     ? `/submissions/export.csv?q=${encodeURIComponent(searchQuery)}`
     : "/submissions/export.csv";
@@ -1273,6 +1303,8 @@ function buildSubmissionsDashboard(submissions, query) {
               placeholder: "Write a warm reply to the person who joined BLAST.",
               recipientLabel: "Reply message",
               emptyText: "Choose a submission to start a reply.",
+              replyEnabled: replySummary.enabled,
+              replyNotice: "Replies are paused until a verified sending domain is configured in Resend.",
             })}
             <div class="table-wrap">
               <table>
@@ -1304,6 +1336,8 @@ function buildSubmissionsDashboard(submissions, query) {
           kind: "submission",
           endpoint: "/api/admin/reply",
           defaultSubject: "Re: Your BLAST join message",
+          replyEnabled: replySummary.enabled,
+          replyNotice: "Replies are paused until a verified sending domain is configured in Resend.",
         })}
         <script>
           (function () {
@@ -2161,7 +2195,7 @@ app.post("/api/notifications/test", requireAdmin, async function (req, res, next
 
     if (result.status === "skipped") {
       return res.status(503).json({
-        message: "Reply email service is not configured yet.",
+        message: "Email alerts are not configured yet.",
         notification: result,
       });
     }
@@ -2221,7 +2255,7 @@ app.post("/api/admin/reply", requireAdmin, async function (req, res, next) {
 
     if (result.status === "skipped") {
       return res.status(503).json({
-        message: "Reply email service is not configured yet.",
+        message: "Replies are paused until a verified domain is configured.",
         notification: result,
       });
     }

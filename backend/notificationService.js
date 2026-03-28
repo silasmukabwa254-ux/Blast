@@ -61,6 +61,21 @@ function getReplyConfig() {
   };
 }
 
+function isReplyDeliveryConfigured() {
+  const config = getReplyConfig();
+  return Boolean(config.apiKey && config.from && !/resend\.dev/i.test(config.from));
+}
+
+function getReplySummary() {
+  const config = getReplyConfig();
+
+  return {
+    enabled: isReplyDeliveryConfigured(),
+    sender: config.from,
+    needsVerifiedDomain: /resend\.dev/i.test(config.from),
+  };
+}
+
 function isNotificationConfigured() {
   const config = getNotificationConfig();
   return Boolean(config.host && config.port && config.user && config.password && config.to);
@@ -412,6 +427,13 @@ async function sendAdminReplyEmail(details) {
     };
   }
 
+  if (replyConfig.from && /resend\.dev/i.test(replyConfig.from)) {
+    return {
+      status: "skipped",
+      reason: "a verified domain is required for admin replies",
+    };
+  }
+
   const config = getNotificationConfig();
   const response = await fetch(RESEND_API_URL, {
     method: "POST",
@@ -463,6 +485,7 @@ async function sendTestNotification() {
 }
 
 module.exports = {
+  getReplySummary,
   getNotificationSummary,
   isNotificationConfigured,
   sendAdminReplyEmail,
