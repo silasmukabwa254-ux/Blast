@@ -41,9 +41,17 @@
               <a class="skip-link" href="#main-content">Skip to content</a>
               <div class="welcome-modal" id="welcomeModal" aria-hidden="true">
                      <div class="welcome-modal__backdrop" data-close-modal="true"></div>
-                     <div class="welcome-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="welcomeModalTitle">
+                    <div class="welcome-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="welcomeModalTitle">
                             <button type="button" class="welcome-modal__close" id="closeWelcomeModal" aria-label="Close welcome message">&times;</button>
-                            <img class="welcome-modal__image" src="blast-logo.webp" alt="BLAST logo" width="110" height="110" decoding="async">
+                            <svg class="welcome-modal__image" viewBox="0 0 360 180" role="img" aria-labelledby="welcomeLogoTitle welcomeLogoDesc">
+                                   <title id="welcomeLogoTitle">BLAST</title>
+                                   <desc id="welcomeLogoDesc">BLAST wordmark in maroon with a gold underline.</desc>
+                                   <rect x="4" y="4" width="352" height="172" rx="34" fill="#fff7fa" stroke="rgba(139, 30, 63, 0.14)"></rect>
+                                   <text x="50%" y="40%" text-anchor="middle" dominant-baseline="middle" fill="#8b1e3f" style="font-family: Georgia, 'Times New Roman', serif; font-size: 74px; font-weight: 800; letter-spacing: 2px;">
+                                          BLAST
+                                   </text>
+                                   <path d="M102 117c20 13 136 13 156 0" fill="none" stroke="#f1c94f" stroke-width="5" stroke-linecap="round"></path>
+                            </svg>
                             <p class="welcome-modal__eyebrow" id="welcomeModalEyebrow">Welcome to BLAST</p>
                             <h2 class="welcome-modal__title" id="welcomeModalTitle">Building Lives Around Sound Truth</h2>
                             <p class="welcome-modal__text" id="welcomeModalText">A youth-centered Christian community focused on faith, mentorship, fellowship, and purposeful living.</p>

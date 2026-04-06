@@ -98,10 +98,10 @@
                             cursor: pointer;
                      }
                      .welcome-modal__image {
-                            width: 110px;
+                            width: min(100%, 160px);
                             height: auto;
                             margin: 0 auto 10px;
-                            border-radius: 16px;
+                            display: block;
                      }
                      .welcome-modal__eyebrow {
                             margin: 0 0 4px;
@@ -1352,7 +1352,7 @@
                                    border-radius: 14px;
                             }
                             .welcome-modal__image {
-                                   width: 84px;
+                                   width: min(100%, 140px);
                                    margin-bottom: 8px;
                             }
                             .welcome-modal__eyebrow {
