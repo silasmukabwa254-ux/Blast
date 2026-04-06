@@ -159,6 +159,32 @@
                             transition: transform 0.25s ease, box-shadow 0.25s ease;
                             text-align: center;
                      }
+                     .home-logo {
+                            width: min(100%, 320px);
+                            margin: 0 auto 16px;
+                            transition: transform 0.28s ease, filter 0.28s ease;
+                            filter: drop-shadow(0 8px 16px rgba(93, 16, 41, 0.12));
+                     }
+                     .home-logo svg {
+                            display: block;
+                            width: 100%;
+                            height: auto;
+                     }
+                     .blast-text {
+                            font-family: Georgia, "Times New Roman", serif;
+                            font-size: 42px;
+                            font-weight: 800;
+                            letter-spacing: 3px;
+                            transform-origin: center;
+                            transition: letter-spacing 0.28s ease, transform 0.28s ease;
+                     }
+                     .home-logo:hover {
+                            transform: translateY(-2px) scale(1.02);
+                            filter: drop-shadow(0 10px 20px rgba(93, 16, 41, 0.18));
+                     }
+                     .home-logo:hover .blast-text {
+                            letter-spacing: 4px;
+                     }
                      .container:hover {
                             transform: translateY(-4px);
                             box-shadow: 0 10px 24px rgba(0,0,0,0.18);
@@ -179,16 +205,6 @@
                             .footer p {
                                    margin: 6px 0;
                             }
-                     
-                     .founded {
-                            background-color: #fff3a3;
-                            display: inline-block;
-                            padding: 4px 8px;
-                            border-radius: 6px;
-                            margin-bottom: 16px;
-
-                     }
-                     
                      
                      img {
                             max-width: 100%;
@@ -1265,6 +1281,14 @@
                             img {
                                    width: 120px;
                                    height: auto;
+                            }
+                            .home-logo {
+                                   width: min(100%, 260px);
+                                   margin-bottom: 12px;
+                            }
+                            .blast-text {
+                                   font-size: 34px;
+                                   letter-spacing: 2px;
                             }
                             .footer {
                                    font-size: 12px;
