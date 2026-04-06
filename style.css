@@ -160,30 +160,25 @@
                             text-align: center;
                      }
                      .home-logo {
-                            width: min(100%, 320px);
-                            margin: 0 auto 16px;
-                            transition: transform 0.28s ease, filter 0.28s ease;
-                            filter: drop-shadow(0 8px 16px rgba(93, 16, 41, 0.12));
+                            width: min(100%, 220px);
+                            margin: 0 auto 18px;
+                            padding: 14px;
+                            border-radius: 28px;
+                            background: linear-gradient(180deg, rgba(255, 251, 253, 0.9), rgba(251, 240, 245, 0.92));
+                            box-shadow: 0 10px 24px rgba(93, 16, 41, 0.14);
+                            transition: transform 0.28s ease, box-shadow 0.28s ease;
                      }
-                     .home-logo svg {
-                            display: block;
+                     .home-logo__image {
                             width: 100%;
                             height: auto;
-                     }
-                     .blast-text {
-                            font-family: Georgia, "Times New Roman", serif;
-                            font-size: 42px;
-                            font-weight: 800;
-                            letter-spacing: 3px;
-                            transform-origin: center;
-                            transition: letter-spacing 0.28s ease, transform 0.28s ease;
+                            display: block;
+                            border-radius: 22px;
+                            margin: 0;
+                            object-fit: cover;
                      }
                      .home-logo:hover {
-                            transform: translateY(-2px) scale(1.02);
-                            filter: drop-shadow(0 10px 20px rgba(93, 16, 41, 0.18));
-                     }
-                     .home-logo:hover .blast-text {
-                            letter-spacing: 4px;
+                            transform: translateY(-2px) scale(1.01);
+                            box-shadow: 0 14px 28px rgba(93, 16, 41, 0.18);
                      }
                      .container:hover {
                             transform: translateY(-4px);
@@ -1291,12 +1286,9 @@
                                    height: auto;
                             }
                             .home-logo {
-                                   width: min(100%, 260px);
-                                   margin-bottom: 12px;
-                            }
-                            .blast-text {
-                                   font-size: 34px;
-                                   letter-spacing: 2px;
+                                   width: min(100%, 180px);
+                                   padding: 10px;
+                                   margin-bottom: 14px;
                             }
                             .footer {
                                    font-size: 12px;
