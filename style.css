@@ -190,8 +190,19 @@
                             box-shadow: 0 10px 24px rgba(0,0,0,0.18);
                      }
               
-                     h1 { color: #5d1029; margin-top: 0; letter-spacing: 0.5px; }
                      p, strong, #message {color: #222; }
+                     .hero-statement {
+                            display: block;
+                            margin: 4px auto 0;
+                            max-width: 58ch;
+                            font-size: 1.03rem;
+                            line-height: 1.65;
+                     }
+                     .hero-mission {
+                            margin: 10px auto 0;
+                            max-width: 58ch;
+                            line-height: 1.7;
+                     }
                      .mission {color: #7a1f1f; }
                      .quote {color: #0d4ea6; }
                      .footer {
@@ -652,7 +663,7 @@
                             margin-top: 28px;
                      }
                      .page-hub {
-                            margin-top: 32px;
+                            margin-top: 42px;
                             padding: 24px 20px 22px;
                             border: 1px solid rgba(93, 16, 41, 0.08);
                             border-radius: 16px;
@@ -1275,9 +1286,6 @@
                                    padding: 16px;
                             
                             }
-                            h1 {
-                                   font-size: 24px;
-                            }
                             img {
                                    width: 120px;
                                    height: auto;
@@ -1358,9 +1366,14 @@
                             .welcome-modal__eyebrow {
                                    font-size: 11px;
                                    letter-spacing: 0.08em;
-                            }
+                           }
                             .welcome-modal__title {
                                    font-size: 21px;
+                            }
+                            .hero-statement,
+                            .hero-mission {
+                                   max-width: 100%;
+                                   font-size: 0.98rem;
                             }
                             .welcome-modal__text {
                                    font-size: 13px;
