@@ -159,6 +159,85 @@
                             transition: transform 0.25s ease, box-shadow 0.25s ease;
                             text-align: center;
                      }
+                     .hero {
+                            display: grid;
+                            grid-template-columns: minmax(220px, 330px) 1fr;
+                            gap: 22px;
+                            align-items: center;
+                            padding: 12px 14px 8px;
+                            margin-bottom: 22px;
+                            border-radius: 22px;
+                            background: linear-gradient(180deg, rgba(255, 248, 251, 0.86), rgba(252, 242, 246, 0.92));
+                            border: 1px solid rgba(139, 30, 63, 0.08);
+                            box-shadow: 0 10px 24px rgba(93, 16, 41, 0.06);
+                            text-align: left;
+                     }
+                     .hero__art {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                     }
+                     .hero__copy {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: flex-start;
+                            gap: 10px;
+                     }
+                     .hero-kicker {
+                            margin: 0;
+                            color: #8b1e3f;
+                            font-size: 0.82rem;
+                            font-weight: 800;
+                            letter-spacing: 0.16em;
+                            text-transform: uppercase;
+                     }
+                     .hero h1 {
+                            margin: 0;
+                            color: #5d1029;
+                            font-size: clamp(1.9rem, 4vw, 3rem);
+                            line-height: 1.05;
+                            letter-spacing: -0.02em;
+                     }
+                     .hero-lead {
+                            margin: 0;
+                            color: #3b2a31;
+                            font-size: 1.02rem;
+                            line-height: 1.7;
+                            max-width: 38ch;
+                     }
+                     .hero-actions {
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 10px;
+                            margin-top: 4px;
+                     }
+                     .hero-button {
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            min-height: 44px;
+                            padding: 0.8rem 1rem;
+                            border-radius: 999px;
+                            text-decoration: none;
+                            font-weight: 700;
+                            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+                     }
+                     .hero-button:hover {
+                            transform: translateY(-2px);
+                     }
+                     .hero-button--primary {
+                            background: #8b1e3f;
+                            color: #fff;
+                            box-shadow: 0 10px 18px rgba(139, 30, 63, 0.18);
+                     }
+                     .hero-button--primary:hover {
+                            background: #721832;
+                     }
+                     .hero-button--secondary {
+                            background: rgba(93, 16, 41, 0.08);
+                            color: #5d1029;
+                            border: 1px solid rgba(93, 16, 41, 0.12);
+                     }
                      .home-logo {
                             width: min(100%, 330px);
                             margin: 0 auto 18px;
@@ -179,16 +258,9 @@
                      }
               
                      p, strong, #message {color: #222; }
-                     .hero-statement {
-                            display: block;
-                            margin: 4px auto 0;
-                            max-width: 58ch;
-                            font-size: 1.03rem;
-                            line-height: 1.65;
-                     }
                      .hero-mission {
-                            margin: 10px auto 0;
-                            max-width: 58ch;
+                            margin: 0;
+                            max-width: 38ch;
                             line-height: 1.7;
                      }
                      .mission {color: #7a1f1f; }
@@ -1273,6 +1345,22 @@
                                    margin: 16px;
                                    padding: 16px;
                             
+                            }
+                            .hero {
+                                   grid-template-columns: 1fr;
+                                   gap: 14px;
+                                   padding: 12px;
+                                   text-align: center;
+                            }
+                            .hero__copy {
+                                   align-items: center;
+                            }
+                            .hero-lead,
+                            .hero-mission {
+                                   max-width: 100%;
+                            }
+                            .hero-actions {
+                                   justify-content: center;
                             }
                             img {
                                    width: 120px;
