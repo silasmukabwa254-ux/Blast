@@ -160,28 +160,25 @@
                             text-align: center;
                      }
                      .hero {
-                            display: grid;
-                            grid-template-columns: minmax(220px, 330px) 1fr;
-                            gap: 22px;
-                            align-items: center;
-                            padding: 12px 14px 8px;
-                            margin-bottom: 22px;
-                            border-radius: 22px;
-                            background: linear-gradient(180deg, rgba(255, 248, 251, 0.86), rgba(252, 242, 246, 0.92));
-                            border: 1px solid rgba(139, 30, 63, 0.08);
-                            box-shadow: 0 10px 24px rgba(93, 16, 41, 0.06);
-                            text-align: left;
-                     }
-                     .hero__art {
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                     }
-                     .hero__copy {
                             display: flex;
                             flex-direction: column;
-                            align-items: flex-start;
-                            gap: 10px;
+                            align-items: center;
+                            gap: 12px;
+                            padding: 8px 0 4px;
+                            margin-bottom: 20px;
+                            text-align: center;
+                     }
+                     .hero__art {
+                           display: flex;
+                           align-items: center;
+                           justify-content: center;
+                           width: 100%;
+                     }
+                     .hero__copy {
+                           display: flex;
+                           flex-direction: column;
+                            align-items: center;
+                            gap: 8px;
                      }
                      .hero-kicker {
                             margin: 0;
@@ -194,8 +191,8 @@
                      .hero h1 {
                             margin: 0;
                             color: #5d1029;
-                            font-size: clamp(1.9rem, 4vw, 3rem);
-                            line-height: 1.05;
+                            font-size: clamp(1.8rem, 4vw, 2.8rem);
+                            line-height: 1.08;
                             letter-spacing: -0.02em;
                      }
                      .hero-lead {
@@ -203,13 +200,14 @@
                             color: #3b2a31;
                             font-size: 1.02rem;
                             line-height: 1.7;
-                            max-width: 38ch;
+                            max-width: 42ch;
                      }
                      .hero-actions {
                             display: flex;
                             flex-wrap: wrap;
                             gap: 10px;
-                            margin-top: 4px;
+                            justify-content: center;
+                            margin-top: 6px;
                      }
                      .hero-button {
                             display: inline-flex;
@@ -239,9 +237,9 @@
                             border: 1px solid rgba(93, 16, 41, 0.12);
                      }
                      .home-logo {
-                            width: min(100%, 330px);
-                            margin: 0 auto 18px;
-                            transition: transform 0.28s ease, box-shadow 0.28s ease;
+                            width: min(100%, 290px);
+                            margin: 0 auto 6px;
+                            transition: transform 0.28s ease;
                      }
                      .home-logo__image {
                             width: 100%;
@@ -260,7 +258,7 @@
                      p, strong, #message {color: #222; }
                      .hero-mission {
                             margin: 0;
-                            max-width: 38ch;
+                            max-width: 44ch;
                             line-height: 1.7;
                      }
                      .mission {color: #7a1f1f; }
@@ -1347,10 +1345,8 @@
                             
                             }
                             .hero {
-                                   grid-template-columns: 1fr;
-                                   gap: 14px;
-                                   padding: 12px;
-                                   text-align: center;
+                                   gap: 10px;
+                                   padding: 6px 0 2px;
                             }
                             .hero__copy {
                                    align-items: center;
@@ -1367,8 +1363,8 @@
                                    height: auto;
                             }
                             .home-logo {
-                                   width: min(100%, 280px);
-                                   margin-bottom: 14px;
+                                   width: min(100%, 240px);
+                                   margin-bottom: 8px;
                             }
                             .footer {
                                    font-size: 12px;
