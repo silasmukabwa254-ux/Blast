@@ -919,17 +919,40 @@
                             margin-top: 14px;
                      }
                      .feed-post__button {
-                            border: 1px solid rgba(93, 16, 41, 0.12);
+                            border: 1px solid rgba(93, 16, 41, 0.14);
                             border-radius: 999px;
                             padding: 8px 14px;
-                            background-color: rgba(139, 30, 63, 0.08);
+                            background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 236, 242, 0.94));
                             color: #5d1029;
                             font: inherit;
                             font-weight: 700;
                             cursor: pointer;
+                            box-shadow: 0 6px 14px rgba(93, 16, 41, 0.08);
+                            transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
                      }
                      .feed-post__button:hover {
-                            background-color: rgba(139, 30, 63, 0.12);
+                            transform: translateY(-1px);
+                            background: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(245, 227, 235, 0.98));
+                            border-color: rgba(93, 16, 41, 0.22);
+                            box-shadow: 0 10px 18px rgba(93, 16, 41, 0.12);
+                     }
+                     .feed-post__button:active {
+                            transform: translateY(0);
+                            box-shadow: 0 4px 10px rgba(93, 16, 41, 0.08);
+                     }
+                     .feed-post__button:focus-visible {
+                            outline: 3px solid rgba(110, 168, 255, 0.75);
+                            outline-offset: 2px;
+                     }
+                     .feed-post__button::before {
+                            margin-right: 6px;
+                            font-size: 0.95em;
+                     }
+                     .feed-post__button:first-child::before {
+                            content: "👍";
+                     }
+                     .feed-post__button:last-child::before {
+                            content: "💬";
                      }
                      .community-feed__cta {
                             margin-top: 30px;
