@@ -722,7 +722,21 @@
                             box-shadow: 0 8px 18px rgba(93, 16, 41, 0.08);
                             position: relative;
                             overflow: hidden;
-                            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+                            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
+                     }
+                     .page-card::after {
+                            content: "";
+                            position: absolute;
+                            inset: auto 0 0 0;
+                            height: 4px;
+                            background: linear-gradient(90deg, rgba(139, 30, 63, 0.9), rgba(241, 194, 79, 0.95));
+                            opacity: 0.8;
+                     }
+                     .page-card:hover,
+                     .page-card:focus-visible {
+                            transform: translateY(-3px);
+                            box-shadow: 0 14px 28px rgba(93, 16, 41, 0.12);
+                            background: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(249, 235, 241, 0.98));
                      }
                      .page-card:focus-visible {
                             border-color: rgba(93, 16, 41, 0.2);
@@ -744,13 +758,14 @@
                      }
                      .page-card__title {
                             color: #5d1029;
-                            font-size: 1.05rem;
+                            font-size: 1.06rem;
                             line-height: 1.35;
                      }
                      .page-card__link {
                             margin-top: auto;
                             color: #8b1e3f;
                             font-weight: 700;
+                            letter-spacing: 0.01em;
                      }
                      .page-card__link::after {
                             content: " ->";
