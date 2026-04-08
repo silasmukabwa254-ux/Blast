@@ -1515,7 +1515,7 @@ function createBlastBotResponse(query) {
 
   return {
     text:
-      "I can help with About, Programs & Events, Media, Community Feed, Leadership, Join, Feedback, Contact, or Patrons. Try one of the quick prompts below, and I'll point you in the right direction.",
+      "I can help with About, Programs & Events, Media, Community Feed, Leadership, Join, Feedback, Contact, or Patrons. Ask me what you need, and I’ll guide you gently to the right place.",
     links: [],
   };
 }
@@ -1582,10 +1582,10 @@ function initBlastBot() {
   eyebrow.className = "blast-bot__eyebrow";
   eyebrow.textContent = "AI assistant";
   const title = document.createElement("h2");
-  title.textContent = "Ask the BLAST Assistant";
+  title.textContent = "Ask the BLAST Companion";
   const subtitle = document.createElement("p");
   subtitle.className = "blast-bot__subtitle";
-  subtitle.textContent = "A smart guide to pages, programs, and ways to get involved.";
+  subtitle.textContent = "A warm guide to pages, prayers, testimonies, and ways to get involved.";
   headingWrap.appendChild(eyebrow);
   headingWrap.appendChild(title);
   headingWrap.appendChild(subtitle);
@@ -1751,7 +1751,11 @@ function initBlastBot() {
 
   addMessage(
     "assistant",
-    "Hi, I'm BLAST Bot. I can help you find the right page, learn about BLAST, or get connected. Try one of the quick prompts below."
+    "Hello, I’m here to help you find your place in BLAST. Ask me about a page, a program, a testimony, or where to begin, and I’ll guide you kindly.",
+    [
+      { label: "Open Community Feed", href: "community-feed.html#feed" },
+      { label: "Join BLAST", href: "join.html#join-form" },
+    ]
   );
 
   panel.id = "blastBotPanel";
