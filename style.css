@@ -212,6 +212,7 @@
                             height: auto;
                             display: block;
                             margin: 0;
+                            filter: drop-shadow(0 10px 18px rgba(93, 16, 41, 0.08));
                      }
                      .home-logo:hover {
                             transform: translateY(-2px) scale(1.01);
