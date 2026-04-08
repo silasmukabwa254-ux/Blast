@@ -724,6 +724,12 @@
                             overflow: hidden;
                             transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
                      }
+                     .page-card--community {
+                            grid-column: span 2;
+                            min-height: 210px;
+                            background: linear-gradient(180deg, rgba(255, 248, 251, 0.98), rgba(244, 234, 240, 0.98));
+                            border-color: rgba(139, 30, 63, 0.16);
+                      }
                      .page-card::after {
                             content: "";
                             position: absolute;
@@ -761,6 +767,15 @@
                             font-size: 1.06rem;
                             line-height: 1.35;
                      }
+                     .page-card--community .page-card__title {
+                            font-size: 1.18rem;
+                     }
+                     .page-card__note {
+                            color: #4b3840;
+                            font-size: 0.94rem;
+                            line-height: 1.55;
+                            max-width: 30ch;
+                      }
                      .page-card__link {
                             margin-top: auto;
                             color: #8b1e3f;
@@ -1733,6 +1748,10 @@
                                    min-height: 0;
                                    padding: 16px;
                             }
+                            .page-card--community {
+                                   grid-column: auto;
+                                   min-height: 0;
+                            }
                             .page-card__title {
                                    font-size: 1rem;
                             }
@@ -1827,6 +1846,10 @@
                             .about-page__grid,
                             .value-grid {
                                    grid-template-columns: 1fr;
+                            }
+                            .page-card--community {
+                                   grid-column: auto;
+                                   min-height: 0;
                             }
                            .feed-grid {
                                    grid-template-columns: 1fr;
