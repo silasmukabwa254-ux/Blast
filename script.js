@@ -151,6 +151,94 @@ function getPartOfDay(hour) {
   return "evening";
 }
 
+const communityFeedVerseReference = document.getElementById("verseTitle");
+const communityFeedVerseText = document.getElementById("verseText");
+const communityFeedVerseNote = document.getElementById("verseNote");
+const communityFeedVerseDate = document.getElementById("verseDate");
+
+function getDailyVerse(date) {
+  const verses = [
+    {
+      reference: "John 15:5",
+      text:
+        "I am the vine; you are the branches. If you remain in me and I in you, you will bear much fruit.",
+      note: "Stay close to Christ and let your life bear good fruit today.",
+    },
+    {
+      reference: "Isaiah 41:10",
+      text:
+        "So do not fear, for I am with you; do not be dismayed, for I am your God.",
+      note: "God’s presence is enough for every step ahead.",
+    },
+    {
+      reference: "Philippians 4:13",
+      text: "I can do all this through him who gives me strength.",
+      note: "The strength you need is already with you.",
+    },
+    {
+      reference: "Psalm 46:1",
+      text: "God is our refuge and strength, an ever-present help in trouble.",
+      note: "When life feels heavy, God stays close.",
+    },
+    {
+      reference: "Romans 15:13",
+      text:
+        "May the God of hope fill you with all joy and peace as you trust in him.",
+      note: "Hope grows where trust begins.",
+    },
+    {
+      reference: "Matthew 11:28",
+      text:
+        "Come to me, all you who are weary and burdened, and I will give you rest.",
+      note: "You are invited to rest in Him today.",
+    },
+    {
+      reference: "2 Timothy 1:7",
+      text:
+        "For the Spirit God gave us does not make us timid, but gives us power, love and self-discipline.",
+      note: "Walk with courage and steady love.",
+    },
+    {
+      reference: "Joshua 1:9",
+      text:
+        "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.",
+      note: "You are not walking alone.",
+    },
+  ];
+
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const day = date.getDate();
+  const index = Math.abs(Math.floor(new Date(year, month, day).getTime() / 86400000)) % verses.length;
+
+  return verses[index];
+}
+
+function initCommunityFeedVerse() {
+  if (
+    !communityFeedVerseReference ||
+    !communityFeedVerseText ||
+    !communityFeedVerseNote ||
+    !communityFeedVerseDate
+  ) {
+    return;
+  }
+
+  const today = new Date();
+  const verse = getDailyVerse(today);
+
+  communityFeedVerseReference.textContent = verse.reference;
+  communityFeedVerseText.textContent = verse.text;
+  communityFeedVerseNote.textContent = verse.note;
+  communityFeedVerseDate.textContent = today.toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+initCommunityFeedVerse();
+
 if (button && message && nameInput && nameError && messageMeta && nameCount && resetBtn) {
   function updateButtonState() {
     const currentName = sanitizeName(nameInput.value).trim();
@@ -885,6 +973,14 @@ function createBlastBotResponse(query) {
     };
   }
 
+  if (has(["community feed", "feed", "verse of the day", "posts", "prayer request"])) {
+    return {
+      text:
+        "The Community Feed page is where you can read a fresh verse, see encouragement posts, and stay connected with what BLAST is sharing today.",
+      links: [{ label: "Open Community Feed", href: "community-feed.html#feed" }],
+    };
+  }
+
   if (
     has([
       "leader",
@@ -942,7 +1038,7 @@ function createBlastBotResponse(query) {
 
   return {
     text:
-      "I can help with About, Programs & Events, Media, Leadership, Join, Feedback, Contact, or Patrons. Try one of the quick prompts below, and I'll point you in the right direction.",
+      "I can help with About, Programs & Events, Media, Community Feed, Leadership, Join, Feedback, Contact, or Patrons. Try one of the quick prompts below, and I'll point you in the right direction.",
     links: [],
   };
 }
@@ -1038,6 +1134,7 @@ function initBlastBot() {
     "About BLAST",
     "Programs & Events",
     "Media",
+    "Community Feed",
     "Leadership",
     "Feedback",
     "Patrons",
