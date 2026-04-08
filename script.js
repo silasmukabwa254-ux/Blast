@@ -1270,20 +1270,6 @@ if (
   });
 }
 
-const backToTopBtn = document.getElementById("backToTopBtn");
-
-if (backToTopBtn) {
-  function updateBackToTopButton() {
-    backToTopBtn.classList.toggle("is-visible", window.scrollY > 600);
-  }
-
-  updateBackToTopButton();
-  window.addEventListener("scroll", updateBackToTopButton, { passive: true });
-  backToTopBtn.addEventListener("click", function () {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-}
-
 const eventList = document.getElementById("eventList");
 const mediaGrid = document.getElementById("mediaGrid");
 const mediaIntro = document.getElementById("mediaIntro");
