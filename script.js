@@ -1605,20 +1605,6 @@ function initBlastBot() {
   messages.setAttribute("aria-live", "polite");
   messages.setAttribute("aria-relevant", "additions text");
 
-  const promptRow = document.createElement("div");
-  promptRow.className = "blast-bot__prompts";
-  const promptItems = [
-    "About BLAST",
-    "Programs & Events",
-    "Media",
-    "Community Feed",
-    "Leadership",
-    "Feedback",
-    "Patrons",
-    "Join BLAST",
-    "Contact",
-  ];
-
   function addMessage(role, text, links) {
     const bubble = document.createElement("div");
     bubble.className = `blast-bot__message blast-bot__message--${role}`;
@@ -1675,18 +1661,6 @@ function initBlastBot() {
       addMessage("assistant", response.text, response.links);
     }, 500);
   }
-
-  promptItems.forEach(function (label) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "blast-bot__prompt";
-    button.textContent = label;
-    button.addEventListener("click", function () {
-      showReply(label);
-      openBot();
-    });
-    promptRow.appendChild(button);
-  });
 
   const form = document.createElement("form");
   form.className = "blast-bot__form";
@@ -1761,7 +1735,6 @@ function initBlastBot() {
   panel.id = "blastBotPanel";
   panel.appendChild(header);
   panel.appendChild(messages);
-  panel.appendChild(promptRow);
   panel.appendChild(form);
 
   widget.appendChild(panel);
