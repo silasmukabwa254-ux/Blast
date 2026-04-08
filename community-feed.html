@@ -7,21 +7,21 @@
               <meta http-equiv="Pragma" content="no-cache">
               <meta http-equiv="Expires" content="0">
               <title>BLAST | Community Feed</title>
-              <meta name="description" content="A community feed for BLAST with a daily verse, encouragement posts, and space to keep growing together.">
+              <meta name="description" content="A BLAST community feed with a daily verse, daily prayer, testimonies, and encouragement posts.">
               <meta name="theme-color" content="#5d1029">
               <meta name="robots" content="index,follow">
               <link rel="canonical" href="https://silasmukabwa254-ux.github.io/Blast/community-feed.html">
               <link rel="icon" href="favicon.svg" type="image/svg+xml">
               <link rel="apple-touch-icon" href="blast-logo.webp">
               <meta property="og:title" content="BLAST | Community Feed">
-              <meta property="og:description" content="A community feed for BLAST with a daily verse, encouragement posts, and space to keep growing together.">
+              <meta property="og:description" content="A BLAST community feed with a daily verse, daily prayer, testimonies, and encouragement posts.">
               <meta property="og:type" content="website">
               <meta property="og:url" content="https://silasmukabwa254-ux.github.io/Blast/community-feed.html">
               <meta property="og:site_name" content="BLAST">
               <meta property="og:image" content="https://silasmukabwa254-ux.github.io/Blast/blast-logo.webp">
               <meta name="twitter:card" content="summary_large_image">
               <meta name="twitter:title" content="BLAST | Community Feed">
-              <meta name="twitter:description" content="A community feed for BLAST with a daily verse, encouragement posts, and space to keep growing together.">
+              <meta name="twitter:description" content="A BLAST community feed with a daily verse, daily prayer, testimonies, and encouragement posts.">
               <meta name="twitter:image" content="https://silasmukabwa254-ux.github.io/Blast/blast-logo.webp">
               <script type="application/ld+json">
               {
@@ -29,11 +29,11 @@
                 "@type": "WebPage",
                 "name": "BLAST Community Feed",
                 "url": "https://silasmukabwa254-ux.github.io/Blast/community-feed.html",
-                "description": "A BLAST community feed with a daily verse and encouragement posts."
+                "description": "A BLAST community feed with a daily verse, daily prayer, testimonies, and encouragement posts."
               }
               </script>
-              <link rel="stylesheet" href="style.css?v=hub-pages-20260325-bot">
-              <script src="script.js?v=hub-pages-20260325-bot" defer></script>
+              <link rel="stylesheet" href="style.css?v=community-feed-20260408">
+              <script src="script.js?v=community-feed-20260408" defer></script>
        </head>
        <body>
               <a class="skip-link" href="#main-content">Skip to content</a>
@@ -42,7 +42,7 @@
                      <p class="page-kicker">Community Feed</p>
                      <h1>A place to share, pray, and keep growing</h1>
                      <p class="page-intro">
-                            This space is for encouragement, prayer requests, testimonies, and the kind of moments that remind us we are not walking alone.
+                            This space is for encouragement, prayer, testimonies, and the kind of moments that remind us we are not walking alone.
                      </p>
 
                      <nav class="site-nav" aria-label="Community feed navigation">
@@ -57,94 +57,62 @@
                             <a href="contact.html">Contact</a>
                      </nav>
 
-                     <section class="community-feed__verse" aria-labelledby="verseTitle">
-                            <p class="page-kicker">Verse of the Day</p>
-                            <div class="verse-card">
-                                   <p class="verse-card__date" id="verseDate">Today</p>
-                                   <p class="verse-card__reference" id="verseTitle">John 3:16</p>
-                                   <p class="verse-card__text" id="verseText">
-                                          For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.
-                                   </p>
-                                   <p class="verse-card__note" id="verseNote">A promise to carry with you today.</p>
-                            </div>
+                     <section class="community-feed__highlights" aria-label="Daily encouragement">
+                            <section class="community-feed__verse" aria-labelledby="verseTitle">
+                                   <p class="page-kicker">Verse of the Day</p>
+                                   <div class="verse-card">
+                                          <p class="verse-card__date" id="verseDate">Today</p>
+                                          <p class="verse-card__reference" id="verseTitle">John 3:16</p>
+                                          <p class="verse-card__text" id="verseText">
+                                                 For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.
+                                          </p>
+                                          <p class="verse-card__note" id="verseNote">A promise to carry with you today.</p>
+                                   </div>
+                            </section>
+
+                            <section class="community-feed__prayer" aria-labelledby="prayerTitle">
+                                   <p class="page-kicker">Prayer of the Day</p>
+                                   <div class="prayer-card">
+                                          <p class="prayer-card__date" id="prayerDate">Today</p>
+                                          <p class="prayer-card__reference" id="prayerTitle">Prayer for Peace</p>
+                                          <p class="prayer-card__text" id="prayerText">
+                                                 Lord, calm every troubled heart, steady every worried mind, and help us rest in your love today.
+                                          </p>
+                                          <p class="prayer-card__note" id="prayerNote">A prayer to carry into the day with hope and trust.</p>
+                                   </div>
+                            </section>
+                     </section>
+
+                     <section class="community-feed__composer" id="share">
+                            <p class="page-kicker">Share a testimony</p>
+                            <h2>Tell us what God has done</h2>
+                            <p class="community-feed__composer-text">Your testimony may strengthen someone else today.</p>
+                            <form class="community-feed__form" id="communityTestimonyForm">
+                                   <div class="community-feed__form-grid">
+                                          <label class="field">
+                                                 <span>Your name</span>
+                                                 <input id="communityTestimonyName" type="text" maxlength="60" placeholder="Enter your name" autocomplete="name">
+                                          </label>
+                                          <label class="field">
+                                                 <span>Email address <em>(optional)</em></span>
+                                                 <input id="communityTestimonyEmail" type="email" maxlength="80" placeholder="name@example.com" autocomplete="email">
+                                          </label>
+                                   </div>
+                                   <label class="field">
+                                          <span>Your testimony</span>
+                                          <textarea id="communityTestimonyMessage" maxlength="500" placeholder="Share something God has done in your life."></textarea>
+                                   </label>
+                                   <div class="community-feed__form-actions">
+                                          <button class="join-button" type="submit">Share testimony</button>
+                                          <p class="community-feed__status" id="communityTestimonyStatus" aria-live="polite"></p>
+                                   </div>
+                            </form>
                      </section>
 
                      <section class="community-feed__posts" aria-labelledby="feedTitle" id="feed">
-                            <p class="page-kicker">Recent posts</p>
-                            <h2 id="feedTitle">What BLAST is sharing today</h2>
-                            <div class="feed-grid">
-                                   <article class="feed-post">
-                                          <div class="feed-post__meta">
-                                                 <strong>Joshua</strong>
-                                                 <span>Today</span>
-                                          </div>
-                                          <p>God helped me overcome fear this week. I am grateful for the peace that came through prayer and the support of my brothers and sisters.</p>
-                                          <div class="feed-post__actions" aria-label="Post actions">
-                                                 <button type="button" class="feed-post__button">Like</button>
-                                                 <button type="button" class="feed-post__button">Comment</button>
-                                          </div>
-                                   </article>
-
-                                   <article class="feed-post">
-                                          <div class="feed-post__meta">
-                                                 <strong>Cynthia</strong>
-                                                 <span>Yesterday</span>
-                                          </div>
-                                          <p>Please pray for my exams. I am trusting God for wisdom, calmness, and the strength to keep going.</p>
-                                          <div class="feed-post__actions" aria-label="Post actions">
-                                                 <button type="button" class="feed-post__button">Like</button>
-                                                 <button type="button" class="feed-post__button">Comment</button>
-                                          </div>
-                                   </article>
-
-                                   <article class="feed-post feed-post--featured">
-                                          <div class="feed-post__meta">
-                                                 <strong>Hope</strong>
-                                                 <span>This week</span>
-                                          </div>
-                                          <p>Today's verse reminded me that BLAST is more than a gathering. It is a place where faith feels close, hope feels alive, and no one has to walk alone.</p>
-                                          <div class="feed-post__actions" aria-label="Post actions">
-                                                 <button type="button" class="feed-post__button">Like</button>
-                                                 <button type="button" class="feed-post__button">Comment</button>
-                                          </div>
-                                   </article>
-
-                                   <article class="feed-post">
-                                          <div class="feed-post__meta">
-                                                 <strong>Elisha</strong>
-                                                 <span>This week</span>
-                                          </div>
-                                          <p>Serving through media keeps showing me how God is using small moments to make a big difference in the community.</p>
-                                          <div class="feed-post__actions" aria-label="Post actions">
-                                                 <button type="button" class="feed-post__button">Like</button>
-                                                 <button type="button" class="feed-post__button">Comment</button>
-                                          </div>
-                                   </article>
-
-                                   <article class="feed-post">
-                                          <div class="feed-post__meta">
-                                                 <strong>Caroline</strong>
-                                                 <span>This week</span>
-                                          </div>
-                                          <p>I love how BLAST keeps reminding us that faith can be steady, warm, and practical in the middle of real life.</p>
-                                          <div class="feed-post__actions" aria-label="Post actions">
-                                                 <button type="button" class="feed-post__button">Like</button>
-                                                 <button type="button" class="feed-post__button">Comment</button>
-                                          </div>
-                                   </article>
-
-                                   <article class="feed-post">
-                                          <div class="feed-post__meta">
-                                                 <strong>Kelvin</strong>
-                                                 <span>Today</span>
-                                          </div>
-                                          <p>Praying for everyone who is carrying something heavy this week. May God give you strength and peace that lasts.</p>
-                                          <div class="feed-post__actions" aria-label="Post actions">
-                                                 <button type="button" class="feed-post__button">Like</button>
-                                                 <button type="button" class="feed-post__button">Comment</button>
-                                          </div>
-                                   </article>
-                            </div>
+                            <p class="page-kicker">Testimony wall</p>
+                            <h2 id="feedTitle">Stories growing with BLAST</h2>
+                            <div class="community-feed__list" id="communityFeedList" aria-live="polite"></div>
                      </section>
 
                      <section class="community-feed__cta">

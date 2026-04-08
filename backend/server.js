@@ -17,6 +17,12 @@ const {
   saveContent,
 } = require("./contentStore");
 const {
+  getCommunityFeed,
+  incrementCommunityLike,
+  saveCommunityComment,
+  saveCommunityTestimony,
+} = require("./communityStore");
+const {
   getReplySummary,
   getNotificationSummary,
   sendAdminReplyEmail,
@@ -43,6 +49,10 @@ const JOIN_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const JOIN_RATE_LIMIT_MAX = 5;
 const FEEDBACK_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const FEEDBACK_RATE_LIMIT_MAX = 5;
+const COMMUNITY_TESTIMONY_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const COMMUNITY_TESTIMONY_RATE_LIMIT_MAX = 4;
+const COMMUNITY_COMMENT_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const COMMUNITY_COMMENT_RATE_LIMIT_MAX = 12;
 
 app.use(function (req, res, next) {
   const origin = req.headers.origin;
@@ -125,6 +135,24 @@ async function isFeedbackRateLimited(req) {
     getClientIdentifier(req),
     FEEDBACK_RATE_LIMIT_WINDOW_MS,
     FEEDBACK_RATE_LIMIT_MAX
+  );
+}
+
+async function isCommunityTestimonyRateLimited(req) {
+  return isRateLimited(
+    "community-testimony",
+    getClientIdentifier(req),
+    COMMUNITY_TESTIMONY_RATE_LIMIT_WINDOW_MS,
+    COMMUNITY_TESTIMONY_RATE_LIMIT_MAX
+  );
+}
+
+async function isCommunityCommentRateLimited(req) {
+  return isRateLimited(
+    "community-comment",
+    getClientIdentifier(req),
+    COMMUNITY_COMMENT_RATE_LIMIT_WINDOW_MS,
+    COMMUNITY_COMMENT_RATE_LIMIT_MAX
   );
 }
 
@@ -2529,6 +2557,161 @@ app.post("/api/feedback", async function (req, res, next) {
     return res.status(201).json({
       message: "Thanks for sharing your feedback.",
       feedback,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+app.get("/api/community/feed", async function (req, res, next) {
+  try {
+    const feed = await getCommunityFeed();
+
+    res.set("Cache-Control", "no-store");
+    res.json({
+      message: "Community feed loaded successfully.",
+      feed,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+app.post("/api/community/testimonies", async function (req, res, next) {
+  try {
+    const fullName = normalizeText(req.body.fullName);
+    const email = normalizeText(req.body.email);
+    const message = normalizeText(req.body.message);
+    const errors = {};
+
+    if (!fullName) {
+      errors.fullName = "Your name is required.";
+    } else if (fullName.length > 60) {
+      errors.fullName = "Your name must be 60 characters or less.";
+    }
+
+    if (email && (email.length > 80 || !isValidEmail(email))) {
+      errors.email = "Please enter a valid email address.";
+    }
+
+    if (!message) {
+      errors.message = "Please share your testimony.";
+    } else if (message.length > 500) {
+      errors.message = "Your testimony must be 500 characters or less.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return res.status(400).json({
+        message: "Please fix the highlighted fields.",
+        errors,
+      });
+    }
+
+    if (await isCommunityTestimonyRateLimited(req)) {
+      return res.status(429).json({
+        message: "You are posting too quickly. Please wait a few minutes and try again.",
+      });
+    }
+
+    const testimony = await saveCommunityTestimony({
+      id: crypto.randomUUID(),
+      fullName,
+      email,
+      message,
+      likes: 0,
+      submittedAt: new Date().toISOString(),
+      comments: [],
+    });
+
+    return res.status(201).json({
+      message: "Your testimony has been shared.",
+      testimony,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+app.post("/api/community/testimonies/:id/like", async function (req, res, next) {
+  try {
+    const testimonyId = normalizeText(req.params.id);
+
+    if (!testimonyId) {
+      return res.status(400).json({
+        message: "A testimony id is required.",
+      });
+    }
+
+    const updated = await incrementCommunityLike(testimonyId);
+
+    if (!updated) {
+      return res.status(404).json({
+        message: "Testimony not found.",
+      });
+    }
+
+    return res.json({
+      message: "Testimony liked.",
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+app.post("/api/community/testimonies/:id/comments", async function (req, res, next) {
+  try {
+    const testimonyId = normalizeText(req.params.id);
+    const fullName = normalizeText(req.body.fullName);
+    const message = normalizeText(req.body.message);
+    const errors = {};
+
+    if (!testimonyId) {
+      return res.status(400).json({
+        message: "A testimony id is required.",
+      });
+    }
+
+    if (!fullName) {
+      errors.fullName = "Your name is required.";
+    } else if (fullName.length > 60) {
+      errors.fullName = "Your name must be 60 characters or less.";
+    }
+
+    if (!message) {
+      errors.message = "Please write a comment.";
+    } else if (message.length > 240) {
+      errors.message = "Your comment must be 240 characters or less.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return res.status(400).json({
+        message: "Please fix the highlighted fields.",
+        errors,
+      });
+    }
+
+    if (await isCommunityCommentRateLimited(req)) {
+      return res.status(429).json({
+        message: "You are commenting too quickly. Please wait a few minutes and try again.",
+      });
+    }
+
+    const comment = await saveCommunityComment(testimonyId, {
+      id: crypto.randomUUID(),
+      fullName,
+      message,
+      submittedAt: new Date().toISOString(),
+    });
+
+    if (!comment) {
+      return res.status(404).json({
+        message: "Testimony not found.",
+      });
+    }
+
+    return res.status(201).json({
+      message: "Your comment has been added.",
+      comment,
     });
   } catch (error) {
     return next(error);

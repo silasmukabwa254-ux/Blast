@@ -155,6 +155,16 @@ const communityFeedVerseReference = document.getElementById("verseTitle");
 const communityFeedVerseText = document.getElementById("verseText");
 const communityFeedVerseNote = document.getElementById("verseNote");
 const communityFeedVerseDate = document.getElementById("verseDate");
+const communityFeedPrayerReference = document.getElementById("prayerTitle");
+const communityFeedPrayerText = document.getElementById("prayerText");
+const communityFeedPrayerNote = document.getElementById("prayerNote");
+const communityFeedPrayerDate = document.getElementById("prayerDate");
+const communityFeedList = document.getElementById("communityFeedList");
+const communityTestimonyForm = document.getElementById("communityTestimonyForm");
+const communityTestimonyName = document.getElementById("communityTestimonyName");
+const communityTestimonyEmail = document.getElementById("communityTestimonyEmail");
+const communityTestimonyMessage = document.getElementById("communityTestimonyMessage");
+const communityTestimonyStatus = document.getElementById("communityTestimonyStatus");
 
 function getDailyVerse(date) {
   const verses = [
@@ -372,6 +382,487 @@ try {
 }
 const CONTENT_API_URL = `${apiOrigin}/api/content`;
 const BLAST_BOT_API_URL = `${apiOrigin}/api/bot/chat`;
+
+function getDailyPrayer(date) {
+  const prayers = [
+    {
+      reference: "Prayer for Peace",
+      text: "Lord, calm every troubled heart, steady every worried mind, and help us rest in your love today.",
+      note: "A prayer to carry into the day with hope and trust.",
+    },
+    {
+      reference: "Prayer for Courage",
+      text: "God, give us courage to keep going, faith to keep trusting, and love to keep serving well.",
+      note: "Strength for the steps we still need to take.",
+    },
+    {
+      reference: "Prayer for Families",
+      text: "Father, cover our families with your care, protect our homes, and let kindness grow in every heart.",
+      note: "A prayer for the people closest to us.",
+    },
+    {
+      reference: "Prayer for Exams",
+      text: "Lord, bless every learner with focus, calm, and wisdom. Help them remember what they have prepared.",
+      note: "A prayer for study, preparation, and peace.",
+    },
+    {
+      reference: "Prayer for Serving",
+      text: "Jesus, make our hands gentle, our words gracious, and our hearts willing to serve where we are needed.",
+      note: "A prayer for a life that blesses others.",
+    },
+    {
+      reference: "Prayer for Hope",
+      text: "God of hope, lift every discouraged spirit, renew joy, and remind us that your mercy is new every morning.",
+      note: "Hope is still growing here.",
+    },
+  ];
+
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const day = date.getDate();
+  const index = Math.abs(Math.floor(new Date(year, month, day).getTime() / 86400000)) % prayers.length;
+
+  return prayers[index];
+}
+
+function formatCommunityDate(value) {
+  return new Date(value).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function formatCommunityDateTime(value) {
+  return new Date(value).toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function initCommunityFeedPrayer() {
+  if (
+    !communityFeedPrayerReference ||
+    !communityFeedPrayerText ||
+    !communityFeedPrayerNote ||
+    !communityFeedPrayerDate
+  ) {
+    return;
+  }
+
+  const today = new Date();
+  const prayer = getDailyPrayer(today);
+
+  communityFeedPrayerReference.textContent = prayer.reference;
+  communityFeedPrayerText.textContent = prayer.text;
+  communityFeedPrayerNote.textContent = prayer.note;
+  communityFeedPrayerDate.textContent = today.toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+function setCommunityFeedStatus(message, isError) {
+  if (!communityTestimonyStatus) return;
+  communityTestimonyStatus.textContent = message;
+  communityTestimonyStatus.style.color = isError ? "#8b1e3f" : "";
+}
+
+function buildCommunityComment(comment) {
+  const item = document.createElement("div");
+  item.className = "feed-post__comment";
+
+  const name = document.createElement("strong");
+  name.textContent = comment.fullName || "BLAST Friend";
+  item.appendChild(name);
+
+  const body = document.createElement("p");
+  body.textContent = comment.message || "";
+  item.appendChild(body);
+
+  const meta = document.createElement("div");
+  meta.className = "feed-post__comment-meta";
+  meta.textContent = formatCommunityDateTime(comment.submittedAt);
+  item.appendChild(meta);
+
+  return item;
+}
+
+function buildCommunityPostCard(post) {
+  const article = document.createElement("article");
+  article.className = "feed-post";
+  if ((post.comments || []).length > 0 && Number(post.likes || 0) >= 12) {
+    article.classList.add("feed-post--featured");
+  }
+
+  const meta = document.createElement("div");
+  meta.className = "feed-post__meta";
+
+  const author = document.createElement("strong");
+  author.textContent = post.fullName || "Anonymous";
+  meta.appendChild(author);
+
+  const date = document.createElement("span");
+  date.textContent = formatCommunityDate(post.submittedAt);
+  meta.appendChild(date);
+  article.appendChild(meta);
+
+  const message = document.createElement("p");
+  message.textContent = post.message || "";
+  article.appendChild(message);
+
+  const actions = document.createElement("div");
+  actions.className = "feed-post__actions";
+
+  const likeButton = document.createElement("button");
+  likeButton.type = "button";
+  likeButton.className = "feed-post__button";
+  likeButton.textContent = `Like (${Number(post.likes || 0)})`;
+
+  const commentButton = document.createElement("button");
+  commentButton.type = "button";
+  commentButton.className = "feed-post__button feed-post__comment-toggle";
+  commentButton.textContent = `Comment (${(post.comments || []).length})`;
+
+  actions.appendChild(likeButton);
+  actions.appendChild(commentButton);
+  article.appendChild(actions);
+
+  const commentPanel = document.createElement("div");
+  commentPanel.className = "feed-post__comment-panel";
+  commentPanel.hidden = true;
+
+  const commentsHeading = document.createElement("p");
+  commentsHeading.className = "feed-post__comments-heading";
+  commentsHeading.textContent = "Comments";
+  commentPanel.appendChild(commentsHeading);
+
+  const commentsList = document.createElement("div");
+  commentsList.className = "feed-post__comment-list";
+  const comments = Array.isArray(post.comments) ? post.comments : [];
+
+  if (comments.length) {
+    comments.forEach(function (comment) {
+      commentsList.appendChild(buildCommunityComment(comment));
+    });
+  } else {
+    const empty = document.createElement("p");
+    empty.className = "feed-post__status";
+    empty.textContent = "Be the first to encourage this testimony.";
+    commentsList.appendChild(empty);
+  }
+
+  commentPanel.appendChild(commentsList);
+
+  const commentForm = document.createElement("form");
+  commentForm.className = "feed-post__comment-form";
+
+  const commentNameLabel = document.createElement("label");
+  commentNameLabel.className = "field";
+
+  const commentNameSpan = document.createElement("span");
+  commentNameSpan.textContent = "Your name";
+  commentNameLabel.appendChild(commentNameSpan);
+
+  const commentNameInput = document.createElement("input");
+  commentNameInput.type = "text";
+  commentNameInput.maxLength = 60;
+  commentNameInput.placeholder = "Enter your name";
+  commentNameInput.autocomplete = "name";
+  commentNameLabel.appendChild(commentNameInput);
+  commentForm.appendChild(commentNameLabel);
+
+  const commentMessageLabel = document.createElement("label");
+  commentMessageLabel.className = "field";
+
+  const commentMessageSpan = document.createElement("span");
+  commentMessageSpan.textContent = "Comment";
+  commentMessageLabel.appendChild(commentMessageSpan);
+
+  const commentMessageInput = document.createElement("textarea");
+  commentMessageInput.rows = 3;
+  commentMessageInput.maxLength = 240;
+  commentMessageInput.placeholder = "Share a kind comment or prayer.";
+  commentMessageLabel.appendChild(commentMessageInput);
+  commentForm.appendChild(commentMessageLabel);
+
+  const commentActions = document.createElement("div");
+  commentActions.className = "feed-post__comment-actions";
+
+  const submitCommentButton = document.createElement("button");
+  submitCommentButton.type = "submit";
+  submitCommentButton.className = "feed-post__button";
+  submitCommentButton.textContent = "Post comment";
+  commentActions.appendChild(submitCommentButton);
+
+  const commentStatus = document.createElement("p");
+  commentStatus.className = "feed-post__status";
+  commentStatus.setAttribute("aria-live", "polite");
+  commentActions.appendChild(commentStatus);
+
+  commentForm.appendChild(commentActions);
+  commentPanel.appendChild(commentForm);
+  article.appendChild(commentPanel);
+
+  commentButton.addEventListener("click", function () {
+    commentPanel.hidden = !commentPanel.hidden;
+    commentButton.classList.toggle("is-active", !commentPanel.hidden);
+    if (!commentPanel.hidden) {
+      commentNameInput.focus();
+    }
+  });
+
+  likeButton.addEventListener("click", async function () {
+    likeButton.disabled = true;
+    commentButton.disabled = true;
+    likeButton.textContent = "Liking...";
+
+    try {
+      const response = await fetch(`${apiOrigin}/api/community/testimonies/${encodeURIComponent(post.id)}/like`, {
+        method: "POST",
+      });
+
+      const result = await response.json().catch(function () {
+        return {};
+      });
+
+      if (!response.ok) {
+        window.alert(result.message || "Could not like this testimony.");
+        return;
+      }
+
+      await loadCommunityFeed();
+    } catch (error) {
+      window.alert(error.message || "Could not reach the backend. Please try again.");
+    } finally {
+      likeButton.disabled = false;
+      commentButton.disabled = false;
+    }
+  });
+
+  commentForm.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    commentStatus.textContent = "";
+
+    const trimmedName = commentNameInput.value.trim();
+    const trimmedMessage = commentMessageInput.value.trim();
+
+    if (!trimmedName) {
+      commentStatus.textContent = "Please enter your name first.";
+      commentStatus.style.color = "#8b1e3f";
+      commentNameInput.focus();
+      return;
+    }
+
+    if (!trimmedMessage) {
+      commentStatus.textContent = "Please write a comment.";
+      commentStatus.style.color = "#8b1e3f";
+      commentMessageInput.focus();
+      return;
+    }
+
+    submitCommentButton.disabled = true;
+    submitCommentButton.textContent = "Posting...";
+    commentStatus.textContent = "Posting your comment...";
+    commentStatus.style.color = "";
+
+    try {
+      const response = await fetch(`${apiOrigin}/api/community/testimonies/${encodeURIComponent(post.id)}/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: trimmedName,
+          message: trimmedMessage,
+        }),
+      });
+
+      const result = await response.json().catch(function () {
+        return {};
+      });
+
+      if (!response.ok) {
+        commentStatus.textContent = result.message || "Could not post the comment.";
+        commentStatus.style.color = "#8b1e3f";
+        return;
+      }
+
+      commentMessageInput.value = "";
+      commentStatus.textContent = result.message || "Comment added.";
+      commentStatus.style.color = "";
+      await loadCommunityFeed();
+    } catch (error) {
+      commentStatus.textContent = error.message || "Could not reach the backend. Please try again.";
+      commentStatus.style.color = "#8b1e3f";
+    } finally {
+      submitCommentButton.disabled = false;
+      submitCommentButton.textContent = "Post comment";
+    }
+  });
+
+  return article;
+}
+
+function renderCommunityFeed(feed) {
+  if (!communityFeedList) return;
+
+  const testimonies = feed && Array.isArray(feed.testimonies) ? feed.testimonies : [];
+  communityFeedList.innerHTML = "";
+
+  if (!testimonies.length) {
+    const empty = document.createElement("article");
+    empty.className = "feed-post";
+
+    const paragraph = document.createElement("p");
+    paragraph.textContent = "The testimony wall is still waiting for the first story. Share one below and help begin the conversation.";
+    empty.appendChild(paragraph);
+
+    communityFeedList.appendChild(empty);
+    return;
+  }
+
+  testimonies.forEach(function (testimony) {
+    communityFeedList.appendChild(buildCommunityPostCard(testimony));
+  });
+}
+
+async function loadCommunityFeed() {
+  if (!communityFeedList) {
+    return;
+  }
+
+  communityFeedList.innerHTML = `
+    <article class="feed-post">
+      <p>Loading the testimony wall...</p>
+    </article>
+  `;
+
+  try {
+    const response = await fetch(`${apiOrigin}/api/community/feed`, {
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    const payload = await response.json().catch(function () {
+      return {};
+    });
+
+    if (!response.ok) {
+      throw new Error(payload.message || "Unable to load the community feed.");
+    }
+
+    renderCommunityFeed(payload.feed || {});
+  } catch (error) {
+    communityFeedList.innerHTML = "";
+
+    const article = document.createElement("article");
+    article.className = "feed-post";
+
+    const paragraph = document.createElement("p");
+    paragraph.textContent = error.message || "Unable to load the community feed.";
+    article.appendChild(paragraph);
+
+    communityFeedList.appendChild(article);
+  }
+}
+
+function initCommunityFeedPage() {
+  if (communityFeedPrayerReference || communityFeedPrayerText || communityFeedPrayerNote || communityFeedPrayerDate) {
+    initCommunityFeedPrayer();
+  }
+
+  if (communityTestimonyForm && communityTestimonyName && communityTestimonyEmail && communityTestimonyMessage && communityTestimonyStatus) {
+    setCommunityFeedStatus("Share a testimony or encourage someone else today.", false);
+
+    communityTestimonyForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      setCommunityFeedStatus("", false);
+
+      const trimmedName = communityTestimonyName.value.trim();
+      const trimmedEmail = communityTestimonyEmail.value.trim();
+      const trimmedMessage = communityTestimonyMessage.value.trim();
+
+      if (!trimmedName) {
+        setCommunityFeedStatus("Please tell us your name first.", true);
+        communityTestimonyName.focus();
+        return;
+      }
+
+      if (!trimmedMessage) {
+        setCommunityFeedStatus("Please share your testimony.", true);
+        communityTestimonyMessage.focus();
+        return;
+      }
+
+      communityTestimonyForm.querySelector(".join-button").disabled = true;
+      setCommunityFeedStatus("Sharing your testimony...", false);
+
+      try {
+        const response = await fetch(`${apiOrigin}/api/community/testimonies`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fullName: trimmedName,
+            email: trimmedEmail,
+            message: trimmedMessage,
+          }),
+        });
+
+        const result = await response.json().catch(function () {
+          return {};
+        });
+
+        if (!response.ok) {
+          if (result.errors) {
+            if (result.errors.fullName) {
+              communityTestimonyName.classList.add("invalid");
+            }
+            if (result.errors.email) {
+              communityTestimonyEmail.classList.add("invalid");
+            }
+            if (result.errors.message) {
+              communityTestimonyMessage.classList.add("invalid");
+            }
+          }
+          setCommunityFeedStatus(result.message || "Please fix the highlighted fields.", true);
+          return;
+        }
+
+        communityTestimonyForm.reset();
+        setCommunityFeedStatus(result.message || "Your testimony has been shared.", false);
+        await loadCommunityFeed();
+      } catch (error) {
+        setCommunityFeedStatus(error.message || "Could not reach the backend. Please try again.", true);
+      } finally {
+        const submitButton = communityTestimonyForm.querySelector(".join-button");
+        if (submitButton) {
+          submitButton.disabled = false;
+        }
+      }
+    });
+
+    [communityTestimonyName, communityTestimonyEmail, communityTestimonyMessage].forEach(function (field) {
+      field.addEventListener("input", function () {
+        field.classList.remove("invalid");
+        setCommunityFeedStatus("", false);
+      });
+    });
+  }
+
+  if (communityFeedList) {
+    loadCommunityFeed();
+  }
+}
+
+initCommunityFeedPage();
+
 let savedJoinName = "";
 let savedJoinEmail = "";
 let savedJoinInterest = "";
@@ -976,7 +1467,7 @@ function createBlastBotResponse(query) {
   if (has(["community feed", "feed", "verse of the day", "posts", "prayer request"])) {
     return {
       text:
-        "The Community Feed page is where you can read a fresh verse, see encouragement posts, and stay connected with what BLAST is sharing today.",
+        "The Community Feed page is where you can read a fresh verse, see the prayer of the day, share testimonies, and stay connected with what BLAST is sharing today.",
       links: [{ label: "Open Community Feed", href: "community-feed.html#feed" }],
     };
   }

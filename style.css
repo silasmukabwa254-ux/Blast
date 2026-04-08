@@ -866,6 +866,102 @@
                             margin: 14px 0 0;
                             color: #4c3a43;
                      }
+                     .community-feed__highlights {
+                            display: grid;
+                            grid-template-columns: repeat(2, minmax(0, 1fr));
+                            gap: 16px;
+                            align-items: start;
+                            margin-top: 28px;
+                     }
+                     .prayer-card {
+                            padding: 22px;
+                            border: 1px solid rgba(93, 16, 41, 0.08);
+                            border-radius: 20px;
+                            background:
+                                   linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 251, 0.96)),
+                                   radial-gradient(circle at top right, rgba(241, 201, 79, 0.12), transparent 48%);
+                            box-shadow: 0 12px 28px rgba(93, 16, 41, 0.07);
+                            text-align: left;
+                            position: relative;
+                            overflow: hidden;
+                     }
+                     .prayer-card::before {
+                            content: "";
+                            position: absolute;
+                            inset: 0 auto auto 0;
+                            width: 100%;
+                            height: 6px;
+                            background: linear-gradient(90deg, #f1c94f, #8b1e3f);
+                     }
+                     .prayer-card__date {
+                            margin: 0 0 8px;
+                            color: #7f6d74;
+                            font-size: 11px;
+                            font-weight: 700;
+                            letter-spacing: 0.14em;
+                            text-transform: uppercase;
+                     }
+                     .prayer-card__reference {
+                            margin: 0 0 10px;
+                            color: #5d1029;
+                            font-size: 0.86rem;
+                            font-weight: 800;
+                            letter-spacing: 0.18em;
+                            text-transform: uppercase;
+                     }
+                     .prayer-card__text {
+                            margin: 0;
+                            color: #5d1029;
+                            font-size: 1.08rem;
+                            line-height: 1.8;
+                     }
+                     .prayer-card__note {
+                            margin: 14px 0 0;
+                            color: #4c3a43;
+                     }
+                     .community-feed__composer {
+                            margin-top: 30px;
+                            padding: 20px;
+                            border: 1px solid rgba(93, 16, 41, 0.08);
+                            border-radius: 18px;
+                            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(252, 243, 247, 0.96));
+                            box-shadow: 0 10px 24px rgba(93, 16, 41, 0.06);
+                            text-align: left;
+                     }
+                     .community-feed__composer h2 {
+                            margin: 6px 0 0;
+                            color: #5d1029;
+                     }
+                     .community-feed__composer-text {
+                            max-width: 620px;
+                            margin-top: 8px;
+                            color: #4c3a43;
+                     }
+                     .community-feed__form {
+                            margin-top: 18px;
+                     }
+                     .community-feed__form .invalid {
+                            border-color: #b00020;
+                            box-shadow: 0 0 0 3px rgba(176, 0, 32, 0.12);
+                     }
+                     .community-feed__form-grid {
+                            display: grid;
+                            grid-template-columns: repeat(2, minmax(0, 1fr));
+                            gap: 16px;
+                            margin-bottom: 16px;
+                     }
+                     .community-feed__form-actions {
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 12px;
+                            align-items: center;
+                            margin-top: 14px;
+                     }
+                     .community-feed__status {
+                            margin: 0;
+                            color: #7f6d74;
+                            line-height: 1.6;
+                     }
                      .community-feed__posts {
                             margin-top: 32px;
                             text-align: left;
@@ -874,6 +970,11 @@
                             margin-top: 6px;
                             color: #5d1029;
                             text-align: center;
+                     }
+                     .community-feed__list {
+                            display: grid;
+                            gap: 16px;
+                            margin-top: 18px;
                      }
                      .feed-grid {
                             display: grid;
@@ -954,6 +1055,74 @@
                      .feed-post__button:last-child::before {
                             content: "💬";
                      }
+                     .feed-post__comments {
+                            margin-top: 14px;
+                            padding-top: 14px;
+                            border-top: 1px solid rgba(93, 16, 41, 0.08);
+                     }
+                     .feed-post__comments-heading {
+                            margin: 0 0 8px;
+                            color: #5d1029;
+                            font-size: 0.88rem;
+                            font-weight: 800;
+                            text-transform: uppercase;
+                            letter-spacing: 0.08em;
+                     }
+                     .feed-post__comment-list {
+                            display: grid;
+                            gap: 10px;
+                            margin: 0;
+                            padding: 0;
+                     }
+                     .feed-post__comment {
+                            padding: 10px 12px;
+                            border-radius: 14px;
+                            background: rgba(255, 255, 255, 0.8);
+                            border: 1px solid rgba(93, 16, 41, 0.08);
+                     }
+                     .feed-post__comment strong {
+                            display: block;
+                            margin-bottom: 4px;
+                            color: #5d1029;
+                     }
+                     .feed-post__comment p {
+                            margin: 0;
+                            color: #3d2b32;
+                            line-height: 1.65;
+                     }
+                     .feed-post__comment-meta {
+                            margin-top: 6px;
+                            color: #7f6d74;
+                            font-size: 0.78rem;
+                     }
+                     .feed-post__comment-toggle {
+                            margin-left: auto;
+                     }
+                     .feed-post__comment-panel {
+                            margin-top: 12px;
+                            padding: 12px;
+                            border-radius: 16px;
+                            background: rgba(255, 255, 255, 0.86);
+                            border: 1px solid rgba(93, 16, 41, 0.08);
+                     }
+                     .feed-post__comment-form {
+                            display: grid;
+                            gap: 10px;
+                     }
+                     .feed-post__comment-form .field {
+                            margin: 0;
+                     }
+                     .feed-post__comment-actions {
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 10px;
+                            align-items: center;
+                     }
+                     .feed-post__button.is-active {
+                            background: linear-gradient(180deg, #8b1e3f, #6f1732);
+                            color: #fff;
+                            border-color: rgba(93, 16, 41, 0.35);
+                     }
                      .community-feed__cta {
                             margin-top: 30px;
                             padding: 18px;
@@ -971,6 +1140,11 @@
                             max-width: 620px;
                             margin: 0 auto 14px;
                             color: #4c3a43;
+                     }
+                     .feed-post__status {
+                            margin: 0;
+                            color: #7f6d74;
+                            font-size: 0.9rem;
                      }
                      .page-kicker {
                             margin: 0;
@@ -1599,6 +1773,10 @@
                            .feed-grid {
                                    grid-template-columns: 1fr;
                             }
+                            .community-feed__highlights,
+                            .community-feed__form-grid {
+                                   grid-template-columns: 1fr;
+                            }
                             .feed-post--featured {
                                    grid-column: auto;
                             }
@@ -1659,5 +1837,16 @@
                             .blast-bot__toggle {
                                    width: 100%;
                                    justify-content: center;
+                            }
+                            .community-feed__composer,
+                            .community-feed__verse,
+                            .community-feed__prayer,
+                            .community-feed__posts {
+                                   margin-inline: 0;
+                            }
+                            .feed-post__actions,
+                            .feed-post__comment-actions,
+                            .community-feed__form-actions {
+                                   align-items: stretch;
                             }
                      }

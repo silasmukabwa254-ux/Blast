@@ -2,6 +2,8 @@
 
 BLAST is a website built with HTML, CSS, JavaScript, and a small Express backend for form submissions.
 
+The site also includes a public Community Feed with a daily verse, a daily prayer, testimony posts, likes, and comments.
+
 ## Frontend
 
 Use `index.html` for deployment.
@@ -23,10 +25,12 @@ The backend lives in `backend/`.
 - Set `PORT` on the host if needed.
 - Set `ALLOWED_ORIGINS` to the frontend origin you want to allow.
 - The backend now stores submissions in Render Postgres when deployed through the blueprint.
+- The backend also stores the Community Feed testimony wall in Render Postgres when deployed through the blueprint.
 - The frontend join form reads `window.BLAST_JOIN_API_URL`, so point that at your deployed backend URL when you publish.
 - Set `ADMIN_USERNAME` and `ADMIN_PASSWORD` on the backend host before you open `/submissions` or `/api/submissions`.
 - In production, the submissions pages are protected with HTTP Basic Auth.
 - BLAST also includes a public feedback form on `feedback.html` and a protected review page at `/feedback`.
+- The Community Feed lives on `community-feed.html` and posts testimonies through the backend API.
 - Set `OPENAI_API_KEY` if you want the BLAST Bot to use the AI assistant mode.
 - `BLAST_AI_MODEL` defaults to `gpt-5.4-mini` and can be changed later if you want a different model.
 - Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, and `NOTIFY_TO_EMAIL` if you want email alerts for new submissions.
@@ -54,12 +58,16 @@ The backend lives in `backend/`.
 - `GET /api/content`
 - `GET /api/submissions`
 - `GET /api/feedback`
+- `GET /api/community/feed`
 - `POST /api/bot/chat`
 - `POST /api/notifications/test`
 - `PUT /api/content`
 - `GET /api/content/export.json`
 - `GET /submissions`
 - `GET /feedback`
+- `POST /api/community/testimonies`
+- `POST /api/community/testimonies/:id/like`
+- `POST /api/community/testimonies/:id/comments`
 - `GET /content`
 - `POST /api/join`
 - `POST /api/feedback`
@@ -72,6 +80,13 @@ The backend lives in `backend/`.
 - Use it to edit the public homepage events and media without changing HTML.
 - The homepage reads those sections from `/api/content`.
 - Use `/api/content/export.json` to download a JSON backup of the homepage content.
+
+### Community Feed
+
+- Open `community-feed.html` from the public site.
+- Share testimonies from the form near the top of the page.
+- Like and comment on testimonies directly on the feed.
+- The page also rotates a daily verse and a daily prayer.
 
 ## Quick Publish Options
 
