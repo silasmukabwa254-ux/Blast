@@ -1025,59 +1025,84 @@
                             margin-top: 18px;
                      }
                      .feed-post {
-                            padding: 18px;
-                            border-radius: 18px;
-                            border: 1px solid rgba(93, 16, 41, 0.08);
-                            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(252, 243, 247, 0.96));
-                            box-shadow: 0 10px 24px rgba(93, 16, 41, 0.06);
+                            position: relative;
+                            overflow: hidden;
+                            padding: 22px;
+                            border-radius: 22px;
+                            border: 1px solid rgba(93, 16, 41, 0.1);
+                            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(251, 243, 247, 0.98));
+                            box-shadow: 0 14px 30px rgba(93, 16, 41, 0.08);
+                     }
+                     .feed-post::before {
+                            content: "";
+                            position: absolute;
+                            inset: 0 auto 0 0;
+                            width: 5px;
+                            background: linear-gradient(180deg, #8b1e3f, #f1c24f);
+                            opacity: 0.88;
                      }
                      .feed-post--featured {
                             grid-column: 1 / -1;
-                            border-left: 5px solid #8b1e3f;
+                            box-shadow: 0 18px 36px rgba(93, 16, 41, 0.12);
                      }
                      .feed-post__meta {
                             display: flex;
                             justify-content: space-between;
                             gap: 12px;
-                            align-items: center;
-                            margin-bottom: 10px;
+                            align-items: flex-start;
+                            margin-bottom: 14px;
                             color: #8b1e3f;
                      }
                      .feed-post__meta strong {
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 8px;
+                            padding: 6px 10px;
+                            border-radius: 999px;
+                            background: rgba(139, 30, 63, 0.08);
                             color: #5d1029;
+                            font-size: 0.98rem;
+                            line-height: 1.3;
                      }
                      .feed-post__meta span {
-                            font-size: 0.82rem;
+                            display: inline-flex;
+                            align-items: center;
+                            padding: 6px 10px;
+                            border-radius: 999px;
+                            background: rgba(93, 16, 41, 0.06);
+                            font-size: 0.78rem;
                             color: #7f6d74;
+                            white-space: nowrap;
                      }
                      .feed-post p {
                             margin: 0;
                             color: #3d2b32;
-                            line-height: 1.75;
+                            line-height: 1.78;
+                            font-size: 0.98rem;
                      }
                      .feed-post__actions {
                             display: flex;
-                            gap: 10px;
+                            gap: 12px;
                             flex-wrap: wrap;
-                            margin-top: 14px;
+                            margin-top: 16px;
                      }
                      .feed-post__button {
                             border: 1px solid rgba(93, 16, 41, 0.14);
                             border-radius: 999px;
-                            padding: 8px 14px;
-                            background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 236, 242, 0.94));
+                            padding: 10px 16px;
+                            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 236, 241, 0.96));
                             color: #5d1029;
                             font: inherit;
                             font-weight: 700;
                             cursor: pointer;
-                            box-shadow: 0 6px 14px rgba(93, 16, 41, 0.08);
-                            transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
+                            box-shadow: 0 8px 18px rgba(93, 16, 41, 0.08);
+                            transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
                      }
                      .feed-post__button:hover {
-                            transform: translateY(-1px);
-                            background: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(245, 227, 235, 0.98));
-                            border-color: rgba(93, 16, 41, 0.22);
-                            box-shadow: 0 10px 18px rgba(93, 16, 41, 0.12);
+                            transform: translateY(-2px);
+                            background: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(244, 228, 236, 0.98));
+                            border-color: rgba(93, 16, 41, 0.24);
+                            box-shadow: 0 12px 22px rgba(93, 16, 41, 0.12);
                      }
                      .feed-post__button:active {
                             transform: translateY(0);
@@ -1088,7 +1113,7 @@
                             outline-offset: 2px;
                      }
                      .feed-post__button::before {
-                            margin-right: 6px;
+                            margin-right: 7px;
                             font-size: 0.95em;
                      }
                      .feed-post__button:first-child::before {
@@ -1098,12 +1123,12 @@
                             content: "💬";
                      }
                      .feed-post__comments {
-                            margin-top: 14px;
-                            padding-top: 14px;
-                            border-top: 1px solid rgba(93, 16, 41, 0.08);
+                            margin-top: 16px;
+                            padding-top: 16px;
+                            border-top: 1px solid rgba(93, 16, 41, 0.1);
                      }
                      .feed-post__comments-heading {
-                            margin: 0 0 8px;
+                            margin: 0 0 10px;
                             color: #5d1029;
                             font-size: 0.88rem;
                             font-weight: 800;
@@ -1112,19 +1137,20 @@
                      }
                      .feed-post__comment-list {
                             display: grid;
-                            gap: 10px;
+                            gap: 12px;
                             margin: 0;
                             padding: 0;
                      }
                      .feed-post__comment {
-                            padding: 10px 12px;
-                            border-radius: 14px;
-                            background: rgba(255, 255, 255, 0.8);
+                            padding: 12px 14px;
+                            border-radius: 16px;
+                            background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(249, 240, 244, 0.95));
                             border: 1px solid rgba(93, 16, 41, 0.08);
+                            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
                      }
                      .feed-post__comment strong {
                             display: block;
-                            margin-bottom: 4px;
+                            margin-bottom: 5px;
                             color: #5d1029;
                      }
                      .feed-post__comment p {
@@ -1133,7 +1159,7 @@
                             line-height: 1.65;
                      }
                      .feed-post__comment-meta {
-                            margin-top: 6px;
+                            margin-top: 7px;
                             color: #7f6d74;
                             font-size: 0.78rem;
                      }
@@ -1141,15 +1167,16 @@
                             margin-left: auto;
                      }
                      .feed-post__comment-panel {
-                            margin-top: 12px;
-                            padding: 12px;
-                            border-radius: 16px;
-                            background: rgba(255, 255, 255, 0.86);
+                            margin-top: 14px;
+                            padding: 16px;
+                            border-radius: 18px;
+                            background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 236, 242, 0.96));
                             border: 1px solid rgba(93, 16, 41, 0.08);
+                            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
                      }
                      .feed-post__comment-form {
                             display: grid;
-                            gap: 10px;
+                            gap: 12px;
                      }
                      .feed-post__comment-form .field {
                             margin: 0;
@@ -1157,7 +1184,7 @@
                      .feed-post__comment-actions {
                             display: flex;
                             flex-wrap: wrap;
-                            gap: 10px;
+                            gap: 12px;
                             align-items: center;
                      }
                      .feed-post__button.is-active {
@@ -1821,6 +1848,24 @@
                             }
                             .feed-post--featured {
                                    grid-column: auto;
+                            }
+                            .feed-post {
+                                   padding: 18px;
+                                   border-radius: 18px;
+                            }
+                            .feed-post__meta {
+                                   flex-direction: column;
+                                   align-items: flex-start;
+                            }
+                            .feed-post__meta span {
+                                   white-space: normal;
+                            }
+                            .feed-post__actions {
+                                   width: 100%;
+                            }
+                            .feed-post__button {
+                                   width: 100%;
+                                   justify-content: center;
                             }
                             .patron-card {
                                    grid-template-columns: 1fr;
